@@ -12,7 +12,7 @@ final class ServerRunner {
     private static final int DEFAULT_PORT = 8080;
     private static volatile ServerRunner instance;
     private AndroidWebServer androidWebServer;
-    private boolean isEnableLogging;
+    private boolean enabledInternalLogging;
 
     private ServerRunner() { }
 
@@ -29,13 +29,13 @@ final class ServerRunner {
         return localInstance;
     }
 
-    void init(Context context, boolean isEnableLogging) {
+    void init(Context context, boolean enabledInternalLogging) {
         if (isAlive()) {
             print(context.getString(R.string.debugger_already_running));
             return;
         }
 
-        this.isEnableLogging = isEnableLogging;
+        this.enabledInternalLogging = enabledInternalLogging;
 
         String ip = HttpUtils.getIpAccess(context);
 
@@ -47,16 +47,6 @@ final class ServerRunner {
         } catch (Exception ex) {
             printErr(context.getString(R.string.error_start_server), ex);
         }
-    }
-
-    private void print(String text) {
-        if (isEnableLogging)
-            Log.d(TAG, text);
-    }
-
-    private void printErr(String text, Throwable th) {
-        if (isEnableLogging)
-            Log.e(TAG, text, th);
     }
 
     boolean isAlive() {
@@ -71,5 +61,15 @@ final class ServerRunner {
 
         androidWebServer = null;
         instance = null;
+    }
+
+    private void print(String text) {
+        if (enabledInternalLogging)
+            Log.d(TAG, text);
+    }
+
+    private void printErr(String text, Throwable th) {
+        if (enabledInternalLogging)
+            Log.e(TAG, text, th);
     }
 }

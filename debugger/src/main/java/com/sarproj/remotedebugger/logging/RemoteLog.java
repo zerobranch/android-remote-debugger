@@ -1,140 +1,64 @@
 package com.sarproj.remotedebugger.logging;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
+import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.managers.continuous.LogDataBaseManager;
-import com.sarproj.remotedebugger.source.local.LogLevels;
 import com.sarproj.remotedebugger.source.models.LogModel;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public final class RemoteLog {
     private static final String DEFAULT_TAG = RemoteLog.class.getSimpleName();
 
-    public static void v(String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.VERBOSE.name(), DEFAULT_TAG, msg));
+    public void log(LogLevel logLevel, String tag, String msg, Throwable th) {
+        if (tag == null) {
+            tag = DEFAULT_TAG;
+        }
+
+        if (msg != null && msg.length() == 0) {
+            msg = null;
+        }
+
+        if (msg == null) {
+            if (th == null) {
+                return;
+            }
+            msg = getStacktrace(th);
+        } else {
+            if (th != null) {
+                msg += "\n" + getStacktrace(th);
+            }
+        }
+
+        getDataBase().add(new LogModel(logLevel.name(), tag, msg));
+
+        if (RemoteDebugger.isEnabledDefaultLogging()) {
+            defaultLog(logLevel.priority(), tag, msg, th);
         }
     }
 
-    public static void v(String tag, String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.VERBOSE.name(), tag, msg));
+    private void defaultLog(int priority, String tag, String msg, Throwable th) {
+        Logger logger = RemoteDebugger.getLogger();
+        if (logger == null) {
+            logger = new DefaultLogger();
         }
+        logger.log(priority, tag, msg, th);
     }
 
-    public static void v(String tag, String msg, Throwable th) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.VERBOSE.name(), tag, msg + getStacktrace(th)));
-        }
-    }
-
-    public static void d(String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.DEBUG.name(), DEFAULT_TAG, msg));
-        }
-    }
-
-    public static void d(String tag, String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.DEBUG.name(), tag, msg));
-        }
-    }
-
-    public static void d(String tag, String msg, Throwable th) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.DEBUG.name(), tag, msg + getStacktrace(th)));
-        }
-    }
-
-    public static void i(String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.INFO.name(), DEFAULT_TAG, msg));
-        }
-    }
-
-    public static void i(String tag, String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.INFO.name(), tag, msg));
-        }
-    }
-
-    public static void i(String tag, String msg, Throwable th) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.INFO.name(), tag, msg + getStacktrace(th)));
-        }
-    }
-
-    public static void w(String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.WARN.name(), DEFAULT_TAG, msg));
-        }
-    }
-
-    public static void w(String tag, String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.WARN.name(), tag, msg));
-        }
-    }
-
-    public static void w(String tag, String msg, Throwable th) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.WARN.name(), tag, msg + getStacktrace(th)));
-        }
-    }
-
-    public static void e(String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.ERROR.name(), DEFAULT_TAG, msg));
-        }
-    }
-
-    public static void e(String tag, String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.ERROR.name(), tag, msg));
-        }
-    }
-
-    public static void e(String tag, String msg, Throwable th) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.ERROR.name(), tag, msg + getStacktrace(th)));
-        }
-    }
-
-    public static void f(String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.FATAL.name(), DEFAULT_TAG, msg));
-        }
-    }
-
-    public static void f(String tag, String msg) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.FATAL.name(), tag, msg));
-        }
-    }
-
-    public static void f(String tag, String msg, Throwable th) {
-        if (isAliveRemoteServices()) {
-            getDataBase().add(new LogModel(LogLevels.FATAL.name(), tag, msg + getStacktrace(th)));
-        }
-    }
-
-    private static String getStacktrace(Throwable th) {
-        try (StringWriter sw = new StringWriter();
-             PrintWriter pw = new PrintWriter(sw)) {
-            th.printStackTrace(pw);
-            return "\n".concat(sw.toString());
-        } catch (IOException ignore) {
+    private String getStacktrace(Throwable th) {
+        if (th == null) {
             return "";
         }
+
+        StringWriter sw = new StringWriter(256);
+        PrintWriter pw = new PrintWriter(sw, false);
+        th.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
     }
 
-    private static boolean isAliveRemoteServices() {
-        return RemoteDebugger.isAlive();
-    }
-
-    private static LogDataBaseManager getDataBase() {
+    private LogDataBaseManager getDataBase() {
         return LogDataBaseManager.getInstance();
     }
 }

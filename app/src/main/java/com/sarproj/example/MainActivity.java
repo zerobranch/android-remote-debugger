@@ -7,7 +7,6 @@ import android.view.View;
 import com.sarproj.example.db.DBHelper;
 import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.logging.NetLoggingInterceptor;
-import com.sarproj.remotedebugger.logging.RemoteLog;
 
 import java.io.IOException;
 
@@ -26,7 +25,12 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new DBHelper(getApplicationContext());
 
         setContentView(R.layout.activity_main);
-        RemoteDebugger.init(getApplicationContext(), true, true);
+        RemoteDebugger.init(getApplicationContext());
+
+        new RemoteDebugger.Builder(getApplication())
+                .enabled(true)
+                .enabledInternalLogging(true)
+                .build();
 
 //        RemoteLog.d("My debug");
 //        RemoteLog.d("My debug", "testTag");
@@ -68,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int i = 4;
                 while (i > 0) {
-                    RemoteLog.d("testTag", "[ " + i + " ] debug это уровенть отладки");
+                    RemoteDebugger.d("testTag", "[ " + i + " ] debug это уровенть отладки");
                     i--;
                 }
 
                 i = -4;
                 while (i < 0) {
-                    RemoteLog.d("farcry", "[ " + i + " ] debug это уровенть отладки");
+                    RemoteDebugger.d("farcry", "[ " + i + " ] debug это уровенть отладки");
                     i++;
                 }
             }
@@ -85,15 +89,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int i = 4;
                 while (i > 0) {
-                    RemoteLog.i("testTag", "[ " + i + " ] info информационная линия просмотра");
+                    RemoteDebugger.i("testTag", "[ " + i + " ] info информационная линия просмотра");
                     i--;
                 }
 
-                RemoteLog.i("testTag", "[ " + 3 + " ] info самая минимальная линия");
+                RemoteDebugger.i("testTag", "[ " + 3 + " ] info самая минимальная линия");
 
                 i = -4;
                 while (i < 0) {
-                    RemoteLog.i("farcry", "[ " + i + " ] info информационная линия просмотра");
+                    RemoteDebugger.i("farcry", "[ " + i + " ] info информационная линия просмотра");
                     i++;
                 }
             }
@@ -104,15 +108,27 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int i = 4;
                 while (i > 0) {
-                    RemoteLog.v("testTag", "[ " + i + " ] verbose самая минимальная линия");
+                    RemoteDebugger.v("testTag", "[ " + i + " ] verbose самая минимальная линия");
                     i--;
                 }
 
                 i = -4;
                 while (i < 0) {
-                    RemoteLog.v("farcry", "[ " + i + " ] verbose самая минимальная линия");
+                    RemoteDebugger.v("farcry", "[ " + i + " ] verbose самая минимальная линия");
                     i++;
                 }
+            }
+        });
+
+        findViewById(R.id.error).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                try {
+                    int a = 1 / 0;
+                } catch (Throwable th) {
+                    RemoteDebugger.e("testTag", "asd", th);
+                }
+                return false;
             }
         });
 
@@ -121,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int i = 4;
                 while (i > 0) {
-                    RemoteLog.e("testTag", "[ " + i + " ] error " +
+                    RemoteDebugger.e("testTag", "[ " + i + " ] error " +
                             "2019-04-10 21:32:32.374 23388-23413/? E/StandaloneKeepAlive: Attempting to start service when the app is in background is not allowed on Android O+. Intent: Intent { cmp=com.google.android.googlequicksearchbox/com.google.android.apps.gsa.shared.util.keepalive.StandaloneKeepAlive$KeepAliveService }\n" +
                             "    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=com.google.android.googlequicksearchbox/com.google.android.apps.gsa.shared.util.keepalive.StandaloneKeepAlive$KeepAliveService }: app is in background uid UidRecord{60ade97 u0a35 TRNB bg:+1h36m26s353ms idle change:uncached procs:1 seq(163,163,163)}\n" +
                             "        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1577)\n" +
@@ -150,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
                 i = -4;
                 while (i < 0) {
-                    RemoteLog.e("farcry", "[ " + i + " ] error тут возможно произошла ошибка");
+                    RemoteDebugger.e("farcry", "[ " + i + " ] error тут возможно произошла ошибка");
                     i++;
                 }
             }
@@ -161,13 +177,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int i = 4;
                 while (i > 0) {
-                    RemoteLog.w("testTag", "[ " + i + " ] warn это навернео уровень предупреждения");
+                    RemoteDebugger.w("testTag", "[ " + i + " ] warn это навернео уровень предупреждения");
                     i--;
                 }
 
                 i = -4;
                 while (i < 0) {
-                    RemoteLog.w("farcry", "[ " + i + " ] warn это навернео уровень предупреждения");
+                    RemoteDebugger.w("farcry", "[ " + i + " ] warn это навернео уровень предупреждения");
                     i++;
                 }
             }
@@ -178,13 +194,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int i = 4;
                 while (i > 0) {
-                    RemoteLog.f("testTag", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
+                    RemoteDebugger.f("testTag", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
                     i--;
                 }
 
                 i = -4;
                 while (i < 0) {
-                    RemoteLog.f("farcry", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
+                    RemoteDebugger.f("farcry", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
                     i++;
                 }
             }

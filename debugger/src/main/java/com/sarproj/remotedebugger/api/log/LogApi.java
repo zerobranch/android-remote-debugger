@@ -6,7 +6,7 @@ import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.settings.Settings;
 import com.sarproj.remotedebugger.source.managers.continuous.LogDataBaseManager;
-import com.sarproj.remotedebugger.source.local.LogLevels;
+import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.http.Host;
@@ -114,7 +114,7 @@ public final class LogApi extends Api {
             offset = Integer.parseInt(primaryOffset);
         }
 
-        if (LogLevels.VERBOSE.name().equalsIgnoreCase(primaryLevel)) {
+        if (LogLevel.VERBOSE.name().equalsIgnoreCase(primaryLevel)) {
             primaryLevel = null;
         }
 
@@ -126,6 +126,6 @@ public final class LogApi extends Api {
     }
 
     private String getLogLevels() {
-        return serialize(new ArrayList<>(Arrays.asList(LogLevels.values())));
+        return serialize(new ArrayList<>(Arrays.asList(LogLevel.values())));
     }
 }
