@@ -1,0 +1,89 @@
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+    background: white;;
+}
+
+.header-content {
+    background: #222;
+    height: 180px;
+    padding-top:70px;
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+#headerTitle {
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #c9c9c9;
+}
+
+#headerSecondTitle {
+    font-size: 30px;
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 1px;
+    color: #c9c9c9;
+}
+
+.selection-button {
+    float:right;
+    border: 1px solid #222;
+    outline: none !important;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 16pt;
+    width: 300px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    color:#515151;
+    cursor:pointer;
+    margin-right: 10px;
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+.selection-button:hover {
+    background-color: #eee;
+}
+
+#headerButton {
+    font-family: 'Josefin Sans', sans-serif;
+    float:right;
+    color: #c9c9c9;
+    margin-right:25px;
+    margin-top:20px;
+    letter-spacing: 0.3px;
+    font-size: 14pt;
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+    border: 1px solid #c9c9c9;
+    border-radius: 3px;
+}
+
+#headerButton:hover {
+    color: #ffab00;
+    border-color: #ffab00;
+}
+
+#headerButton:active {
+   opacity: 0.8;
+}
+
+#selectionMenu {
+    margin-top: 70px;
+}
+
+.root-section {
+    margin: auto;
+    display: table;
+    margin-top: 10px;
+}

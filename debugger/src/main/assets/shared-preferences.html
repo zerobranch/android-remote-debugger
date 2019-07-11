@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Remote database</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="css/shared-preferences.css">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet">
+
+    <script language="JavaScript">
+        function httpPost(url, body, successCallback, errorCallback) {
+            url = '/' + url;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('post', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        successCallback();
+                    } else if (errorCallback != null) {
+                        errorCallback(xhr.status, xhr.statusText, xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.send(body);
+        }
+
+        function httpGet(url, params, successCallback, errorCallback) {
+            url = url + "?" + params;
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        successCallback(xhr.responseText);
+                    } else if (errorCallback != null) {
+                        errorCallback(xhr.status, xhr.statusText, xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.open('get', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(null);
+        }
+    </script>
+</head>
+<body onresize="onPageResize()">
+
+<div id="header">
+    <div id="headerLeft">
+        <div id="controlPanel">
+            <div id="tableControlPanel">
+                <label for="sharedPrefsChooser"></label>
+                <select id="sharedPrefsChooser" onchange="onSharedPrefsSelected()">
+                    <option disabled selected value="non">Not chosen</option>
+                </select>
+            </div>
+
+            <div id="actionsPanel">
+                <svg id="selectAll" class="default-btn panel-action-item" onclick="onSelectingAllClick()" height="30"
+                     viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,5h2L5,3c-1.1,0 -2,0.9 -2,2zM3,13h2v-2L3,11v2zM7,21h2v-2L7,19v2zM3,9h2L5,7L3,7v2zM13,3h-2v2h2L13,3zM19,3v2h2c0,-1.1 -0.9,-2 -2,-2zM5,21v-2L3,19c0,1.1 0.9,2 2,2zM3,17h2v-2L3,15v2zM9,3L7,3v2h2L9,3zM11,21h2v-2h-2v2zM19,13h2v-2h-2v2zM19,21c1.1,0 2,-0.9 2,-2h-2v2zM19,9h2L21,7h-2v2zM19,17h2v-2h-2v2zM15,21h2v-2h-2v2zM15,5h2L17,3h-2v2zM7,17h10L17,7L7,7v10zM9,9h6v6L9,15L9,9z"></path>
+                </svg>
+                <svg id="addTableRecord" class="default-btn panel-action-item" onclick="onAddTableRecordClick()"
+                     height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                </svg>
+                <svg id="changeTableRecord" class="default-btn panel-action-item" onclick="onChangeTableRecordClick()"
+                     height="30" viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z"></path>
+                </svg>
+                <svg id="deleteTableRecord" class="default-btn panel-action-item" onclick="onDeleteTableRecordClick()"
+                     height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div id="headerRight">
+            <a href="/" id="rightTitle">Home</a>
+
+            <input type="text" id="changeContentFont" class="default-input" onkeyup="onFontChanged(this)" placeholder="Size" title="Text size">
+            <input type="text" id="search" class="default-input" placeholder="Search for text.." title="Type in a text">
+
+            <div id="connectionStatus">Connected</div>
+
+            <div id="moreContent" class="dropdown">
+                <svg id="more" class="open-dropdown-btn default-btn" onclick="onMoreClick()" height="35" viewBox="0 0 24 24" width="35"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,10c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2zM12,16c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2z"></path>
+                </svg>
+                <div id="moreItems" class="dropdown-content">
+                    <label id="dropDatabase" class="dropdown-content-item more-items" onclick="onDropSharedPrefsClick()">Drop SharedPreferences</label>
+                </div>
+            </div>
+
+            <div id="theme">
+                <svg id="darkTheme" onclick="onChangeThemeClick(true)" height="30" viewBox="0 0 24 24" width="30"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M0 0h24v24H0z" fill="none"></path>
+                </svg>
+                <svg id="lightTheme" onclick="onChangeThemeClick(false)" height="30" viewBox="0 0 24 24" width="30"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path fill="none" d="M0 0h24v24H0V0z"></path>
+                    <path d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                </svg>
+            </div>
+
+            <svg id="refresh" class="default-btn" onclick="onRefresh()" height="35" viewBox="0 0 24 24" width="35"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M12,4L12,1L8,5l4,4L12,6c3.31,0 6,2.69 6,6 0,1.01 -0.25,1.97 -0.7,2.8l1.46,1.46C19.54,15.03 20,13.57 20,12c0,-4.42 -3.58,-8 -8,-8zM12,18c-3.31,0 -6,-2.69 -6,-6 0,-1.01 0.25,-1.97 0.7,-2.8L5.24,7.74C4.46,8.97 4,10.43 4,12c0,4.42 3.58,8 8,8v3l4,-4 -4,-4v3z"></path>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<div id="baseContent" class="base-content-dark-style">
+    <div id="auxiliaryContainer">
+        <div id="infoContent" class="info-content-dark-style"></div>
+        <div id="notificationContent" class="notification-content-dark-style">No data</div>
+        <div id="loader"></div>
+    </div>
+
+    <div id="tableContent" class="table-content-dark-style">
+        <table id="dataTableContent" class="table-dark-style">
+        </table>
+        <div id="tableInfo" class="table-info-dark-style"></div>
+    </div>
+</div>
+
+<div id="changeTableItemModal" class="modal">
+    <div id="changeTableSmallModal" class="small-modal-item-content modal-content detail-item-content-dark-style">
+        <div class="modal-header modal-header-dark-style" id="detailItemHeader">
+            Edit Item
+        </div>
+
+        <hr class="hr-modal"/>
+
+        <div id="changeTableSmallBody" class="modal-input-fields-body modal-input-fields-body-dark-style">
+            <div class="detail-item-body">
+                <p><label for="changeModalKey" class="detail-item-header detail-item-header-dark-style">Key</label></p>
+                <input id="changeModalKey" readonly placeholder="Key" class="detail-item-input detail-item-input-dark-style" type="text" name="Key">
+            </div>
+            <div class="detail-item-body">
+                <p><label for="changeModalValue" class="detail-item-header detail-item-header-dark-style">Value</label>
+                    <span id="setStringHint" class="set-string-hint">enter values separated by commas</span>
+                </p>
+                <input id="changeModalValue" placeholder="Boolean" class="detail-item-input detail-item-input-dark-style" type="text" name="Value">
+                <label for="booleanSelector"></label>
+                <select id="booleanSelector" class="hide booleanSelector default-selector default-selector-dark-style">
+                    <option id="selectorOptionTrue" value="true">true</option>
+                    <option id="selectorOptionFalse" value="false">false</option>
+                </select>
+                <div id="itemType">Type: </div>
+            </div>
+        </div>
+
+        <hr class="hr-modal"/>
+
+        <div class="detail-actions-footer-dark-style" id="detailActionsFooter">
+            <button class="modal-action_button default-button default-button-dark-style" id="detailActionButton"
+                    type="button" onclick="onSaveChangedDataClick()" name="saveChangedData">Save</button>
+            <button class="modal-action_button default-button default-button-dark-style" id="detailCancelAlertButton"
+                    type="button" onclick="onCancelChangingDataClick()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="addTableItemModal" class="modal">
+    <div id="addTableItemModalContent" class="small-modal-item-content modal-content detail-item-content-dark-style">
+        <div class="modal-header modal-header-dark-style" id="addItemHeader">
+            Add Item
+        </div>
+
+        <hr class="hr-modal"/>
+
+        <div class="modal-input-fields-body">
+            <div class="detail-item-body">
+                <p><label class="detail-item-header" for="typeSelector">Type</label></p>
+                <select id="typeSelector" onchange="onAddItemTypeSelect()" class="booleanSelector default-selector default-selector-dark-style">
+                    <option id="selectorOptionString" selected value="String">String</option>
+                    <option id="selectorOptionInteger" value="Integer">Integer</option>
+                    <option id="selectorOptionLong" value="Long">Long</option>
+                    <option id="selectorOptionFloat" value="Float">Float</option>
+                    <option id="selectorOptionBoolean" value="Boolean">Boolean</option>
+                    <option id="selectorOptionSetString" value="Set<String>">Set&lt;String&gt;</option>
+                </select>
+            </div>
+            <div class="detail-item-body">
+                <p><label for="addItemModalKey" class="detail-item-header">Key</label></p>
+                <input id="addItemModalKey" placeholder="Key"
+                       class="detail-item-input detail-item-input-dark-style" type="text" name="Key">
+            </div>
+            <div class="detail-item-body">
+                <p>
+                    <label for="addModalSelect" class="detail-item-header">Value</label>
+                    <span id="addItemSetStringHint" class="set-string-hint">enter values separated by commas</span>
+                </p>
+                <input id="addModalSelect" placeholder="String"
+                       class="detail-item-input detail-item-input-dark-style" type="text" name="Value">
+                <label for="addItemsBooleanSelector"></label>
+                <select id="addItemsBooleanSelector" class="hide booleanSelector default-selector default-selector-dark-style">
+                    <option id="optionTrue" value="true">true</option>
+                    <option id="optionFalse" value="false">false</option>
+                </select>
+            </div>
+        </div>
+
+        <hr class="hr-modal"/>
+
+        <div class="detail-actions-footer-dark-style" id="addItemActionsFooter">
+            <button class="modal-action_button default-button default-button-dark-style" id="addItemActionButton"
+                    type="button" onclick="onSaveNewDataClick()" name="saveAddData">Save
+            </button>
+            <button class="modal-action_button default-button default-button-dark-style" id="addItemCancelAlertButton"
+                    type="button" onclick="onCancelAddDataClick()">Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmationModal" class="modal small-modal">
+    <div id="confirmationModalContent" class="modal-content confirmation-modal-content-dark-style">
+        <div id="confirmationModalHeader">Are you sure?</div>
+
+        <hr class="hr-modal">
+
+        <div id="confirmationActionContent">
+            <button class="default-button confirm-button-dark-style" id="actionButton" onclick="onConfirmDropClick()">Drop</button>
+            <button class="default-button cancel-confirm-button-dark-style" id="cancelConfirmButton" onclick="onCancelDropClick()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="errorContent" class="error-content-dark-style">
+    <pre id="errorText"></pre>
+
+    <svg id="closeErrorContent" class="close-error-content-dark-style" onclick="onCloseErrorContentClick()" height="30"
+         viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"></path>
+    </svg>
+
+    <svg id="copyErrorContent" class="copy-error-content-white-style" onclick="onErrorTextClick()" height="23"
+         viewBox="0 0 24 24" width="23" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z"></path>
+    </svg>
+    <span id="errorTextCopied" class="tooltip-text">Copied!</span>
+</div>
+
+</body>
+<script>
+    // region Init constants
+    const DEFAULT_FONT_SIZE = 12;
+    const DARK_THEME = "DARK";
+    const LIGHT_THEME = "LIGHT";
+    const ESC_KEYCODE = 27;
+    const TABLE_HEADER_SIZE = 1;
+    const CHOOSE_SHARED_PREFERENCES_TEXT = "Choose a SharedPreferences";
+    const NUMBER_OF_RECORDS = "Number of records";
+    const DELETE_DATABASE_QUESTION_TEXT = "Are you sure you want to delete the current <span class='markText'>SharedPreferences</span>?";
+    const DELETE_ENTITY_QUESTION_TEXT = "Are you sure?";
+    const CONNECTION_LOST_MESSAGE = "Connection lost!";
+    const ITEM_TYPE_MSG = "Type: ";
+    const SHARED_NOT_CHOSEN_VALUE = "not_chosen";
+
+    const FIELD_TYPE_INTEGER = "Integer";
+    const FIELD_TYPE_LONG = "Long";
+    const FIELD_TYPE_FLOAT = "Float";
+    const FIELD_TYPE_STRING = "String";
+    const FIELD_TYPE_BOOLEAN = "Boolean";
+    const FIELD_TYPE_SET_STRING = "Set<String>";
+    // endregion
+
+    //region init variables
+    let changeTableItemModal = getElementById('changeTableItemModal');
+    let addTableItemModal = getElementById('addTableItemModal');
+    let tableInfo = getElementById("tableInfo");
+    let dropDatabase = getElementById("dropDatabase");
+    let notificationContent = getElementById("notificationContent");
+    let infoContent = getElementById("infoContent");
+    let deleteTableRecord = getElementById("deleteTableRecord");
+    let changeTableRecord = getElementById("changeTableRecord");
+    let addTableRecord = getElementById("addTableRecord");
+    let selectAllElement = getElementById("selectAll");
+    let dataTableContent = getElementById("dataTableContent");
+    let sharedPrefsChooser = getElementById("sharedPrefsChooser");
+    let lightTheme = getElementById("lightTheme");
+    let darkTheme = getElementById("darkTheme");
+    let connectionStatus = getElementById("connectionStatus");
+    let loader = getElementById("loader");
+    let errorContent = getElementById('errorContent');
+    let errorText = getElementById('errorText');
+    let detailActionButton = getElementById('detailActionButton');
+    let search = getElementById('search');
+    let confirmationModal = getElementById('confirmationModal');
+    let confirmationModalHeader = getElementById('confirmationModalHeader');
+    let baseContent = getElementById('baseContent');
+    let tableContent = getElementById('tableContent');
+    let closeErrorContent = getElementById('closeErrorContent');
+    let detailItemHeader = getElementById('detailItemHeader');
+    let detailActionsFooter = getElementById('detailActionsFooter');
+    let confirmationModalContent = getElementById('confirmationModalContent');
+    let actionButton = getElementById('actionButton');
+    let cancelConfirmButton = getElementById('cancelConfirmButton');
+    let detailCancelAlertButton = getElementById('detailCancelAlertButton');
+    let changeContentFont = getElementById('changeContentFont');
+    let moreItems = getElementById('moreItems');
+    let moreContent = getElementById('moreContent');
+    let header = getElementById('header');
+    let headerRight = getElementById('headerRight');
+    let changeModalKey = getElementById('changeModalKey');
+    let booleanSelector = getElementById('booleanSelector');
+    let addItemsBooleanSelector = getElementById('addItemsBooleanSelector');
+    let selectorOptionTrue = getElementById('selectorOptionTrue');
+    let selectorOptionFalse = getElementById('selectorOptionFalse');
+    let setStringHint = getElementById('setStringHint');
+    let addItemSetStringHint = getElementById('addItemSetStringHint');
+    let itemType = getElementById('itemType');
+    let typeSelector = getElementById('typeSelector');
+    let addItemModalKey = getElementById('addItemModalKey');
+    let changeTableSmallModal = getElementById('changeTableSmallModal');
+    let changeTableSmallBody = getElementById('changeTableSmallBody');
+    let addTableItemModalContent = getElementById('addTableItemModalContent');
+    let addItemHeader = getElementById('addItemHeader');
+    let addItemActionButton = getElementById('addItemActionButton');
+    let addItemCancelAlertButton = getElementById('addItemCancelAlertButton');
+    let addItemActionsFooter = getElementById('addItemActionsFooter');
+    let copyErrorContent = getElementById('copyErrorContent');
+    let errorTextCopied = getElementById('errorTextCopied');
+    //endregion
+
+    let isDarkTheme = true;
+    let isConnectionLost = false;
+    let selectedSharedPrefs = null;
+    let selectedItemForChange = null;
+    let selectedTableRecordsPositions = [];
+    let isSelectedAllTableRecords = false;
+    let lastSearchText = "";
+    let deleteSharedPrefsMark = false;
+    let currentContentFont = DEFAULT_FONT_SIZE;
+    let headerRightDefaultY = headerRight.offsetTop;
+
+    window.onload = function () {
+        updateControlPanelState();
+        loadDefaultsSetting();
+        loadSharedPreferencesNames();
+
+        window.addEventListener("keyup", onGlobalKeyUp);
+        search.addEventListener("keyup", onSearchKeyUp);
+        onPageResize();
+    };
+
+    window.onclick = function (e) {
+        if (!e.target.matches('.dropdown-btn')) {
+            hideDropdown();
+        }
+
+        if (!e.target.matches('.open-dropdown-btn')) {
+            hideElement(moreItems);
+        }
+
+        if (e.target === changeTableItemModal) {
+            hideChangeTableItemModal();
+        }
+
+        if (e.target === addTableItemModal) {
+            hideAddTableItemModal();
+        }
+
+        if (e.target === confirmationModal) {
+            hideConfirmationModal();
+        }
+    };
+
+    function loadDefaultsSetting() {
+        showLoader();
+        const body = 'getDefaultsSettings=' + encodeURIComponent('');
+        httpGet('shared-preferences', body, function (response) {
+            hideLoader();
+            let settings = JSON.parse(response);
+
+            currentContentFont = settings['sharedPreferencesFont'];
+            isDarkTheme = settings['theme'] === DARK_THEME;
+            changeTheme(isDarkTheme);
+
+            setContentFont(currentContentFont);
+
+            if (DEFAULT_FONT_SIZE !== currentContentFont) {
+                changeContentFont.value = currentContentFont;
+            }
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function saveDefaultsSetting() {
+        let setting = {};
+        setting.theme = isDarkTheme === true ? DARK_THEME : LIGHT_THEME;
+        setting.sharedPreferencesFont = currentContentFont;
+
+        let body = 'saveDefaultsSetting=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(JSON.stringify(setting));
+
+        httpPost('shared-preferences', body, function () {
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    // region Ui events
+    function onMoreClick() {
+        showElement(moreItems);
+    }
+
+    function onPageResize() {
+        if (headerRight.offsetTop > headerRightDefaultY + 8) {
+            header.style.height = "130px";
+            baseContent.style.top = "131px";
+            headerRight.style.marginTop = "8px";
+        } else {
+            header.style.height = "90px";
+            baseContent.style.top = "91px";
+            headerRight.style.marginTop = "0px";
+        }
+    }
+
+    function onConfirmDropClick() {
+        if (deleteSharedPrefsMark) {
+            executeDropSharedPrefs();
+        }
+
+        deleteSharedPrefsMark = false;
+    }
+
+    function onCancelDropClick() {
+        hideConfirmationModal();
+    }
+
+    function onErrorTextClick() {
+        copyToClipboard(errorText.innerHTML);
+        visibleElement(errorTextCopied);
+
+        let tooltipTimeout = setTimeout(function () {
+            clearInterval(tooltipTimeout);
+            invisibleElement(errorTextCopied);
+        }, 800);
+    }
+
+    function onSearchKeyUp() {
+        executeSearch(search.value.trim());
+    }
+
+    function onGlobalKeyUp(event) {
+        if (event.keyCode === ESC_KEYCODE) {
+            event.preventDefault();
+            hideChangeTableItemModal();
+            hideAddTableItemModal();
+            hideConfirmationModal();
+        }
+    }
+
+    function onFontChanged(item) {
+        if (isNumber(item.value)) {
+            currentContentFont = item.value;
+            setContentFont(currentContentFont);
+            saveDefaultsSetting();
+        }
+    }
+
+    function onCloseErrorContentClick() {
+        clearContent(errorText);
+        hideElement(errorContent);
+    }
+
+    function onDropSharedPrefsClick() {
+        if (!isSelectedSharedPrefs()) {
+            return
+        }
+
+        deleteSharedPrefsMark = true;
+        confirmationModalHeader.innerHTML = DELETE_DATABASE_QUESTION_TEXT;
+        showElement(confirmationModal);
+    }
+
+    function onRefresh() {
+        hideElement(notificationContent);
+        hideElement(infoContent);
+
+        loadSharedPreferencesNames();
+
+        if (lastSearchText !== "") {
+            executeSearch(lastSearchText)
+        } else if (isSelectedSharedPrefs()) {
+            loadSharedPrefItem();
+        }
+    }
+
+    function onTableLineClick(position) {
+        let tableLine = getElementsByClassName("item-row-content")[position];
+
+        if (selectedTableRecordsPositions.includes(position)) {
+            removeByItem(selectedTableRecordsPositions, position);
+            setTableLineSelected(tableLine, false);
+        } else {
+            setTableLineSelected(tableLine, true);
+            selectedTableRecordsPositions.push(position);
+        }
+
+        updateControlPanelState();
+        onPageResize();
+    }
+
+    function onDeleteTableRecordClick() {
+        let keysJson = "[";
+        for (let i = 0; i < selectedTableRecordsPositions.length; i++) {
+            let tableItem = getCurrentTableValuesMap(selectedTableRecordsPositions[i] + TABLE_HEADER_SIZE);
+            keysJson += '"' + tableItem.key + '",';
+        }
+        keysJson = removeLast(keysJson) + ']';
+
+        let body = 'remove=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(keysJson);
+
+        httpPost('shared-preferences', body, function () {
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function onAddTableRecordClick() {
+        recreateNode(getElementById("addModalSelect"));
+        typeSelector.selectedIndex = 0;
+        addItemsBooleanSelector.selectedIndex = 0;
+
+        let updateAddModalSelect = getElementById("addModalSelect");
+        updateAddModalSelect.placeholder = FIELD_TYPE_STRING;
+        updateAddModalSelect.value = "";
+        addItemModalKey.value = "";
+
+        hideElement(addItemsBooleanSelector);
+        hideElement(addItemSetStringHint);
+        showElement(updateAddModalSelect);
+
+        showElement(addTableItemModal);
+    }
+
+    function onChangeTableRecordClick() {
+        if (selectedTableRecordsPositions.length === 1) {
+            onChangeTableItemClick(selectedTableRecordsPositions[0])
+        }
+    }
+
+    function onSelectingAllClick() {
+        isSelectedAllTableRecords = !isSelectedAllTableRecords;
+        let tableRecordsSize = getElementsByClassName("item-row-content").length;
+
+        selectedTableRecordsPositions = [];
+
+        for (let i = 0; i < tableRecordsSize; i++) {
+            let tableLine = getElementsByClassName("item-row-content")[i];
+
+            if (isSelectedAllTableRecords) {
+                selectedTableRecordsPositions.push(i);
+                setTableLineSelected(tableLine, true);
+            } else {
+                setTableLineSelected(tableLine, false);
+            }
+        }
+
+        updateControlPanelState();
+    }
+
+    function onCancelChangingDataClick() {
+        hideChangeTableItemModal();
+    }
+
+    function onCancelAddDataClick() {
+        hideAddTableItemModal();
+    }
+
+    function onAddItemTypeSelect() {
+        let type = typeSelector.options[typeSelector.selectedIndex].value;
+
+        recreateNode(getElementById("addModalSelect"));
+        let updateAddModalSelect = getElementById("addModalSelect");
+        updateAddModalSelect.placeholder = type;
+
+        if (type === FIELD_TYPE_INTEGER || type === FIELD_TYPE_LONG) {
+            hideElement(addItemsBooleanSelector);
+            hideElement(addItemSetStringHint);
+            showElement(updateAddModalSelect);
+
+            updateAddModalSelect.value = "";
+            setInputFilter(updateAddModalSelect, /^[-]?\d*$/);
+        } else if (type === FIELD_TYPE_FLOAT) {
+            hideElement(addItemsBooleanSelector);
+            hideElement(addItemSetStringHint);
+            showElement(updateAddModalSelect);
+
+            updateAddModalSelect.value = "";
+            setInputFilter(updateAddModalSelect, /^[-]?(\d*[.])?\d*$/);
+        } else if (type === FIELD_TYPE_BOOLEAN) {
+            showElement(addItemsBooleanSelector);
+            hideElement(updateAddModalSelect);
+            hideElement(addItemSetStringHint);
+            updateAddModalSelect.value = "";
+        } else if (type === FIELD_TYPE_SET_STRING) {
+            hideElement(addItemsBooleanSelector);
+            showElement(updateAddModalSelect);
+            showElement(addItemSetStringHint);
+        } else {
+            hideElement(addItemsBooleanSelector);
+            hideElement(addItemSetStringHint);
+            showElement(updateAddModalSelect);
+        }
+    }
+
+    function onChangeTableItemClick(position) {
+        detailActionButton.value = position;
+
+        selectedItemForChange = getCurrentTableValuesMap(position + TABLE_HEADER_SIZE);
+
+        let key = selectedItemForChange.key;
+        let value = selectedItemForChange.value;
+        let varType = selectedItemForChange.varType;
+
+        createChangeModalField(key, value, varType);
+        showElement(changeTableItemModal);
+    }
+
+    function createChangeModalField(key, value, varType) {
+        recreateNode(getElementById("changeModalValue"));
+
+        let updateChangeModalValue = getElementById("changeModalValue");
+
+        if (varType === FIELD_TYPE_INTEGER || varType === FIELD_TYPE_LONG) {
+            hideElement(booleanSelector);
+            hideElement(setStringHint);
+            showElement(updateChangeModalValue);
+
+            setInputFilter(updateChangeModalValue, /^[-]?\d*$/);
+        } else if (varType === FIELD_TYPE_FLOAT) {
+            hideElement(booleanSelector);
+            hideElement(setStringHint);
+            showElement(updateChangeModalValue);
+
+            setInputFilter(updateChangeModalValue, /^[-]?(\d*[.])?\d*$/);
+        } else if (varType === FIELD_TYPE_BOOLEAN) {
+            if (value === "true") {
+                selectorOptionTrue.selected = true;
+            } else {
+                selectorOptionFalse.selected = true;
+            }
+
+            showElement(booleanSelector);
+            hideElement(updateChangeModalValue);
+            hideElement(setStringHint);
+        } else if (varType === FIELD_TYPE_SET_STRING) {
+            value = stringLastRemove(stringFirstRemove(value));
+            hideElement(booleanSelector);
+            showElement(updateChangeModalValue);
+            showElement(setStringHint);
+        } else {
+            hideElement(booleanSelector);
+            hideElement(setStringHint);
+            showElement(updateChangeModalValue);
+        }
+
+        changeModalKey.readOnly = true;
+        updateChangeModalValue.placeholder = varType;
+
+        changeModalKey.value = key;
+        updateChangeModalValue.value = value;
+        itemType.innerText = ITEM_TYPE_MSG + varType;
+        updateChangeModalValue.focus();
+    }
+
+    function recreateNode(oldElement) {
+        let newElement = oldElement.cloneNode(true);
+        oldElement.parentNode.replaceChild(newElement, oldElement);
+    }
+
+    function onSaveNewDataClick() {
+        let type = typeSelector.options[typeSelector.selectedIndex].value;
+        let value = "";
+
+        if (type === FIELD_TYPE_BOOLEAN) {
+            value = addItemsBooleanSelector.options[addItemsBooleanSelector.selectedIndex].value
+        } else if (type === FIELD_TYPE_SET_STRING) {
+            value = "[" + getElementById("addModalSelect").value + "]"
+        } else {
+            value = getElementById("addModalSelect").value
+        }
+
+        updateItem(addItemModalKey.value, value, type)
+    }
+
+    function onSaveChangedDataClick() {
+        if (selectedItemForChange.varType === FIELD_TYPE_BOOLEAN) {
+            selectedItemForChange.value = booleanSelector.options[booleanSelector.selectedIndex].value
+        } else if (selectedItemForChange.varType === FIELD_TYPE_SET_STRING) {
+            selectedItemForChange.value = "[" + getElementById("changeModalValue").value + "]"
+        } else {
+            selectedItemForChange.value = getElementById("changeModalValue").value
+        }
+
+        updateItem(selectedItemForChange.key, selectedItemForChange.value, selectedItemForChange.varType)
+    }
+
+    function updateItem(key, value, type) {
+        let bodyJson = '{' +
+            '"key":"' + key + '",' +
+            '"value":"' + value + '",' +
+            '"type":"' + type +
+            '"}';
+
+        let body = 'update=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(bodyJson);
+
+        httpPost('shared-preferences', body, function () {
+            hideChangeTableItemModal();
+            hideAddTableItemModal();
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function onChangeThemeClick(isDark) {
+        changeTheme(isDark);
+        saveDefaultsSetting();
+    }
+
+    // endregion
+
+    // region Base content
+    function loadSharedPreferencesNames() {
+        showLoader();
+
+        let body = 'getAllNames=' + encodeURIComponent('');
+        httpGet('shared-preferences', body, function (response) {
+            hideLoader();
+
+            if (!isSelectedSharedPrefs()) {
+                infoContent.innerHTML = CHOOSE_SHARED_PREFERENCES_TEXT;
+                clearContent(dataTableContent);
+                hideElement(tableInfo);
+                showElement(infoContent);
+            }
+
+            let sharedPreferencesNames = JSON.parse(response);
+            clearContent(sharedPrefsChooser);
+
+            creteDefaultSharedDropdownItem();
+
+            let selectedIndex = 0;
+
+            sharedPreferencesNames.forEach(function (sharedPrefsItem, index) {
+                let label = document.createElement("option");
+                label.className = "dropdown-content-item";
+                label.value = sharedPrefsItem;
+                label.innerHTML = sharedPrefsItem;
+
+                if (isSelectedSharedPrefs() && selectedSharedPrefs === sharedPrefsItem) {
+                    selectedIndex = index + 1;
+                }
+
+                sharedPrefsChooser.appendChild(label);
+            });
+
+            sharedPrefsChooser.selectedIndex = selectedIndex.toString();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function creteDefaultSharedDropdownItem() {
+        let label = document.createElement("option");
+        label.className = "dropdown-content-item";
+        label.value = SHARED_NOT_CHOSEN_VALUE;
+        label.innerHTML = "Not chosen";
+        label.disabled = true;
+        sharedPrefsChooser.appendChild(label);
+    }
+
+    function onSharedPrefsSelected() {
+        let sharedPrefsItem = sharedPrefsChooser.value;
+        if (sharedPrefsItem === SHARED_NOT_CHOSEN_VALUE) {
+            return
+        }
+
+        hideElement(infoContent);
+        hideElement(notificationContent);
+
+        selectedSharedPrefs = sharedPrefsItem;
+        clearContent(dataTableContent);
+        search.value = "";
+        lastSearchText = "";
+        setEnabled(search, false);
+        hideElement(tableInfo);
+        selectedTableRecordsPositions = [];
+        updateControlPanelState();
+        visibleElement(moreContent);
+        showElement(addTableRecord);
+        showElement(dropDatabase);
+
+        loadSharedPrefItem();
+    }
+
+    function loadSharedPrefItem() {
+        showLoader();
+        hideElement(notificationContent);
+        selectedTableRecordsPositions = [];
+        updateControlPanelState();
+
+        let body = 'getAll=' + encodeURIComponent('')
+            + '&' + 'name=' + encodeURIComponent(selectedSharedPrefs);
+
+        httpGet('shared-preferences', body, function (response) {
+            hideLoader();
+            clearContent(dataTableContent);
+
+            let sharedPreferenceData = JSON.parse(response);
+
+            setEnabled(search, true);
+
+            if (isEmptyTableContent(sharedPreferenceData)) {
+                showElement(notificationContent);
+                hideElement(tableInfo);
+                updateControlPanelState();
+                return;
+            } else {
+                hideElement(notificationContent);
+                tableInfo.innerHTML = NUMBER_OF_RECORDS + " " + sharedPreferenceData.length;
+                showElement(tableInfo);
+            }
+
+            let tableRow = dataTableContent.insertRow();
+            if (isDarkTheme) {
+                tableRow.className = "item-row item-row-header-dark-style";
+            } else {
+                tableRow.className = "item-row item-row-header-white-style";
+            }
+
+            createHeaderTableLine(tableRow);
+
+            sharedPreferenceData.forEach(function (tableItem, rowIndex) {
+                let tableRow = dataTableContent.insertRow();
+                let type = tableItem['type'];
+
+                if (isDarkTheme) {
+                    tableRow.className = type + " item-row item-row-content item-row-content-dark-style";
+                } else {
+                    tableRow.className = type + " item-row item-row-content item-row-content-white-style";
+                }
+
+                createContentTableLine(tableItem, tableRow, rowIndex);
+
+                tableRow.onclick = function () {
+                    onTableLineClick(rowIndex);
+                };
+            });
+
+            updateControlPanelState();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function executeDropSharedPrefs() {
+        let body = 'drop=' + encodeURIComponent('')
+            + '&' + 'name=' + encodeURIComponent(selectedSharedPrefs);
+
+        httpPost('shared-preferences', body, function () {
+            clearContent(dataTableContent);
+
+            invisibleElement(moreContent);
+            hideElement(addTableRecord);
+            hideElement(dropDatabase);
+            hideElement(tableInfo);
+            hideElement(confirmationModal);
+
+            search.value = "";
+            lastSearchText = "";
+            setEnabled(search, false);
+
+            selectedSharedPrefs = null;
+
+            selectedItemForChange = null;
+            selectedTableRecordsPositions = [];
+            isSelectedAllTableRecords = false;
+            updateControlPanelState();
+
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function executeSearch(searchText) {
+        lastSearchText = searchText;
+        if (!isSelectedSharedPrefs()) {
+            return
+        }
+
+        showLoader();
+
+        let filter = searchText.toUpperCase();
+        let tr = dataTableContent.getElementsByTagName("tr");
+
+        for (let i = 0; i < tr.length; i++) {
+            let keyTd = tr[i].getElementsByTagName("td")[0];
+            let valueTd = tr[i].getElementsByTagName("td")[1];
+
+            if (keyTd || valueTd) {
+                let keyText = keyTd.textContent || keyTd.innerText;
+                let valueText = valueTd.textContent || valueTd.innerText;
+
+                if (keyText.toUpperCase().indexOf(filter) > -1 || valueText.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+        hideLoader();
+    }
+
+    //endregion
+
+    // region Base functionality
+    function showErrorMessage(text) {
+        errorText.innerHTML = text;
+        showElement(errorContent);
+    }
+
+    function createHeaderTableLine(tableRow) {
+        createHeader(tableRow, "Key");
+        createHeader(tableRow, "Value");
+    }
+
+    function createHeader(tableRow, name) {
+        let tableCell = document.createElement('th');
+        tableCell.innerText = name;
+        tableCell.classList.add("header-cell");
+        tableCell.style.fontSize = currentContentFont + "pt";
+
+        if (isDarkTheme) {
+            tableCell.classList.add("item-cell-dark-style");
+        } else {
+            tableCell.classList.add("item-cell-white-style");
+        }
+        tableRow.appendChild(tableCell);
+    }
+
+    function createContentTableLine(tableItem, tableRow, rowIndex) {
+        let key = tableItem['key'];
+        let value = tableItem['value'];
+
+        createLine(key, tableRow, rowIndex, true);
+        createLine(value, tableRow, rowIndex, false);
+    }
+
+    function createLine(tableItem, tableRow, rowIndex, isFirstColumn) {
+        let tableCell = document.createElement('td');
+
+        if (isFirstColumn) {
+            let text = document.createTextNode(tableItem);
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "24");
+            svg.setAttribute("height", "24");
+            svg.setAttribute("viewBox", "0 0 24 24");
+
+            if (isDarkTheme) {
+                svg.setAttribute("class", "img-change img-change-dark-style");
+            } else {
+                svg.setAttribute("class", "img-change img-change-white-style");
+            }
+
+            let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttributeNS(null, "d", "M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z");
+            svg.appendChild(path);
+
+            svg.onclick = function () {
+                onTableLineClick(rowIndex);
+                onChangeTableItemClick(rowIndex)
+            };
+            tableCell.appendChild(svg);
+
+            tableCell.appendChild(text);
+        } else {
+            tableCell.innerText = tableItem;
+        }
+
+        tableCell.className = "item-cell";
+        tableCell.style.fontSize = currentContentFont + "pt";
+
+        if (isDarkTheme) {
+            tableCell.classList.add("item-cell-dark-style");
+        } else {
+            tableCell.classList.add("item-cell-white-style");
+        }
+
+        tableRow.appendChild(tableCell);
+    }
+
+    function updateControlPanelState() {
+        setTableControlButtonsState();
+        setSelectingAllState();
+    }
+
+    function setTableControlButtonsState() {
+        if (selectedTableRecordsPositions.length === 0) {
+            hideElement(deleteTableRecord);
+            hideElement(changeTableRecord);
+        } else if (selectedTableRecordsPositions.length === 1) {
+            showElement(deleteTableRecord);
+            showElement(changeTableRecord);
+        } else {
+            showElement(deleteTableRecord);
+            hideElement(changeTableRecord);
+        }
+    }
+
+    function setSelectingAllState() {
+        let tableRecordsSize = getElementsByClassName("item-row-content").length;
+
+        if (tableRecordsSize === 0) {
+            hideElement(selectAllElement);
+            isSelectedAllTableRecords = false;
+        } else if (selectedTableRecordsPositions.length === tableRecordsSize) {
+            showElement(selectAllElement);
+            selectAllElement.classList.remove('default-btn');
+            selectAllElement.classList.add('default-btn-active');
+            isSelectedAllTableRecords = true;
+        } else {
+            showElement(selectAllElement);
+            selectAllElement.classList.remove('default-btn-active');
+            selectAllElement.classList.add('default-btn');
+            isSelectedAllTableRecords = false;
+        }
+    }
+
+    function setTableLineSelected(tableLine, isSelected) {
+        for (let i = 0; i < tableLine.cells.length; i++) {
+            if (isSelected) {
+                if (isDarkTheme) {
+                    tableLine.cells[i].classList.add("item-active-dark-style");
+                } else {
+                    tableLine.cells[i].classList.add("item-active-white-style");
+                }
+            } else {
+                tableLine.cells[i].classList.remove("item-active-dark-style");
+                tableLine.cells[i].classList.remove("item-active-white-style");
+            }
+        }
+    }
+
+    function hideChangeTableItemModal() {
+        hideElement(changeTableItemModal);
+        selectedItemForChange = null;
+    }
+
+    function hideAddTableItemModal() {
+        hideElement(addTableItemModal);
+    }
+
+    function hideConfirmationModal() {
+        hideElement(confirmationModal);
+        confirmationModalHeader.innerHTML = DELETE_ENTITY_QUESTION_TEXT;
+        deleteSharedPrefsMark = false;
+    }
+
+    function getCurrentTableValuesMap(position) {
+        let tr = dataTableContent.getElementsByTagName("tr")[position];
+        let tds = tr.getElementsByTagName("td");
+
+        let key = tds[0].innerText;
+        let value = tds[1].innerText;
+        let varType = getVarTypeFromElement(tr);
+
+        return new TableModel(key, value, varType);
+    }
+
+    function hideDropdown() {
+        let dropdownContent = getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdownContent.length; i++) {
+            let openDropdown = dropdownContent[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+
+    function changeTheme(isDark) {
+        isDarkTheme = isDark;
+
+        if (isDarkTheme) {
+            showElement(lightTheme);
+            hideElement(darkTheme);
+            setDarkTheme();
+        } else {
+            hideElement(lightTheme);
+            showElement(darkTheme);
+            setWhiteTheme();
+        }
+    }
+
+    function setDarkTheme() {
+        baseContent.classList.remove("base-content-white-style");
+        baseContent.classList.add("base-content-dark-style");
+
+        tableContent.classList.remove("table-content-white-style");
+        tableContent.classList.add("table-content-dark-style");
+
+        dataTableContent.classList.remove("table-white-style");
+        dataTableContent.classList.add("table-dark-style");
+
+        infoContent.classList.remove("info-content-white-style");
+        infoContent.classList.add("info-content-dark-style");
+
+        notificationContent.classList.remove("notification-content-white-style");
+        notificationContent.classList.add("notification-content-dark-style");
+
+        errorContent.classList.remove("error-content-white-style");
+        errorContent.classList.add("error-content-dark-style");
+
+        closeErrorContent.classList.remove("close-error-content-white-style");
+        closeErrorContent.classList.add("close-error-content-dark-style");
+
+        detailItemHeader.classList.remove("modal-header-white-style");
+        detailItemHeader.classList.add("modal-header-dark-style");
+
+        detailActionsFooter.classList.remove("detail-actions-footer-white-style");
+        detailActionsFooter.classList.add("detail-actions-footer-dark-style");
+
+        confirmationModalContent.classList.remove("confirmation-modal-content-white-style");
+        confirmationModalContent.classList.add("confirmation-modal-content-dark-style");
+
+        actionButton.classList.remove("confirm-button-white-style");
+        actionButton.classList.add("confirm-button-dark-style");
+
+        cancelConfirmButton.classList.remove("cancel-confirm-button-white-style");
+        cancelConfirmButton.classList.add("cancel-confirm-button-dark-style");
+
+        tableInfo.classList.remove("table-info-white-style");
+        tableInfo.classList.add("table-info-dark-style");
+
+        detailActionButton.classList.remove("default-button-white-style");
+        detailActionButton.classList.add("default-button-dark-style");
+
+        detailCancelAlertButton.classList.remove("default-button-white-style");
+        detailCancelAlertButton.classList.add("default-button-dark-style");
+
+        changeTableSmallModal.classList.remove("detail-item-content-white-style");
+        changeTableSmallModal.classList.add("detail-item-content-dark-style");
+
+        changeTableSmallBody.classList.remove("modal-input-fields-body-white-style");
+        changeTableSmallBody.classList.add("modal-input-fields-body-dark-style");
+
+        addTableItemModalContent.classList.remove("detail-item-content-white-style");
+        addTableItemModalContent.classList.add("detail-item-content-dark-style");
+
+        addItemHeader.classList.remove("modal-header-white-style");
+        addItemHeader.classList.add("modal-header-dark-style");
+
+        typeSelector.classList.remove("default-selector-white-style");
+        typeSelector.classList.add("default-selector-dark-style");
+
+        addItemModalKey.classList.remove("detail-item-input-white-style");
+        addItemModalKey.classList.add("detail-item-input-dark-style");
+
+        addItemsBooleanSelector.classList.remove("default-selector-white-style");
+        addItemsBooleanSelector.classList.add("default-selector-dark-style");
+
+        addItemActionsFooter.classList.remove("detail-actions-footer-white-style");
+        addItemActionsFooter.classList.add("detail-actions-footer-dark-style");
+
+        addItemActionButton.classList.remove("default-button-white-style");
+        addItemActionButton.classList.add("default-button-dark-style");
+
+        addItemCancelAlertButton.classList.remove("default-button-white-style");
+        addItemCancelAlertButton.classList.add("default-button-dark-style");
+
+        booleanSelector.classList.remove("default-selector-white-style");
+        booleanSelector.classList.add("default-selector-dark-style");
+
+        copyErrorContent.classList.remove("copy-error-content-white-style");
+        copyErrorContent.classList.add("copy-error-content-dark-style");
+
+        let tableLine = getElementsByClassName("item-row");
+        for (let i = 0; i < tableLine.length; i++) {
+            if (i === 0) {
+                tableLine[i].classList.add("item-row-header-dark-style");
+                tableLine[i].classList.remove("item-row-header-white-style");
+            } else {
+                tableLine[i].classList.add("item-row-content-dark-style");
+                tableLine[i].classList.remove("item-row-content-white-style");
+            }
+        }
+
+        let imgRecordChange = getElementsByClassName("img-change");
+        for (let i = 0; i < imgRecordChange.length; i++) {
+            imgRecordChange[i].classList.add("img-change-dark-style");
+            imgRecordChange[i].classList.remove("img-change-white-style");
+        }
+
+        let activeItems = getElementsByClassName("item-cell");
+        for (let i = 0; i < activeItems.length; i++) {
+            if (activeItems[i].classList.contains("item-active-white-style")) {
+                activeItems[i].classList.remove("item-active-white-style");
+                activeItems[i].classList.add("item-active-dark-style");
+            }
+            activeItems[i].classList.remove("item-cell-white-style");
+            activeItems[i].classList.add("item-cell-dark-style");
+        }
+
+        let headerCells = getElementsByClassName("header-cell");
+        for (let i = 0; i < headerCells.length; i++) {
+            headerCells[i].classList.remove("item-cell-white-style");
+            headerCells[i].classList.add("item-cell-dark-style");
+        }
+
+        let paginationItem = getElementsByClassName("pagination-item");
+        for (let i = 0; i < paginationItem.length; i++) {
+            paginationItem[i].classList.remove("pagination-item-white-style");
+            paginationItem[i].classList.add("pagination-item-dark-style");
+        }
+
+        let detailItemHeaders = getElementsByClassName("detail-item-header");
+        for (let i = 0; i < detailItemHeaders.length; i++) {
+            detailItemHeaders[i].classList.remove("detail-item-header-white-style");
+            detailItemHeaders[i].classList.add("detail-item-header-dark-style");
+        }
+
+        let detailItemInputs = getElementsByClassName("detail-item-input");
+        for (let i = 0; i < detailItemInputs.length; i++) {
+            detailItemInputs[i].classList.remove("detail-item-input-white-style");
+            detailItemInputs[i].classList.add("detail-item-input-dark-style");
+        }
+    }
+
+    function setWhiteTheme() {
+        baseContent.classList.remove("base-content-dark-style");
+        baseContent.classList.add("base-content-white-style");
+
+        tableContent.classList.remove("table-content-dark-style");
+        tableContent.classList.add("table-content-white-style");
+
+        dataTableContent.classList.remove("table-dark-style");
+        dataTableContent.classList.add("table-white-style");
+
+        infoContent.classList.remove("info-content-dark-style");
+        infoContent.classList.add("info-content-white-style");
+
+        notificationContent.classList.remove("notification-content-dark-style");
+        notificationContent.classList.add("notification-content-white-style");
+
+        errorContent.classList.remove("error-content-dark-style");
+        errorContent.classList.add("error-content-white-style");
+
+        closeErrorContent.classList.remove("close-error-content-dark-style");
+        closeErrorContent.classList.add("close-error-content-white-style");
+
+        detailItemHeader.classList.remove("modal-header-dark-style");
+        detailItemHeader.classList.add("modal-header-white-style");
+
+        detailActionsFooter.classList.remove("detail-actions-footer-dark-style");
+        detailActionsFooter.classList.add("detail-actions-footer-white-style");
+
+        confirmationModalContent.classList.remove("confirmation-modal-content-dark-style");
+        confirmationModalContent.classList.add("confirmation-modal-content-white-style");
+
+        actionButton.classList.remove("confirm-button-dark-style");
+        actionButton.classList.add("confirm-button-white-style");
+
+        cancelConfirmButton.classList.remove("cancel-confirm-button-dark-style");
+        cancelConfirmButton.classList.add("cancel-confirm-button-white-style");
+
+        tableInfo.classList.remove("table-info-dark-style");
+        tableInfo.classList.add("table-info-white-style");
+
+        detailActionButton.classList.remove("default-button-dark-style");
+        detailActionButton.classList.add("default-button-white-style");
+
+        detailCancelAlertButton.classList.remove("default-button-dark-style");
+        detailCancelAlertButton.classList.add("default-button-white-style");
+
+        changeTableSmallModal.classList.remove("detail-item-content-dark-style");
+        changeTableSmallModal.classList.add("detail-item-content-white-style");
+
+        changeTableSmallBody.classList.remove("modal-input-fields-body-dark-style");
+        changeTableSmallBody.classList.add("modal-input-fields-body-white-style");
+
+
+        addTableItemModalContent.classList.remove("detail-item-content-dark-style");
+        addTableItemModalContent.classList.add("detail-item-content-white-style");
+
+        addItemHeader.classList.remove("modal-header-dark-style");
+        addItemHeader.classList.add("modal-header-white-style");
+
+        typeSelector.classList.remove("default-selector-dark-style");
+        typeSelector.classList.add("default-selector-white-style");
+
+        addItemModalKey.classList.remove("detail-item-input-dark-style");
+        addItemModalKey.classList.add("detail-item-input-white-style");
+
+        addItemsBooleanSelector.classList.remove("default-selector-dark-style");
+        addItemsBooleanSelector.classList.add("default-selector-white-style");
+
+        addItemActionsFooter.classList.remove("detail-actions-footer-dark-style");
+        addItemActionsFooter.classList.add("detail-actions-footer-white-style");
+
+        addItemActionButton.classList.remove("default-button-dark-style");
+        addItemActionButton.classList.add("default-button-white-style");
+
+        addItemCancelAlertButton.classList.remove("default-button-dark-style");
+        addItemCancelAlertButton.classList.add("default-button-white-style");
+
+        booleanSelector.classList.remove("default-selector-dark-style");
+        booleanSelector.classList.add("default-selector-white-style");
+
+        copyErrorContent.classList.remove("copy-error-content-dark-style");
+        copyErrorContent.classList.add("copy-error-content-white-style");
+
+        let tableLine = getElementsByClassName("item-row");
+        for (let i = 0; i < tableLine.length; i++) {
+            if (i === 0) {
+                tableLine[i].classList.add("item-row-header-white-style");
+                tableLine[i].classList.remove("item-row-header-dark-style");
+            } else {
+                tableLine[i].classList.add("item-row-content-white-style");
+                tableLine[i].classList.remove("item-row-content-dark-style");
+            }
+        }
+
+        let imgRecordChange = getElementsByClassName("img-change");
+        for (let i = 0; i < imgRecordChange.length; i++) {
+            imgRecordChange[i].classList.add("img-change-white-style");
+            imgRecordChange[i].classList.remove("img-change-dark-style");
+        }
+
+        let activeItems = getElementsByClassName("item-cell");
+        for (let i = 0; i < activeItems.length; i++) {
+            if (activeItems[i].classList.contains("item-active-dark-style")) {
+                activeItems[i].classList.remove("item-active-dark-style");
+                activeItems[i].classList.add("item-active-white-style");
+            }
+
+            activeItems[i].classList.remove("item-cell-dark-style");
+            activeItems[i].classList.add("item-cell-white-style");
+        }
+
+        let headerCells = getElementsByClassName("header-cell");
+        for (let i = 0; i < headerCells.length; i++) {
+            headerCells[i].classList.remove("item-cell-dark-style");
+            headerCells[i].classList.add("item-cell-white-style");
+        }
+
+        let paginationItem = getElementsByClassName("pagination-item");
+        for (let i = 0; i < paginationItem.length; i++) {
+            paginationItem[i].classList.remove("pagination-item-dark-style");
+            paginationItem[i].classList.add("pagination-item-white-style");
+        }
+
+        let detailItemHeaders = getElementsByClassName("detail-item-header");
+        for (let i = 0; i < detailItemHeaders.length; i++) {
+            detailItemHeaders[i].classList.remove("detail-item-header-dark-style");
+            detailItemHeaders[i].classList.add("detail-item-header-white-style");
+        }
+
+        let detailItemInputs = getElementsByClassName("detail-item-input");
+        for (let i = 0; i < detailItemInputs.length; i++) {
+            detailItemInputs[i].classList.remove("detail-item-input-dark-style");
+            detailItemInputs[i].classList.add("detail-item-input-white-style");
+        }
+    }
+
+    function setContentFont(fontSize) {
+        let tableCells = getElementsByClassName("item-cell");
+        for (let i = 0; i < tableCells.length; i++) {
+            tableCells[i].style.fontSize = fontSize + "pt";
+        }
+
+        let tableHeaders = getElementsByClassName("header-cell");
+        fontSize = parseInt(fontSize, 10) + 2;
+
+        for (let i = 0; i < tableHeaders.length; i++) {
+            tableHeaders[i].style.fontSize = fontSize + "pt";
+        }
+    }
+
+    function failedConnection(status, statusText, responseText) {
+        if (status === 0) {
+            isConnectionLost = true;
+
+            connectionStatus.innerHTML = CONNECTION_LOST_MESSAGE;
+            connectionStatus.style.color = '#e53935';
+
+            let switcher = false;
+            let backgroundInterval = setInterval(function () {
+                if (!switcher) {
+                    invisibleElement(connectionStatus);
+                } else {
+                    visibleElement(connectionStatus);
+                }
+                switcher = !switcher;
+            }, 130);
+
+            let backgroundTimeout = setTimeout(function () {
+                clearInterval(backgroundInterval);
+                clearTimeout(backgroundTimeout);
+                visibleElement(connectionStatus);
+            }, 1100);
+        } else {
+            showErrorMessage(status + " " + statusText + "\n" + responseText);
+        }
+
+        hideLoader();
+    }
+
+    function showLoader() {
+        showElement(loader)
+    }
+
+    function hideLoader() {
+        hideElement(loader)
+    }
+
+    // endregion
+
+    // region Utils
+    function copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+        } else {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+    }
+
+    function isEmptyTableContent(tablesList) {
+        return tablesList.length === 0
+    }
+
+    function isSelectedSharedPrefs() {
+        return selectedSharedPrefs != null && selectedSharedPrefs !== "";
+    }
+
+    function isNumber(str) {
+        return /^\d+$/.test(str);
+    }
+
+    function clearContent(element) {
+        element.innerHTML = '';
+    }
+
+    function getElementById(id) {
+        return document.getElementById(id);
+    }
+
+    function getElementsByClassName(name) {
+        return document.getElementsByClassName(name);
+    }
+
+    function showElement(element) {
+        element.style.display = "block";
+    }
+
+    function hideElement(element) {
+        element.style.display = "none";
+    }
+
+    function invisibleElement(element) {
+        element.style.visibility = "hidden";
+    }
+
+    function visibleElement(element) {
+        element.style.visibility = "visible";
+    }
+
+    function removeLast(array) {
+        return array.slice(0, -1);
+    }
+
+    function setEnabled(element, enabled = true) {
+        if (enabled) {
+            element.classList.remove("disabled")
+        } else {
+            element.classList.add("disabled")
+        }
+    }
+
+    function removeByItem(array, item) {
+        let index = array.indexOf(item);
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+    }
+
+    function stringLastRemove(text) {
+        return text.substring(0, text.length - 1);
+    }
+
+    function stringFirstRemove(text) {
+        return text.substring(1)
+    }
+
+    function getVarTypeFromElement(element) {
+        if (element.classList.contains(FIELD_TYPE_INTEGER)) {
+            return FIELD_TYPE_INTEGER
+        } else if (element.classList.contains(FIELD_TYPE_FLOAT)) {
+            return FIELD_TYPE_FLOAT
+        } else if (element.classList.contains(FIELD_TYPE_STRING)) {
+            return FIELD_TYPE_STRING
+        } else if (element.classList.contains(FIELD_TYPE_BOOLEAN)) {
+            return FIELD_TYPE_BOOLEAN
+        } else if (element.classList.contains(FIELD_TYPE_LONG)) {
+            return FIELD_TYPE_LONG
+        } else if (element.classList.contains(FIELD_TYPE_SET_STRING)) {
+            return FIELD_TYPE_SET_STRING
+        }
+    }
+
+    function setInputFilter(input, inputFilter) {
+        ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+            input.addEventListener(event, function() {
+                if (inputFilter.test(this.value)) {
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                } else if (this.hasOwnProperty("oldValue")) {
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                }
+            });
+        });
+    }
+    // endregion
+
+    // region Models
+    let TableModel = class {
+        constructor(key, value, varType) {
+            this.key = key;
+            this.value = value;
+            this.varType = varType;
+        }
+    };
+    // endregion
+
+</script>
+</html>

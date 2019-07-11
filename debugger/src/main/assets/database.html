@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Remote database</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="css/database.css">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet">
+
+    <script language="JavaScript">
+        function httpPost(url, body, successCallback, errorCallback) {
+            url = '/' + url;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('post', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        successCallback();
+                    } else if (errorCallback != null) {
+                        errorCallback(xhr.status, xhr.statusText, xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.send(body);
+        }
+
+        function httpGet(url, params, successCallback, errorCallback) {
+            url = url + "?" + params;
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        successCallback(xhr.responseText);
+                    } else if (errorCallback != null) {
+                        errorCallback(xhr.status, xhr.statusText, xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.open('get', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(null);
+        }
+    </script>
+</head>
+<body onresize="onPageResize()">
+
+<div id="header">
+    <div id="headerLeft">
+        <div id="controlPanel">
+            <div id="tableControlPanel">
+                <label for="dataBaseList"></label>
+                <select id="dataBaseList" onchange="onDbListClick()">
+                    <option disabled selected value="not_chosen">Database</option>
+                </select>
+
+                <label for="tableList"></label>
+                <select id="tableList" onchange="onTableListClick()">
+                    <option disabled selected value="non">Table</option>
+                </select>
+                <div id="databaseVersion"></div>
+            </div>
+
+            <div id="actionsPanel">
+                <svg id="selectAll" class="default-btn panel-action-item" onclick="onSelectingAllClick()" height="30"
+                     viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,5h2L5,3c-1.1,0 -2,0.9 -2,2zM3,13h2v-2L3,11v2zM7,21h2v-2L7,19v2zM3,9h2L5,7L3,7v2zM13,3h-2v2h2L13,3zM19,3v2h2c0,-1.1 -0.9,-2 -2,-2zM5,21v-2L3,19c0,1.1 0.9,2 2,2zM3,17h2v-2L3,15v2zM9,3L7,3v2h2L9,3zM11,21h2v-2h-2v2zM19,13h2v-2h-2v2zM19,21c1.1,0 2,-0.9 2,-2h-2v2zM19,9h2L21,7h-2v2zM19,17h2v-2h-2v2zM15,21h2v-2h-2v2zM15,5h2L17,3h-2v2zM7,17h10L17,7L7,7v10zM9,9h6v6L9,15L9,9z"></path>
+                </svg>
+                <svg id="changeTableRecord" class="default-btn panel-action-item" onclick="onChangeTableRecordClick()"
+                     height="30" viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z"></path>
+                </svg>
+                <svg id="deleteTableRecord" class="default-btn panel-action-item" onclick="onDeleteTableRecordClick()"
+                     height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div id="headerRight">
+            <a href="/" id="rightTitle">Home</a>
+
+            <input type="text" id="changeContentFont" class="default-input" onkeyup="onFontChanged(this)" placeholder="Size" title="Text size">
+            <input type="text" id="search" class="default-input" placeholder="Search for text.." title="Type in a text">
+
+            <div id="connectionStatus">Connected</div>
+
+            <div id="moreContent" class="dropdown">
+                <svg id="more" class="open-dropdown-btn default-btn" onclick="onMoreClick()" height="35" viewBox="0 0 24 24" width="35"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,10c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2zM12,16c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2z"></path>
+                </svg>
+                <div id="moreItems" class="dropdown-content">
+                    <label id="dropTable" class="dropdown-content-item more-items" onclick="onDropTableClick()">Drop Table</label>
+                    <label id="dropDatabase" class="dropdown-content-item more-items" onclick="onDropDatabaseClick()">Drop Database</label>
+                </div>
+            </div>
+
+            <div id="theme">
+                <svg id="darkTheme" onclick="onChangeThemeClick(true)" height="30" viewBox="0 0 24 24" width="30"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M0 0h24v24H0z" fill="none"></path>
+                </svg>
+                <svg id="lightTheme" onclick="onChangeThemeClick(false)" height="30" viewBox="0 0 24 24" width="30"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path fill="none" d="M0 0h24v24H0V0z"></path>
+                    <path d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                </svg>
+            </div>
+
+            <svg id="refresh" class="default-btn" onclick="onRefresh()" height="35" viewBox="0 0 24 24" width="35"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M12,4L12,1L8,5l4,4L12,6c3.31,0 6,2.69 6,6 0,1.01 -0.25,1.97 -0.7,2.8l1.46,1.46C19.54,15.03 20,13.57 20,12c0,-4.42 -3.58,-8 -8,-8zM12,18c-3.31,0 -6,-2.69 -6,-6 0,-1.01 0.25,-1.97 0.7,-2.8L5.24,7.74C4.46,8.97 4,10.43 4,12c0,4.42 3.58,8 8,8v3l4,-4 -4,-4v3z"></path>
+            </svg>
+
+            <svg id="customSql" class="default-btn" onclick="onCustomSqlClick()" height="35" viewBox="0 0 24 24" width="35"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.77,6.76L6.23,5.48 0.82,12l5.41,6.52 1.54,-1.28L3.42,12l4.35,-5.24zM7,13h2v-2L7,11v2zM17,11h-2v2h2v-2zM11,13h2v-2h-2v2zM17.77,5.48l-1.54,1.28L20.58,12l-4.35,5.24 1.54,1.28L23.18,12l-5.41,-6.52z"></path>
+            </svg>
+        </div>
+
+    </div>
+</div>
+
+<div id="baseContent" class="base-content-dark-style">
+    <div id="auxiliaryContainer">
+        <div id="infoContent" class="info-content-dark-style" onclick="onInfoContentClick()"></div>
+        <div id="notificationContent" class="notification-content-dark-style">No data</div>
+        <div id="loader"></div>
+    </div>
+
+    <div id="tableContent" class="table-content-dark-style">
+        <table id="dbTableContent" class="table-dark-style">
+        </table>
+        <div id="pagination">
+            <hr id="hrPagination" class="hr-pagination-dark-style">
+            <button name="selectedPage" onclick="onFirstPageClick()" value="First" class="pagination-item pagination-item-dark-style">First</button>
+            <button name="selectedPage" onclick="onPreviousPageClick()" value="«" class="pagination-item pagination-item-dark-style">«</button>
+            <span id="pagesByNumber"></span>
+            <button name="selectedPage" onclick="onNextPageClick()" value="»" class="pagination-item pagination-item-dark-style">»</button>
+            <button name="selectedPage" onclick="onLastPageClick()" value="Last" class="pagination-item pagination-item-dark-style">Last</button>
+            <input name="selectedPage" id="pageNumberInput">
+            <button class="go-page-number-dark-theme" onclick="onGoPageClick()" id="goPageNumber" type="submit">Go</button>
+        </div>
+        <div id="tableInfo" class="table-info-dark-style"></div>
+    </div>
+</div>
+
+<div id="changeTableItemModal" class="modal">
+    <div class="modal-content detail-item-content-dark-style" id="detailItemContent">
+        <div class="modal-header modal-header-dark-style" id="detailItemHeader">
+            Edit Item
+        </div>
+
+        <hr class="hr-modal"/>
+
+        <div id="detailModalBody">
+        </div>
+
+        <hr class="hr-modal"/>
+
+        <div class="detail-actions-footer-dark-style" id="detailActionsFooter">
+            <button class="default-button default-button-dark-style" id="detailActionButton" type="button"
+                    onclick="onSaveChangedDataClick()" name="saveChangedData">Save
+            </button>
+            <button class="default-button default-button-dark-style" id="detailCancelAlertButton" type="button"
+                    onclick="onCancelChangingDataClick()">Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="customQueryModal" class="modal">
+    <div id="customQueryModalContent" class="modal-content custom-query-modal-dark-style">
+        <div id="customQueryModalHeader" class="modal-header custom-query-header-dark-style">
+            Enter custom query
+        </div>
+
+        <hr class="hr-modal">
+
+        <div id="customQueryContent">
+            <label for="customQueryEditContent"></label>
+            <textarea id="customQueryEditContent" class="custom-query-editor-dark-style" name="customQuery" autofocus></textarea>
+        </div>
+
+        <hr class="hr-modal">
+
+        <div id="customQueryActionContent">
+            <button id="customQuerySubmit" class="default-button custom-query-submit-dark-style" type="submit" onclick="onCustomQueryClick()">Execute</button>
+            <div id="customSqlHintText">Ctrl + Enter</div>
+        </div>
+    </div>
+</div>
+
+<div id="confirmationModal" class="modal small-modal">
+    <div id="confirmationModalContent" class="modal-content confirmation-modal-content-dark-style">
+        <div id="confirmationModalHeader">Are you sure?</div>
+
+        <hr class="hr-modal">
+
+        <div id="confirmationActionContent">
+            <button class="default-button confirm-button-dark-style" id="actionButton" onclick="onConfirmDropClick()">Drop</button>
+            <button class="default-button cancel-confirm-button-dark-style" id="cancelConfirmButton" onclick="onCancelDropClick()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="errorContent" class="error-content-dark-style">
+    <pre id="errorText"></pre>
+
+    <svg id="closeErrorContent" class="close-error-content-dark-style" onclick="onCloseErrorContentClick()" height="30"
+         viewBox="0 0 24 24" width="30" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"></path>
+    </svg>
+
+    <svg id="copyErrorContent" class="copy-error-content-white-style" onclick="onErrorTextClick()" height="23"
+         viewBox="0 0 24 24" width="23" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z"></path>
+    </svg>
+    <span id="errorTextCopied" class="tooltip-text">Copied!</span>
+</div>
+
+</body>
+<script>
+    // region Init constants
+    const DEFAULT_FONT_SIZE = 12;
+    const DARK_THEME = "DARK";
+    const LIGHT_THEME = "LIGHT";
+    const PAGINATION_SIZE = 10;
+    const MAX_TABLE_LINE_IN_PAGE = 15;
+    const FIRST_PAGE = 1;
+    const LAST_PAGE = -1;
+    const ENTER_KEYCODE = 13;
+    const ESC_KEYCODE = 27;
+    const CTRL_KEYCODE = 17;
+    const COMMAND_KEYCODE = 91;
+    const TABLE_HEADER_SIZE = 1;
+    const CHOOSE_TABLE_TEXT = "Choose a table";
+    const CHOOSE_DATABASE_TEXT = "Choose a database";
+    const NUMBER_OF_RECORDS = "Number of records";
+    const DEFAULT_TABLE_LIST_TITLE = "Table";
+    const DEFAULT_DATABASE_LIST_TITLE = "Database";
+    const DB_VERSION_TEXT = "v. ";
+    const DELETE_DATABASE_QUESTION_TEXT = "Are you sure you want to delete the current <span class='markText'>database</span>?";
+    const DELETE_TABLE_QUESTION_TEXT = "Are you sure you want to delete the current <span class='markText'>table</span>?";
+    const DELETE_ENTITY_QUESTION_TEXT = "Are you sure?";
+    const CONNECTION_LOST_MESSAGE = "Connection lost!";
+    const SELECTOR_NOT_CHOSEN_VALUE = "not_chosen";
+
+    const FIELD_TYPE_NULL = "null";
+    const FIELD_TYPE_INTEGER = "integer";
+    const FIELD_TYPE_REAL = "real";
+    const FIELD_TYPE_BLOB = "blob";
+    const FIELD_TYPE_TEXT = "text";
+    // endregion
+
+    //region init variables
+    let pageNumberInput = getElementById("pageNumberInput");
+    let changeTableItemModal = getElementById('changeTableItemModal');
+    let tableControlPanel = getElementById("tableControlPanel");
+    let tableInfo = getElementById("tableInfo");
+    let tableList = getElementById("tableList");
+    let dropTable = getElementById("dropTable");
+    let dropDatabase = getElementById("dropDatabase");
+    let databaseVersionLabel = getElementById("databaseVersion");
+    let notificationContent = getElementById("notificationContent");
+    let infoContent = getElementById("infoContent");
+    let deleteTableRecord = getElementById("deleteTableRecord");
+    let changeTableRecord = getElementById("changeTableRecord");
+    let selectAllElement = getElementById("selectAll");
+    let dbTableContent = getElementById("dbTableContent");
+    let dataBaseList = getElementById("dataBaseList");
+    let pagesByNumber = getElementById("pagesByNumber");
+    let goPageNumber = getElementById("goPageNumber");
+    let lightTheme = getElementById("lightTheme");
+    let darkTheme = getElementById("darkTheme");
+    let pagination = getElementById("pagination");
+    let connectionStatus = getElementById("connectionStatus");
+    let loader = getElementById("loader");
+    let errorContent = getElementById('errorContent');
+    let errorText = getElementById('errorText');
+    let detailModalBody = getElementById('detailModalBody');
+    let detailActionButton = getElementById('detailActionButton');
+    let customQueryModal = getElementById('customQueryModal');
+    let customQueryEditContent = getElementById('customQueryEditContent');
+    let customSql = getElementById('customSql');
+    let search = getElementById('search');
+    let confirmationModal = getElementById('confirmationModal');
+    let confirmationModalHeader = getElementById('confirmationModalHeader');
+    let baseContent = getElementById('baseContent');
+    let tableContent = getElementById('tableContent');
+    let hrPagination = getElementById('hrPagination');
+    let closeErrorContent = getElementById('closeErrorContent');
+    let detailItemContent = getElementById('detailItemContent');
+    let detailItemHeader = getElementById('detailItemHeader');
+    let detailActionsFooter = getElementById('detailActionsFooter');
+    let confirmationModalContent = getElementById('confirmationModalContent');
+    let actionButton = getElementById('actionButton');
+    let cancelConfirmButton = getElementById('cancelConfirmButton');
+    let customQueryModalContent = getElementById('customQueryModalContent');
+    let customQueryModalHeader = getElementById('customQueryModalHeader');
+    let customQuerySubmit = getElementById('customQuerySubmit');
+    let detailCancelAlertButton = getElementById('detailCancelAlertButton');
+    let changeContentFont = getElementById('changeContentFont');
+    let moreItems = getElementById('moreItems');
+    let moreContent = getElementById('moreContent');
+    let header = getElementById('header');
+    let headerRight = getElementById('headerRight');
+    let copyErrorContent = getElementById('copyErrorContent');
+    let errorTextCopied = getElementById('errorTextCopied');
+    //endregion
+
+    let isDarkTheme = true;
+    let isConnectionLost = false;
+    let selectedDatabase = null;
+    let currentPage = FIRST_PAGE;
+    let selectedTable = null;
+    let pagesCount = 0;
+    let selectedTableLineMap = null;
+    let selectedTableRecordsPositions = [];
+    let isSelectedAllTableRecords = false;
+    let backgroundTimeout = null;
+    let lastSearchText = "";
+    let deleteDatabaseMark = false;
+    let deleteTableMark = false;
+    let currentContentFont = DEFAULT_FONT_SIZE;
+    let headerRightDefaultY = headerRight.offsetTop;
+    let globalKeyPressed = [];
+
+    window.onload = function () {
+        updateControlPanelState();
+        loadDefaultsSetting();
+        loadDatabases();
+
+        pageNumberInput.addEventListener("keyup", onGoPageKeyUp);
+        customQueryEditContent.addEventListener("keyup", onCustomQueryFinishKeyUp);
+        search.addEventListener("keyup", onSearchKeyUp);
+
+        window.addEventListener("keyup", onGlobalKeyUp);
+        window.addEventListener("keydown", onGlobalKeyDown);
+
+        onPageResize();
+    };
+
+    window.onclick = function (e) {
+        if (!e.target.matches('.dropdown-btn')) {
+            hideDropdown();
+        }
+
+        if (!e.target.matches('.open-dropdown-btn')) {
+            hideElement(moreItems);
+        }
+
+        if (e.target === changeTableItemModal) {
+            hideChangeTableItemModal();
+        }
+
+        if (e.target === customQueryModal) {
+            hideCustomQueryModal();
+        }
+
+        if (e.target === confirmationModal) {
+            hideConfirmationModal();
+        }
+    };
+
+    function onCustomQueryFinishKeyUp(event) {
+        if ((containsItem(globalKeyPressed, COMMAND_KEYCODE)
+            || containsItem(globalKeyPressed, CTRL_KEYCODE))
+            && containsItem(globalKeyPressed, ENTER_KEYCODE)) {
+            globalKeyPressed.length = 0;
+            onCustomQueryClick();
+        }
+    }
+
+    function onGlobalKeyUp(event) {
+        removeByItem(globalKeyPressed, event.keyCode);
+
+        if (event.keyCode === ESC_KEYCODE) {
+            event.preventDefault();
+            hideChangeTableItemModal();
+            hideCustomQueryModal();
+            hideConfirmationModal();
+        }
+    }
+
+    function onGlobalKeyDown(event) {
+        if (!containsItem(globalKeyPressed, event.keyCode)
+            && (event.keyCode === ENTER_KEYCODE
+                || event.keyCode === COMMAND_KEYCODE
+                || event.keyCode === CTRL_KEYCODE)) {
+            globalKeyPressed.push(event.keyCode);
+        }
+    }
+
+    function loadDefaultsSetting() {
+        showLoader();
+        const body = 'getDefaultsSettings=' + encodeURIComponent('');
+        httpGet('database', body, function (response) {
+            hideLoader();
+            let settings = JSON.parse(response);
+            currentContentFont = settings['databaseFont'];
+            isDarkTheme = settings['theme'] === DARK_THEME;
+            changeTheme(isDarkTheme);
+
+            setContentFont(currentContentFont);
+
+            if (DEFAULT_FONT_SIZE !== currentContentFont) {
+                changeContentFont.value = currentContentFont;
+            }
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function saveDefaultsSetting() {
+        let setting = {};
+        setting.theme = isDarkTheme === true ? DARK_THEME : LIGHT_THEME;
+        setting.databaseFont = currentContentFont;
+
+        let body = 'saveDefaultsSetting=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(JSON.stringify(setting));
+
+        httpPost('database', body, function () {
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    // region Ui events
+    function onMoreClick() {
+        showElement(moreItems);
+    }
+
+    function onPageResize() {
+        if (headerRight.offsetTop > headerRightDefaultY + 8) {
+            header.style.height = "130px";
+            baseContent.style.top = "131px";
+            headerRight.style.marginTop = "8px";
+        } else {
+            header.style.height = "90px";
+            baseContent.style.top = "91px";
+            headerRight.style.marginTop = "0px";
+        }
+    }
+
+    function onErrorTextClick() {
+        copyToClipboard(errorText.innerHTML);
+        visibleElement(errorTextCopied);
+
+        let tooltipTimeout = setTimeout(function () {
+            clearInterval(tooltipTimeout);
+            invisibleElement(errorTextCopied);
+        }, 800);
+    }
+
+    function onConfirmDropClick() {
+        if (deleteDatabaseMark) {
+            executeDropDatabase();
+        } else if(deleteTableMark) {
+            executeDropTable();
+        }
+
+        deleteDatabaseMark = false;
+        deleteTableMark = false;
+    }
+
+    function onCancelDropClick() {
+        hideConfirmationModal();
+    }
+
+    function onSearchKeyUp() {
+        let searchText = search.value.trim();
+
+        if (searchText.length === 0) {
+            lastSearchText = "";
+
+            if (selectedTable != null) {
+                getTable(selectedTable, currentPage);
+                return;
+            } else {
+                return
+            }
+        }
+
+        if (backgroundTimeout != null) {
+            clearTimeout(backgroundTimeout);
+        }
+
+        backgroundTimeout = setTimeout(function () {
+            clearTimeout(backgroundTimeout);
+            executeSearch(searchText);
+        }, 300)
+    }
+
+    function onCustomQueryClick() {
+        let query = customQueryEditContent.value.trim();
+
+        if (query.length === 0) {
+            return
+        }
+
+        showLoader();
+
+        query = query.replace(new RegExp(String.fromCharCode(160), "g"), " ");
+
+        let body = 'getByQuery=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(query);
+        httpGet('database', body, function (response) {
+            hideLoader();
+            clearTableContent();
+            hideCustomQueryModal();
+            hideElement(infoContent);
+
+            let tables = JSON.parse(response);
+            let tablesList = tables['data'];
+            let tableItemsCount = tables['count'];
+            let headers = tables['headers'];
+
+            if (isEmptyTableContent(tablesList)) {
+                showElement(notificationContent);
+                hideElement(tableInfo);
+                return;
+            } else {
+                hideElement(notificationContent);
+                tableInfo.innerHTML = NUMBER_OF_RECORDS + " " + tableItemsCount;
+                showElement(tableInfo);
+            }
+
+            let tableRow = dbTableContent.insertRow();
+            if (isDarkTheme) {
+                tableRow.className = "item-row item-row-header-dark-style";
+            } else {
+                tableRow.className = "item-row item-row-header-white-style";
+            }
+
+            createHeaderTableLine(headers, tableRow);
+
+            tablesList.forEach(function (tableItem, rowIndex) {
+                let tableRow = dbTableContent.insertRow();
+
+                if (isDarkTheme) {
+                    tableRow.className = "item-row item-row-content item-row-content-dark-style";
+                } else {
+                    tableRow.className = "item-row item-row-content item-row-content-white-style";
+                }
+
+                createContentTableLine(tableItem, tableRow, rowIndex, false);
+            });
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function onFontChanged(item) {
+        if (isNumber(item.value)) {
+            currentContentFont = item.value;
+            setContentFont(currentContentFont);
+            saveDefaultsSetting();
+        }
+    }
+
+    function onCloseErrorContentClick() {
+        clearContent(errorText);
+        hideElement(errorContent);
+    }
+
+    function onDropTableClick() {
+        if (!isSelectedTable()) {
+            return
+        }
+
+        deleteDatabaseMark = false;
+        deleteTableMark = true;
+        confirmationModalHeader.innerHTML = DELETE_TABLE_QUESTION_TEXT;
+        showElement(confirmationModal);
+    }
+
+    function onDropDatabaseClick() {
+        if (!isSelectedDatabase()) {
+            return
+        }
+
+        deleteDatabaseMark = true;
+        deleteTableMark = false;
+        confirmationModalHeader.innerHTML = DELETE_DATABASE_QUESTION_TEXT;
+        showElement(confirmationModal);
+    }
+
+    function onCustomSqlClick() {
+        showElement(customQueryModal);
+        customQueryEditContent.focus();
+    }
+
+    function onRefresh() {
+        hideElement(notificationContent);
+        hideElement(infoContent);
+
+        loadDatabases();
+
+        if (selectedDatabase != null) {
+            loadTables(selectedDatabase, true);
+        }
+
+        if (lastSearchText !== "") {
+            executeSearch(lastSearchText)
+        } else if (selectedTable != null) {
+            getTable(selectedTable, currentPage);
+        }
+    }
+
+    function onInfoContentClick() {
+        let switcher = false;
+        let backgroundInterval = setInterval(function () {
+            if (!switcher) {
+                tableControlPanel.style.border = "1px solid #ff0000";
+            } else {
+                tableControlPanel.style.border = "1px solid #bb8600";
+            }
+            switcher = !switcher;
+        }, 180);
+
+        let backgroundTimeout = setTimeout(function () {
+            clearInterval(backgroundInterval);
+            clearTimeout(backgroundTimeout);
+            tableControlPanel.style.border = "1px solid #bb8600";
+        }, 3000)
+    }
+
+    function onTableLineClick(position) {
+        let tableLine = getElementsByClassName("item-row-content")[position];
+
+        if (selectedTableRecordsPositions.includes(position)) {
+            removeByItem(selectedTableRecordsPositions, position);
+            setTableLineSelected(tableLine, false);
+        } else {
+            setTableLineSelected(tableLine, true);
+            selectedTableRecordsPositions.push(position);
+        }
+
+        updateControlPanelState();
+        onPageResize();
+    }
+
+    function onDeleteTableRecordClick() {
+        let headersJson = "";
+        let fieldsJson = "";
+
+        let headers = dbTableContent
+            .getElementsByTagName("tr")[0]
+            .getElementsByTagName("th");
+
+        for (let i = 0; i < headers.length; i++) {
+            headersJson += '"' + headers[i].innerText + '",';
+        }
+        headersJson = removeLast(headersJson);
+
+        let trs = getElementsByClassName("item-row-content");
+        for (let i = 0; i < selectedTableRecordsPositions.length; i++) {
+            let tr = trs[selectedTableRecordsPositions[i]].getElementsByTagName("td");
+            fieldsJson += '[';
+            for (let j = 0; j < tr.length; j++) {
+                fieldsJson += '"' + tr[j].innerText + '",';
+            }
+
+            fieldsJson = removeLast(fieldsJson) + '],';
+        }
+
+        fieldsJson = removeLast(fieldsJson);
+
+        let bodyJson = '{"headers":[' + headersJson + '],' +
+            '"fields":[' + fieldsJson + ']}';
+
+        let body = 'deleteTableItems=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(bodyJson)
+            + '&' + 'name=' + encodeURIComponent(selectedTable);
+
+        httpPost('database', body, function () {
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function onChangeTableRecordClick() {
+        if (selectedTableRecordsPositions.length === 1) {
+            onChangeTableItemClick(selectedTableRecordsPositions[0])
+        }
+    }
+
+    function onSelectingAllClick() {
+        isSelectedAllTableRecords = !isSelectedAllTableRecords;
+        let tableRecordsSize = getElementsByClassName("item-row-content").length;
+
+        selectedTableRecordsPositions = [];
+
+        for (let i = 0; i < tableRecordsSize; i++) {
+            let tableLine = getElementsByClassName("item-row-content")[i];
+
+            if (isSelectedAllTableRecords) {
+                selectedTableRecordsPositions.push(i);
+                setTableLineSelected(tableLine, true);
+            } else {
+                setTableLineSelected(tableLine, false);
+            }
+        }
+
+        updateControlPanelState();
+    }
+
+    function onCancelChangingDataClick() {
+        hideChangeTableItemModal();
+    }
+
+    function onChangeTableItemClick(position) {
+        clearContent(detailModalBody);
+        detailActionButton.value = position;
+
+        selectedTableLineMap = getCurrentTableValuesMap(position + TABLE_HEADER_SIZE);
+
+        selectedTableLineMap.forEach(table => {
+            let headerValue = table.header;
+            let itemValue = table.value;
+            let input = document.createElement("input");
+            let itemRoot = document.createElement("div");
+            let pLabel = document.createElement("p");
+            let label = document.createElement("label");
+            let labelText = document.createTextNode(headerValue);
+
+            if (table.varType === FIELD_TYPE_INTEGER) {
+                setInputFilter(input, /^\d*?\d*$/);
+            } else if (table.varType === FIELD_TYPE_REAL) {
+                setInputFilter(input, /^\d*\.?\d*$/);
+            }
+
+            input.readOnly = table.isImmutable;
+            input.placeholder = headerValue;
+
+            itemRoot.className = "detail-item-body";
+            label.classList.add("detail-item-header");
+            input.classList.add("detail-item-input");
+
+            if (isDarkTheme) {
+                label.classList.add("detail-item-header-dark-style");
+                input.classList.add("detail-item-input-dark-style");
+            } else {
+                label.classList.add("detail-item-header-white-style");
+                input.classList.add("detail-item-input-white-style");
+            }
+
+            input.type = "text";
+            input.name = headerValue;
+            input.value = itemValue;
+
+            label.appendChild(labelText);
+            pLabel.appendChild(label);
+            itemRoot.appendChild(pLabel);
+            itemRoot.appendChild(input);
+            detailModalBody.appendChild(itemRoot);
+        });
+
+        showElement(changeTableItemModal);
+    }
+
+    function onSaveChangedDataClick() {
+        let oldValMap = selectedTableLineMap;
+        let newValMap = getChangedTableValuesMap();
+
+        let oldValJson = "";
+        let newValJson = "";
+        let headersJson = "";
+
+        for (let key of newValMap.keys()) {
+            headersJson += '"' + key + '",';
+            newValJson += '"' + newValMap.get(key) + '",';
+        }
+
+        oldValMap.forEach(table => {
+            oldValJson += '"' + table.value + '",';
+        });
+
+        newValJson = '"newValues":[' + removeLast(newValJson) + ']';
+        oldValJson = '"oldValues":[' + removeLast(oldValJson) + ']';
+        headersJson = '"headers":[' + removeLast(headersJson) + ']';
+
+        let bodyJson = '{' + headersJson + ',' + oldValJson + ',' + newValJson + '}';
+
+        let body = 'updateTable=' + encodeURIComponent('')
+            + '&' + 'data=' + encodeURIComponent(bodyJson)
+            + '&' + 'name=' + encodeURIComponent(selectedTable);
+
+        httpPost('database', body, function () {
+            hideChangeTableItemModal();
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function onDbListClick() {
+        let databaseItem = dataBaseList.value;
+        if (databaseItem === SELECTOR_NOT_CHOSEN_VALUE) {
+            return
+        }
+
+        hideElement(infoContent);
+        hideElement(notificationContent);
+
+        selectedTable = null;
+        selectedDatabase = databaseItem;
+        clearContent(dbTableContent);
+        resetChooser(tableList, DEFAULT_TABLE_LIST_TITLE);
+
+        hidePagination();
+        search.value = "";
+        lastSearchText = "";
+        setEnabled(search, false);
+        hideElement(tableInfo);
+        selectedTableRecordsPositions = [];
+        updateControlPanelState();
+        visibleElement(moreContent);
+        showElement(dropDatabase);
+        visibleElement(customSql);
+        hideElement(dropTable);
+
+        loadTables(databaseItem);
+    }
+
+    function onTableListClick() {
+        let tableItem = tableList.value;
+        if (tableItem === SELECTOR_NOT_CHOSEN_VALUE) {
+            return
+        }
+
+        hideElement(infoContent);
+        showElement(dropTable);
+        getTable(tableItem, currentPage);
+    }
+
+    function onChangeThemeClick(isDark) {
+        changeTheme(isDark);
+        saveDefaultsSetting();
+    }
+
+    // endregion
+
+    // region Base content
+    function loadDatabases() {
+        showLoader();
+
+        let body = 'getDatabases=' + encodeURIComponent('');
+        httpGet('database', body, function (response) {
+            hideLoader();
+
+            if (!isSelectedDatabase()) {
+                infoContent.innerHTML = CHOOSE_DATABASE_TEXT;
+                clearContent(dbTableContent);
+                hideElement(tableInfo);
+                showElement(infoContent);
+            }
+
+            let databases = JSON.parse(response);
+            resetChooser(dataBaseList, DEFAULT_DATABASE_LIST_TITLE);
+            let selectedIndex = 0;
+
+            databases.forEach(function (databaseItem, index) {
+                let label = document.createElement("option");
+                label.className = "dropdown-content-item";
+                label.value = databaseItem;
+                label.innerHTML = databaseItem;
+
+                if (isSelectedDatabase() && selectedDatabase === databaseItem) {
+                    selectedIndex = index + 1;
+                }
+
+                dataBaseList.appendChild(label);
+            });
+
+            dataBaseList.selectedIndex = selectedIndex.toString();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function resetChooser(chooser, defaultText) {
+        clearContent(chooser);
+        let label = document.createElement("option");
+        label.className = "dropdown-content-item";
+        label.value = SELECTOR_NOT_CHOSEN_VALUE;
+        label.innerHTML = defaultText;
+        label.disabled = true;
+        chooser.appendChild(label);
+    }
+
+    function loadTables(database) {
+        showLoader();
+
+        let body = 'getTables=' + encodeURIComponent('')
+            + '&' + 'database=' + encodeURIComponent(database);
+
+        httpGet('database', body, function (response) {
+            hideLoader();
+
+            if (!isSelectedTable()) {
+                infoContent.innerHTML = CHOOSE_TABLE_TEXT;
+                clearContent(dbTableContent);
+                showElement(infoContent);
+                hideElement(tableInfo);
+            }
+
+            let tablesModel = JSON.parse(response);
+            let databaseVersion = tablesModel['databaseVersion'];
+            let tables = tablesModel['tables'];
+
+            resetChooser(tableList, DEFAULT_TABLE_LIST_TITLE);
+            let selectedIndex = 0;
+
+            databaseVersionLabel.innerHTML = DB_VERSION_TEXT + databaseVersion;
+
+            tables.forEach(function (tableItem, index) {
+                let label = document.createElement("option");
+                label.className = "dropdown-content-item";
+                label.value = tableItem;
+                label.innerHTML = tableItem;
+
+                if (isSelectedTable() && selectedTable === tableItem) {
+                    selectedIndex = index + 1;
+                }
+
+                tableList.appendChild(label);
+            });
+
+            tableList.selectedIndex = selectedIndex.toString();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function getTable(tableName, tableCurrentPage) {
+        showLoader();
+        hideElement(notificationContent);
+        selectedTableRecordsPositions = [];
+        updateControlPanelState();
+
+        selectedTable = tableName;
+        currentPage = getValidCurrentPage(tableCurrentPage);
+
+        let body = 'getTable=' + encodeURIComponent('')
+            + '&' + 'name=' + encodeURIComponent(tableName)
+            + '&' + 'page=' + encodeURIComponent(currentPage)
+            + '&' + 'size=' + encodeURIComponent(MAX_TABLE_LINE_IN_PAGE.toString());
+
+        httpGet('database', body, function (response) {
+            hideLoader();
+            clearContent(dbTableContent);
+
+            let tables = JSON.parse(response);
+            let tablesList = tables['data'];
+            let tableItemsCount = tables['count'];
+            let headers = tables['headers'];
+
+            loadPaginationPages(tableItemsCount);
+            setEnabled(search, true);
+
+            if (isEmptyTableContent(tablesList) && tableItemsCount !== 0) {
+                getTable(tableName, LAST_PAGE);
+                return;
+            } else if (isEmptyTableContent(tablesList)) {
+                hidePagination();
+                showElement(notificationContent);
+                hideElement(tableInfo);
+                updateControlPanelState();
+                return;
+            } else {
+                hideElement(notificationContent);
+                showPagination();
+                tableInfo.innerHTML = NUMBER_OF_RECORDS + " " + tableItemsCount;
+                showElement(tableInfo);
+            }
+
+            let tableRow = dbTableContent.insertRow();
+            if (isDarkTheme) {
+                tableRow.className = "item-row item-row-header-dark-style";
+            } else {
+                tableRow.className = "item-row item-row-header-white-style";
+            }
+
+            createHeaderTableLine(headers, tableRow);
+
+            tablesList.forEach(function (tableItem, rowIndex) {
+                let tableRow = dbTableContent.insertRow();
+
+                if (isDarkTheme) {
+                    tableRow.className = "item-row item-row-content item-row-content-dark-style";
+                } else {
+                    tableRow.className = "item-row item-row-content item-row-content-white-style";
+                }
+                createContentTableLine(tableItem, tableRow, rowIndex);
+
+                tableRow.onclick = function () {
+                    onTableLineClick(rowIndex);
+                };
+            });
+
+            updateControlPanelState();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function executeDropDatabase() {
+        let body = 'dropDatabase=' + encodeURIComponent('')
+            + '&' + 'name=' + encodeURIComponent(selectedDatabase);
+
+        httpPost('database', body, function () {
+            clearContent(dbTableContent);
+            clearContent(databaseVersionLabel);
+            resetChooser(tableList, DEFAULT_TABLE_LIST_TITLE);
+            resetChooser(dataBaseList, DEFAULT_DATABASE_LIST_TITLE);
+            tableList.selectedIndex = "0";
+
+            invisibleElement(moreContent);
+            hideElement(dropDatabase);
+            invisibleElement(customSql);
+            hideElement(dropTable);
+            hideElement(tableInfo);
+            hideElement(confirmationModal);
+
+            search.value = "";
+            lastSearchText = "";
+            setEnabled(search, false);
+
+            selectedDatabase = null;
+            selectedTable = null;
+            hidePagination();
+
+            currentPage = FIRST_PAGE;
+            pagesCount = 0;
+            selectedTableLineMap = null;
+            selectedTableRecordsPositions = [];
+            isSelectedAllTableRecords = false;
+            updateControlPanelState();
+
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function executeDropTable() {
+        let body = 'dropTable=' + encodeURIComponent('')
+            + '&' + 'name=' + encodeURIComponent(selectedTable);
+
+        httpPost('database', body, function () {
+            clearTableContent();
+
+            hideElement(confirmationModal);
+            onRefresh();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function clearTableContent() {
+        clearContent(dbTableContent);
+
+        hideElement(dropTable);
+        hidePagination();
+        hideElement(tableInfo);
+        search.value = "";
+        lastSearchText = "";
+        setEnabled(search, false);
+
+        selectedTable = null;
+        resetChooser(tableList, DEFAULT_TABLE_LIST_TITLE);
+
+        currentPage = FIRST_PAGE;
+        pagesCount = 0;
+        selectedTableLineMap = null;
+        selectedTableRecordsPositions = [];
+        isSelectedAllTableRecords = false;
+        updateControlPanelState();
+    }
+
+    function executeSearch(searchText) {
+        lastSearchText = searchText;
+        if (searchText.length === 0 || !isSelectedTable()) {
+            return
+        }
+
+        showLoader();
+
+        let body = 'search=' + encodeURIComponent('')
+            + '&' + 'name=' + encodeURIComponent(selectedTable)
+            + '&' + 'data=' + encodeURIComponent(searchText);
+
+        httpGet('database', body, function (response) {
+            hideLoader();
+            clearContent(dbTableContent);
+            hideElement(notificationContent);
+            hidePagination();
+            hideElement(tableInfo);
+            selectedTableLineMap = null;
+            selectedTableRecordsPositions = [];
+            isSelectedAllTableRecords = false;
+            updateControlPanelState();
+
+            let tables = JSON.parse(response);
+            let tablesList = tables['data'];
+            let tableItemsCount = tables['count'];
+            let headers = tables['headers'];
+
+            if (isEmptyTableContent(tablesList)) {
+                showElement(notificationContent);
+                hideElement(tableInfo);
+                updateControlPanelState();
+                return;
+            } else {
+                hideElement(notificationContent);
+                tableInfo.innerHTML = NUMBER_OF_RECORDS + " " + tableItemsCount;
+                showElement(tableInfo);
+            }
+
+            let tableRow = dbTableContent.insertRow();
+            if (isDarkTheme) {
+                tableRow.className = "item-row item-row-header-dark-style";
+            } else {
+                tableRow.className = "item-row item-row-header-white-style";
+            }
+
+            createHeaderTableLine(headers, tableRow);
+
+            tablesList.forEach(function (tableItem, rowIndex) {
+                let tableRow = dbTableContent.insertRow();
+
+                if (isDarkTheme) {
+                    tableRow.className = "item-row item-row-content item-row-content-dark-style";
+                } else {
+                    tableRow.className = "item-row item-row-content item-row-content-white-style";
+                }
+
+                createContentTableLine(tableItem, tableRow, rowIndex);
+
+                tableRow.onclick = function () {
+                    onTableLineClick(rowIndex);
+                };
+            });
+
+            updateControlPanelState();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    //endregion
+
+    // region Pagination
+    function loadPaginationPages(tableItemCount) {
+        pagesCount = Math.ceil(tableItemCount / MAX_TABLE_LINE_IN_PAGE);
+        clearContent(pagesByNumber);
+
+        if (currentPage > pagesCount || currentPage === LAST_PAGE) {
+            currentPage = pagesCount;
+        }
+
+        let firstPage;
+        let lastPage;
+
+        if (currentPage <= PAGINATION_SIZE / 2 || pagesCount <= PAGINATION_SIZE) {
+            firstPage = FIRST_PAGE;
+            lastPage = ((pagesCount > PAGINATION_SIZE) ? PAGINATION_SIZE : pagesCount) + 1;
+        } else if (currentPage > pagesCount - PAGINATION_SIZE / 2) {
+            firstPage = pagesCount - (PAGINATION_SIZE - 1);
+            lastPage = pagesCount + 1;
+        } else {
+            firstPage = currentPage - (PAGINATION_SIZE / 2 - 1);
+            lastPage = currentPage + (PAGINATION_SIZE / 2 + 1);
+        }
+
+        for (let i = firstPage; i < lastPage; i++) {
+            let button = document.createElement('button');
+            button.name = 'selectedPage';
+            button.value = i;
+
+            if (i === currentPage) {
+                button.className = 'pagination-item active';
+            } else {
+                button.className = 'pagination-item';
+            }
+
+            if (isDarkTheme) {
+                button.classList.add("pagination-item-dark-style")
+            } else {
+                button.classList.add("pagination-item-white-style")
+            }
+
+            button.appendChild(document.createTextNode(i));
+            pagesByNumber.appendChild(button);
+
+            button.onclick = function () {
+                if (isSelectedTable()) {
+                    getTable(selectedTable, parseInt(this.value));
+                }
+            }
+        }
+    }
+
+    function onFirstPageClick() {
+        if (isSelectedTable) {
+            getTable(selectedTable, 1);
+        }
+    }
+
+    function onPreviousPageClick() {
+        if (isSelectedTable) {
+            getTable(selectedTable, currentPage - 1);
+        }
+    }
+
+    function onNextPageClick() {
+        if (isSelectedTable) {
+            getTable(selectedTable, currentPage + 1);
+        }
+    }
+
+    function onLastPageClick() {
+        if (isSelectedTable) {
+            getTable(selectedTable, LAST_PAGE);
+        }
+    }
+
+    function onGoPageKeyUp(event) {
+        if (event.keyCode === ENTER_KEYCODE) {
+            event.preventDefault();
+            goPageNumber.click();
+        }
+    }
+
+    function onGoPageClick() {
+        if (isSelectedTable() && isNumber(pageNumberInput.value)) {
+            let page = parseInt(pageNumberInput.value);
+            if (page < 0) {
+                page = FIRST_PAGE;
+            }
+
+            getTable(selectedTable, page);
+            pageNumberInput.value = "";
+            pageNumberInput.focus();
+        }
+    }
+
+    function hidePagination() {
+        clearContent(pagesByNumber);
+        hideElement(pagination);
+    }
+
+    function showPagination() {
+        showElement(pagination);
+    }
+
+    // endregion
+
+    // region Base functionality
+    function showErrorMessage(text) {
+        errorText.innerHTML = text;
+        showElement(errorContent);
+    }
+
+    function createHeaderTableLine(tableItem, tableRow) {
+        tableItem.forEach(function (cellItem) {
+            let tableCell = document.createElement('th');
+            tableCell.innerText = cellItem['name'];
+
+            if (cellItem['isMutable'] !== true) {
+                tableCell.classList.add("immutable");
+            }
+
+            tableCell.classList.add(cellItem['type']);
+            tableCell.classList.add("header-cell");
+            tableCell.style.fontSize = currentContentFont + "pt";
+
+            if (isDarkTheme) {
+                tableCell.classList.add("item-cell-dark-style");
+            } else {
+                tableCell.classList.add("item-cell-white-style");
+            }
+
+            tableRow.appendChild(tableCell);
+        });
+    }
+
+    function createContentTableLine(tableItem, tableRow, rowIndex, isMutable = true) {
+        tableItem.forEach(function (cellItem, cellIndex) {
+            let tableCell = tableRow.insertCell(cellIndex);
+
+            if (cellIndex === 0) {
+                let text = document.createTextNode(cellItem);
+
+                if (isMutable) {
+                    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg.setAttribute("width", "24");
+                    svg.setAttribute("height", "24");
+                    svg.setAttribute("viewBox", "0 0 24 24");
+
+                    if (isDarkTheme) {
+                        svg.setAttribute("class", "img-change img-change-dark-style");
+                    } else {
+                        svg.setAttribute("class", "img-change img-change-white-style");
+                    }
+
+                    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttributeNS(null, "d", "M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z");
+                    svg.appendChild(path);
+
+                    svg.onclick = function () {
+                        onTableLineClick(rowIndex);
+                        onChangeTableItemClick(rowIndex)
+                    };
+                    tableCell.appendChild(svg);
+                }
+
+                tableCell.appendChild(text);
+            } else {
+                tableCell.innerText = cellItem;
+            }
+            tableCell.className = "item-cell";
+            tableCell.style.fontSize = currentContentFont + "pt";
+
+            if (isDarkTheme) {
+                tableCell.classList.add("item-cell-dark-style");
+            } else {
+                tableCell.classList.add("item-cell-white-style");
+            }
+        });
+    }
+
+    function getValidCurrentPage(tableCurrentPage) {
+        if (tableCurrentPage === LAST_PAGE) {
+            return LAST_PAGE;
+        } else if (pagesCount === 0 || tableCurrentPage < FIRST_PAGE) {
+            return FIRST_PAGE
+        } else if (tableCurrentPage > pagesCount) {
+            return pagesCount
+        } else {
+            return tableCurrentPage;
+        }
+    }
+
+    function updateControlPanelState() {
+        setTableControlButtonsState();
+        setSelectingAllState();
+    }
+
+    function setTableControlButtonsState() {
+        if (selectedTableRecordsPositions.length === 0) {
+            hideElement(deleteTableRecord);
+            hideElement(changeTableRecord);
+        } else if (selectedTableRecordsPositions.length === 1) {
+            showElement(deleteTableRecord);
+            showElement(changeTableRecord);
+        } else {
+            showElement(deleteTableRecord);
+            hideElement(changeTableRecord);
+        }
+    }
+
+    function setSelectingAllState() {
+        let tableRecordsSize = getElementsByClassName("item-row-content").length;
+
+        if (tableRecordsSize === 0) {
+            hideElement(selectAllElement);
+            isSelectedAllTableRecords = false;
+        } else if (selectedTableRecordsPositions.length === tableRecordsSize) {
+            showElement(selectAllElement);
+            selectAllElement.classList.remove('default-btn');
+            selectAllElement.classList.add('default-btn-active');
+            isSelectedAllTableRecords = true;
+        } else {
+            showElement(selectAllElement);
+            selectAllElement.classList.remove('default-btn-active');
+            selectAllElement.classList.add('default-btn');
+            isSelectedAllTableRecords = false;
+        }
+    }
+
+    function setTableLineSelected(tableLine, isSelected) {
+        for (let i = 0; i < tableLine.cells.length; i++) {
+            if (isSelected) {
+                if (isDarkTheme) {
+                    tableLine.cells[i].classList.add("item-active-dark-style");
+                } else {
+                    tableLine.cells[i].classList.add("item-active-white-style");
+                }
+            } else {
+                tableLine.cells[i].classList.remove("item-active-dark-style");
+                tableLine.cells[i].classList.remove("item-active-white-style");
+            }
+        }
+    }
+
+    function hideChangeTableItemModal() {
+        hideElement(changeTableItemModal);
+        selectedTableLineMap = null;
+    }
+
+    function hideCustomQueryModal() {
+        hideElement(customQueryModal);
+    }
+
+    function hideConfirmationModal() {
+        hideElement(confirmationModal);
+        confirmationModalHeader.innerHTML = DELETE_ENTITY_QUESTION_TEXT;
+        deleteDatabaseMark = false;
+        deleteTableMark = false;
+    }
+
+    function getChangedTableValuesMap() {
+        let map = new Map();
+
+        let headers = getElementsByClassName("detail-item-header");
+        let values = getElementsByClassName("detail-item-input");
+
+        for (let i = 0; i < headers.length; i++) {
+            let headerValue = headers[i].innerText;
+            let itemValue = values[i].value;
+
+            map.set(headerValue, itemValue);
+        }
+
+        return map;
+    }
+
+    function getCurrentTableValuesMap(position) {
+        let list = [];
+
+        let tr = dbTableContent
+            .getElementsByTagName("tr")[position]
+            .getElementsByTagName("td");
+
+        let header = dbTableContent
+            .getElementsByTagName("tr")[0]
+            .getElementsByTagName("th");
+
+        for (let i = 0; i < tr.length; i++) {
+            let name = header[i].innerText;
+            let itemValue = tr[i].innerText;
+            let varType = getVarTypeFromElement(header[i]);
+            let isImmutable = header[i].classList.contains("immutable");
+            let table = new TableModel(name, itemValue, varType, isImmutable);
+
+            list.push(table);
+        }
+
+        return list;
+    }
+
+    function hideDropdown() {
+        let dropdownContent = getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdownContent.length; i++) {
+            let openDropdown = dropdownContent[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+
+    function changeTheme(isDark) {
+        isDarkTheme = isDark;
+
+        if (isDarkTheme) {
+            showElement(lightTheme);
+            hideElement(darkTheme);
+            setDarkTheme();
+        } else {
+            hideElement(lightTheme);
+            showElement(darkTheme);
+            setWhiteTheme();
+        }
+    }
+
+    function setDarkTheme() {
+        baseContent.classList.remove("base-content-white-style");
+        baseContent.classList.add("base-content-dark-style");
+
+        tableContent.classList.remove("table-content-white-style");
+        tableContent.classList.add("table-content-dark-style");
+
+        dbTableContent.classList.remove("table-white-style");
+        dbTableContent.classList.add("table-dark-style");
+
+        goPageNumber.classList.remove("go-page-number-white-theme");
+        goPageNumber.classList.add("go-page-number-dark-theme");
+
+        hrPagination.classList.remove("hr-pagination-white-style");
+        hrPagination.classList.add("hr-pagination-dark-style");
+
+        infoContent.classList.remove("info-content-white-style");
+        infoContent.classList.add("info-content-dark-style");
+
+        notificationContent.classList.remove("notification-content-white-style");
+        notificationContent.classList.add("notification-content-dark-style");
+
+        errorContent.classList.remove("error-content-white-style");
+        errorContent.classList.add("error-content-dark-style");
+
+        closeErrorContent.classList.remove("close-error-content-white-style");
+        closeErrorContent.classList.add("close-error-content-dark-style");
+
+        detailItemContent.classList.remove("detail-item-content-white-style");
+        detailItemContent.classList.add("detail-item-content-dark-style");
+
+        detailItemHeader.classList.remove("modal-header-white-style");
+        detailItemHeader.classList.add("modal-header-dark-style");
+
+        detailActionsFooter.classList.remove("detail-actions-footer-white-style");
+        detailActionsFooter.classList.add("detail-actions-footer-dark-style");
+
+        confirmationModalContent.classList.remove("confirmation-modal-content-white-style");
+        confirmationModalContent.classList.add("confirmation-modal-content-dark-style");
+
+        actionButton.classList.remove("confirm-button-white-style");
+        actionButton.classList.add("confirm-button-dark-style");
+
+        cancelConfirmButton.classList.remove("cancel-confirm-button-white-style");
+        cancelConfirmButton.classList.add("cancel-confirm-button-dark-style");
+
+        customQueryModalContent.classList.remove("custom-query-modal-white-style");
+        customQueryModalContent.classList.add("custom-query-modal-dark-style");
+
+        customQueryModalHeader.classList.remove("custom-query-header-white-style");
+        customQueryModalHeader.classList.add("custom-query-header-dark-style");
+
+        customQuerySubmit.classList.remove("custom-query-submit-white-style");
+        customQuerySubmit.classList.add("custom-query-submit-dark-style");
+
+        customQueryEditContent.classList.remove("custom-query-editor-white-style");
+        customQueryEditContent.classList.add("custom-query-editor-dark-style");
+
+        tableInfo.classList.remove("table-info-white-style");
+        tableInfo.classList.add("table-info-dark-style");
+
+        detailActionButton.classList.remove("default-button-white-style");
+        detailActionButton.classList.add("default-button-dark-style");
+
+        detailCancelAlertButton.classList.remove("default-button-white-style");
+        detailCancelAlertButton.classList.add("default-button-dark-style");
+
+        copyErrorContent.classList.remove("copy-error-content-white-style");
+        copyErrorContent.classList.add("copy-error-content-dark-style");
+
+        let tableLine = getElementsByClassName("item-row");
+        for (let i = 0; i < tableLine.length; i++) {
+            if (i === 0) {
+                tableLine[i].classList.add("item-row-header-dark-style");
+                tableLine[i].classList.remove("item-row-header-white-style");
+            } else {
+                tableLine[i].classList.add("item-row-content-dark-style");
+                tableLine[i].classList.remove("item-row-content-white-style");
+            }
+        }
+
+        let imgRecordChange = getElementsByClassName("img-change");
+        for (let i = 0; i < imgRecordChange.length; i++) {
+            imgRecordChange[i].classList.add("img-change-dark-style");
+            imgRecordChange[i].classList.remove("img-change-white-style");
+        }
+
+        let activeItems = getElementsByClassName("item-cell");
+        for (let i = 0; i < activeItems.length; i++) {
+            if (activeItems[i].classList.contains("item-active-white-style")) {
+                activeItems[i].classList.remove("item-active-white-style");
+                activeItems[i].classList.add("item-active-dark-style");
+            }
+            activeItems[i].classList.remove("item-cell-white-style");
+            activeItems[i].classList.add("item-cell-dark-style");
+        }
+
+        let headerCells = getElementsByClassName("header-cell");
+        for (let i = 0; i < headerCells.length; i++) {
+            headerCells[i].classList.remove("item-cell-white-style");
+            headerCells[i].classList.add("item-cell-dark-style");
+        }
+
+        let paginationItem = getElementsByClassName("pagination-item");
+        for (let i = 0; i < paginationItem.length; i++) {
+            paginationItem[i].classList.remove("pagination-item-white-style");
+            paginationItem[i].classList.add("pagination-item-dark-style");
+        }
+
+        let detailItemHeaders = getElementsByClassName("detail-item-header");
+        for (let i = 0; i < detailItemHeaders.length; i++) {
+            detailItemHeaders[i].classList.remove("detail-item-header-white-style");
+            detailItemHeaders[i].classList.add("detail-item-header-dark-style");
+        }
+
+        let detailItemInputs = getElementsByClassName("detail-item-input");
+        for (let i = 0; i < detailItemInputs.length; i++) {
+            detailItemInputs[i].classList.remove("detail-item-input-white-style");
+            detailItemInputs[i].classList.add("detail-item-input-dark-style");
+        }
+    }
+
+    function setWhiteTheme() {
+        baseContent.classList.remove("base-content-dark-style");
+        baseContent.classList.add("base-content-white-style");
+
+        tableContent.classList.remove("table-content-dark-style");
+        tableContent.classList.add("table-content-white-style");
+
+        dbTableContent.classList.remove("table-dark-style");
+        dbTableContent.classList.add("table-white-style");
+
+        goPageNumber.classList.remove("go-page-number-dark-theme");
+        goPageNumber.classList.add("go-page-number-white-theme");
+
+        hrPagination.classList.remove("hr-pagination-dark-style");
+        hrPagination.classList.add("hr-pagination-white-style");
+
+        infoContent.classList.remove("info-content-dark-style");
+        infoContent.classList.add("info-content-white-style");
+
+        notificationContent.classList.remove("notification-content-dark-style");
+        notificationContent.classList.add("notification-content-white-style");
+
+        errorContent.classList.remove("error-content-dark-style");
+        errorContent.classList.add("error-content-white-style");
+
+        closeErrorContent.classList.remove("close-error-content-dark-style");
+        closeErrorContent.classList.add("close-error-content-white-style");
+
+        detailItemContent.classList.remove("detail-item-content-dark-style");
+        detailItemContent.classList.add("detail-item-content-white-style");
+
+        detailItemHeader.classList.remove("modal-header-dark-style");
+        detailItemHeader.classList.add("modal-header-white-style");
+
+        detailActionsFooter.classList.remove("detail-actions-footer-dark-style");
+        detailActionsFooter.classList.add("detail-actions-footer-white-style");
+
+        confirmationModalContent.classList.remove("confirmation-modal-content-dark-style");
+        confirmationModalContent.classList.add("confirmation-modal-content-white-style");
+
+        actionButton.classList.remove("confirm-button-dark-style");
+        actionButton.classList.add("confirm-button-white-style");
+
+        cancelConfirmButton.classList.remove("cancel-confirm-button-dark-style");
+        cancelConfirmButton.classList.add("cancel-confirm-button-white-style");
+
+        customQueryModalContent.classList.remove("custom-query-modal-dark-style");
+        customQueryModalContent.classList.add("custom-query-modal-white-style");
+
+        customQueryModalHeader.classList.remove("custom-query-header-dark-style");
+        customQueryModalHeader.classList.add("custom-query-header-white-style");
+
+        customQuerySubmit.classList.remove("custom-query-submit-dark-style");
+        customQuerySubmit.classList.add("custom-query-submit-white-style");
+
+        customQueryEditContent.classList.remove("custom-query-editor-dark-style");
+        customQueryEditContent.classList.add("custom-query-editor-white-style");
+
+        tableInfo.classList.remove("table-info-dark-style");
+        tableInfo.classList.add("table-info-white-style");
+
+        detailActionButton.classList.remove("default-button-dark-style");
+        detailActionButton.classList.add("default-button-white-style");
+
+        detailCancelAlertButton.classList.remove("default-button-dark-style");
+        detailCancelAlertButton.classList.add("default-button-white-style");
+
+        copyErrorContent.classList.remove("copy-error-content-dark-style");
+        copyErrorContent.classList.add("copy-error-content-white-style");
+
+        let tableLine = getElementsByClassName("item-row");
+        for (let i = 0; i < tableLine.length; i++) {
+            if (i === 0) {
+                tableLine[i].classList.add("item-row-header-white-style");
+                tableLine[i].classList.remove("item-row-header-dark-style");
+            } else {
+                tableLine[i].classList.add("item-row-content-white-style");
+                tableLine[i].classList.remove("item-row-content-dark-style");
+            }
+        }
+
+        let imgRecordChange = getElementsByClassName("img-change");
+        for (let i = 0; i < imgRecordChange.length; i++) {
+            imgRecordChange[i].classList.add("img-change-white-style");
+            imgRecordChange[i].classList.remove("img-change-dark-style");
+        }
+
+        let activeItems = getElementsByClassName("item-cell");
+        for (let i = 0; i < activeItems.length; i++) {
+            if (activeItems[i].classList.contains("item-active-dark-style")) {
+                activeItems[i].classList.remove("item-active-dark-style");
+                activeItems[i].classList.add("item-active-white-style");
+            }
+
+            activeItems[i].classList.remove("item-cell-dark-style");
+            activeItems[i].classList.add("item-cell-white-style");
+        }
+
+        let headerCells = getElementsByClassName("header-cell");
+        for (let i = 0; i < headerCells.length; i++) {
+            headerCells[i].classList.remove("item-cell-dark-style");
+            headerCells[i].classList.add("item-cell-white-style");
+        }
+
+        let paginationItem = getElementsByClassName("pagination-item");
+        for (let i = 0; i < paginationItem.length; i++) {
+            paginationItem[i].classList.remove("pagination-item-dark-style");
+            paginationItem[i].classList.add("pagination-item-white-style");
+        }
+
+        let detailItemHeaders = getElementsByClassName("detail-item-header");
+        for (let i = 0; i < detailItemHeaders.length; i++) {
+            detailItemHeaders[i].classList.remove("detail-item-header-dark-style");
+            detailItemHeaders[i].classList.add("detail-item-header-white-style");
+        }
+
+        let detailItemInputs = getElementsByClassName("detail-item-input");
+        for (let i = 0; i < detailItemInputs.length; i++) {
+            detailItemInputs[i].classList.remove("detail-item-input-dark-style");
+            detailItemInputs[i].classList.add("detail-item-input-white-style");
+        }
+    }
+
+    function setContentFont(fontSize) {
+        let tableCells = getElementsByClassName("item-cell");
+        for (let i = 0; i < tableCells.length; i++) {
+            tableCells[i].style.fontSize = fontSize + "pt";
+        }
+
+        let tableHeaders = getElementsByClassName("header-cell");
+        fontSize = parseInt(fontSize, 10) + 2;
+
+        for (let i = 0; i < tableHeaders.length; i++) {
+            tableHeaders[i].style.fontSize = fontSize + "pt";
+        }
+    }
+
+    function failedConnection(status, statusText, responseText) {
+        if (status === 0) {
+            isConnectionLost = true;
+
+            connectionStatus.innerHTML = CONNECTION_LOST_MESSAGE;
+            connectionStatus.style.color = '#e53935';
+
+            let switcher = false;
+            let backgroundInterval = setInterval(function () {
+                if (!switcher) {
+                    invisibleElement(connectionStatus);
+                } else {
+                    visibleElement(connectionStatus);
+                }
+                switcher = !switcher;
+            }, 130);
+
+            let backgroundTimeout = setTimeout(function () {
+                clearInterval(backgroundInterval);
+                clearTimeout(backgroundTimeout);
+                visibleElement(connectionStatus);
+            }, 1100);
+        } else {
+            showErrorMessage(status + " " + statusText + "\n" + responseText);
+        }
+
+        hideLoader();
+    }
+
+    function showLoader() {
+        showElement(loader)
+    }
+
+    function hideLoader() {
+        hideElement(loader)
+    }
+
+    // endregion
+
+    // region Utils
+    function copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+        } else {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+    }
+
+    function isEmptyTableContent(tablesList) {
+        return tablesList.length === 0
+    }
+
+    function isSelectedDatabase() {
+        return selectedDatabase != null && selectedDatabase !== "";
+    }
+
+    function isSelectedTable() {
+        return selectedTable != null && selectedTable !== "";
+    }
+
+    function isNumber(str) {
+        return /^\d+$/.test(str);
+    }
+
+    function clearContent(element) {
+        element.innerHTML = '';
+    }
+
+    function getElementById(id) {
+        return document.getElementById(id);
+    }
+
+    function getElementsByClassName(name) {
+        return document.getElementsByClassName(name);
+    }
+
+    function showElement(element) {
+        element.style.display = "block";
+    }
+
+    function hideElement(element) {
+        element.style.display = "none";
+    }
+
+    function invisibleElement(element) {
+        element.style.visibility = "hidden";
+    }
+
+    function visibleElement(element) {
+        element.style.visibility = "visible";
+    }
+
+    function removeLast(array) {
+        return array.slice(0, -1);
+    }
+
+    function setEnabled(element, enabled = true) {
+        if (enabled) {
+            element.classList.remove("disabled")
+        } else {
+            element.classList.add("disabled")
+        }
+    }
+
+    function containsItem(array, item) {
+        return array.indexOf(item) !== -1
+    }
+
+    function removeByItem(array, item) {
+        let index = array.indexOf(item);
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+    }
+
+    function getVarTypeFromElement(element) {
+        if (element.classList.contains(FIELD_TYPE_NULL)) {
+            return FIELD_TYPE_NULL
+        } else if (element.classList.contains(FIELD_TYPE_INTEGER)) {
+            return FIELD_TYPE_INTEGER
+        } else if (element.classList.contains(FIELD_TYPE_REAL)) {
+            return FIELD_TYPE_REAL
+        } else if (element.classList.contains(FIELD_TYPE_BLOB)) {
+            return FIELD_TYPE_BLOB
+        } else if (element.classList.contains(FIELD_TYPE_TEXT)) {
+            return FIELD_TYPE_TEXT
+        }
+    }
+
+    function setInputFilter(input, inputFilter) {
+        ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+            input.addEventListener(event, function() {
+                if (inputFilter.test(this.value)) {
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                } else if (this.hasOwnProperty("oldValue")) {
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                }
+            });
+        });
+    }
+    // endregion
+
+    // region Models
+    let TableModel = class {
+        constructor(header, value, varType, isImmutable) {
+            this.header = header;
+            this.value = value;
+            this.varType = varType;
+            this.isImmutable = isImmutable;
+        }
+    };
+    // endregion
+
+</script>
+</html>
