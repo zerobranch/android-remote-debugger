@@ -20,6 +20,7 @@ public class HttpLogModel {
     public String requestBody;
     public String errorMessage;
     public String responseBody;
+    public boolean isCompletedRequest;
     public Map<String, String> requestHeaders;
     public Map<String, String> responseHeaders;
     public Map<String, String> queryParams;

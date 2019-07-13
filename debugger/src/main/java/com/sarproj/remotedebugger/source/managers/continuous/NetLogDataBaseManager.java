@@ -53,16 +53,18 @@ public final class NetLogDataBaseManager {
         }
     }
 
-    public void addLog(HttpLogModel model) {
+    public HttpLogModel addLog(HttpLogModel model) {
         synchronized (LOCK) {
-            model.responseBody = model.responseBody.replaceAll("'", "''");
-            httpLogRepository.add(model);
+            if (model.responseBody != null) {
+                model.responseBody = model.responseBody.replaceAll("'", "''");
+            }
+            return httpLogRepository.add(model);
         }
     }
 
-    public long getLastId(long defaultValue) {
+    public void update(HttpLogModel model) {
         synchronized (LOCK) {
-            return httpLogRepository.getLastId(defaultValue);
+            httpLogRepository.update(model);
         }
     }
 

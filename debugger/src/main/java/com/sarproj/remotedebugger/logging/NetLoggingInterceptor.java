@@ -2,6 +2,7 @@ package com.sarproj.remotedebugger.logging;
 
 import android.net.Uri;
 
+import com.sarproj.remotedebugger.source.managers.continuous.NetLogDataBaseManager;
 import com.sarproj.remotedebugger.source.models.HttpLogModel;
 
 import java.io.IOException;
@@ -80,17 +81,24 @@ public class NetLoggingInterceptor implements Interceptor {
             httpLogModel.requestBody = buffer.readString(charset);
         }
 
+        httpLogModel.isCompletedRequest = false;
+        httpLogModel = NetLogDataBaseManager.getInstance().addLog(httpLogModel);
+
         long startTime = System.currentTimeMillis();
         Response response;
         try {
             response = chain.proceed(request);
         } catch (Exception e) {
             httpLogModel.errorMessage = e.getMessage();
+            httpLogModel.isCompletedRequest = true;
+            NetLogDataBaseManager.getInstance().update(httpLogModel);
             throw e;
         }
 
         httpLogModel.requestDuration = System.currentTimeMillis() - startTime;
         httpLogModel.requestStartTime = startTime;
+
+        httpLogModel.isCompletedRequest = true;
 
         httpLogModel.code = response.code();
         httpLogModel.message = response.message();
@@ -129,10 +137,7 @@ public class NetLoggingInterceptor implements Interceptor {
             }
         }
 
-//        NetLogDataBaseManager.getInstance().getLastId(0);
-//        NetLogDataBaseManager.getInstance().addLog(httpLogModel);
-//        NetLogDataBaseManager.getInstance().getLastId(0);
-//        NetLogDataBaseManager.getInstance().clearAll();
+        NetLogDataBaseManager.getInstance().update(httpLogModel);
 
         return response;
     }
