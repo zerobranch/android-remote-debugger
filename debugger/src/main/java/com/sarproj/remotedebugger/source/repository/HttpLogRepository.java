@@ -31,16 +31,16 @@ public class HttpLogRepository {
         values.put(NetLogTable.RESPONSE_BODY_SIZE, model.responseBodySize);
         values.put(NetLogTable.PORT, model.port);
         values.put(NetLogTable.IS_COMPLETED_REQUEST, model.isCompletedRequest);
-        values.put(NetLogTable.METHOD, model.method);
-        values.put(NetLogTable.MESSAGE, model.message);
-        values.put(NetLogTable.REQUEST_CONTENT_TYPE, model.requestContentType);
-        values.put(NetLogTable.BASE_URL, model.baseUrl);
-        values.put(NetLogTable.IP, model.ip);
-        values.put(NetLogTable.FULL_URL, model.fullUrl);
-        values.put(NetLogTable.SHORT_URL, model.shortUrl);
-        values.put(NetLogTable.REQUEST_BODY, model.requestBody);
-        values.put(NetLogTable.ERROR_MESSAGE, model.errorMessage);
-        values.put(NetLogTable.RESPONSE_BODY, model.responseBody);
+        values.put(NetLogTable.METHOD, sqlFormat(model.method));
+        values.put(NetLogTable.MESSAGE, sqlFormat(model.message));
+        values.put(NetLogTable.REQUEST_CONTENT_TYPE, sqlFormat(model.requestContentType));
+        values.put(NetLogTable.BASE_URL, sqlFormat(model.baseUrl));
+        values.put(NetLogTable.IP, sqlFormat(model.ip));
+        values.put(NetLogTable.FULL_URL, sqlFormat(model.fullUrl));
+        values.put(NetLogTable.SHORT_URL, sqlFormat(model.shortUrl));
+        values.put(NetLogTable.REQUEST_BODY, sqlFormat(model.requestBody));
+        values.put(NetLogTable.ERROR_MESSAGE, sqlFormat(model.errorMessage));
+        values.put(NetLogTable.RESPONSE_BODY, sqlFormat(model.responseBody));
         putMap(values, NetLogTable.REQUEST_HEADERS, model.requestHeaders);
         putMap(values, NetLogTable.RESPONSE_HEADERS, model.responseHeaders);
         putMap(values, NetLogTable.QUERY_PARAMS, model.queryParams);
@@ -59,16 +59,16 @@ public class HttpLogRepository {
         values.put(NetLogTable.RESPONSE_BODY_SIZE, model.responseBodySize);
         values.put(NetLogTable.PORT, model.port);
         values.put(NetLogTable.IS_COMPLETED_REQUEST, model.isCompletedRequest);
-        values.put(NetLogTable.METHOD, model.method);
-        values.put(NetLogTable.MESSAGE, model.message);
-        values.put(NetLogTable.REQUEST_CONTENT_TYPE, model.requestContentType);
-        values.put(NetLogTable.BASE_URL, model.baseUrl);
-        values.put(NetLogTable.IP, model.ip);
-        values.put(NetLogTable.FULL_URL, model.fullUrl);
-        values.put(NetLogTable.SHORT_URL, model.shortUrl);
-        values.put(NetLogTable.REQUEST_BODY, model.requestBody);
-        values.put(NetLogTable.ERROR_MESSAGE, model.errorMessage);
-        values.put(NetLogTable.RESPONSE_BODY, model.responseBody);
+        values.put(NetLogTable.METHOD, sqlFormat(model.method));
+        values.put(NetLogTable.MESSAGE, sqlFormat(model.message));
+        values.put(NetLogTable.REQUEST_CONTENT_TYPE, sqlFormat(model.requestContentType));
+        values.put(NetLogTable.BASE_URL, sqlFormat(model.baseUrl));
+        values.put(NetLogTable.IP, sqlFormat(model.ip));
+        values.put(NetLogTable.FULL_URL, sqlFormat(model.fullUrl));
+        values.put(NetLogTable.SHORT_URL, sqlFormat(model.shortUrl));
+        values.put(NetLogTable.REQUEST_BODY, sqlFormat(model.requestBody));
+        values.put(NetLogTable.ERROR_MESSAGE, sqlFormat(model.errorMessage));
+        values.put(NetLogTable.RESPONSE_BODY, sqlFormat(model.responseBody));
         putMap(values, NetLogTable.REQUEST_HEADERS, model.requestHeaders);
         putMap(values, NetLogTable.RESPONSE_HEADERS, model.responseHeaders);
         putMap(values, NetLogTable.QUERY_PARAMS, model.queryParams);
@@ -77,7 +77,7 @@ public class HttpLogRepository {
     }
 
     public void clearAll() {
-        database.execSQL("delete from " + REMOTE_NET_LOGS_TABLE_NAME);
+        database.delete(REMOTE_NET_LOGS_TABLE_NAME, null, null);
     }
 
     private HttpLogModel getLast() {
@@ -93,28 +93,28 @@ public class HttpLogRepository {
             httpLogModel.id = 0;
         } else {
             httpLogModel.id = cursor.getLong(cursor.getColumnIndex(NetLogTable.ID));
-            httpLogModel.method = cursor.getString(cursor.getColumnIndex(NetLogTable.METHOD));
+            httpLogModel.method = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.METHOD)));
             httpLogModel.code = cursor.getInt(cursor.getColumnIndex(NetLogTable.CODE));
-            httpLogModel.message = cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE));
+            httpLogModel.message = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE)));
             httpLogModel.requestStartTime = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_START_TIME));
             httpLogModel.requestDuration = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_DURATION));
-            httpLogModel.requestContentType = cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_CONTENT_TYPE));
+            httpLogModel.requestContentType = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_CONTENT_TYPE)));
             httpLogModel.requestBodySize = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_BODY_SIZE));
             httpLogModel.responseBodySize = cursor.getLong(cursor.getColumnIndex(NetLogTable.RESPONSE_BODY_SIZE));
-            httpLogModel.baseUrl = cursor.getString(cursor.getColumnIndex(NetLogTable.BASE_URL));
+            httpLogModel.baseUrl = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.BASE_URL)));
             httpLogModel.port = cursor.getInt(cursor.getColumnIndex(NetLogTable.PORT));
-            httpLogModel.ip = cursor.getString(cursor.getColumnIndex(NetLogTable.IP));
-            httpLogModel.fullUrl = cursor.getString(cursor.getColumnIndex(NetLogTable.FULL_URL));
-            httpLogModel.shortUrl = cursor.getString(cursor.getColumnIndex(NetLogTable.SHORT_URL));
-            httpLogModel.requestBody = cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_BODY));
-            httpLogModel.errorMessage = cursor.getString(cursor.getColumnIndex(NetLogTable.ERROR_MESSAGE));
-            httpLogModel.responseBody = cursor.getString(cursor.getColumnIndex(NetLogTable.RESPONSE_BODY));
+            httpLogModel.ip = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.IP)));
+            httpLogModel.fullUrl = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.FULL_URL)));
+            httpLogModel.shortUrl = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.SHORT_URL)));
+            httpLogModel.requestBody = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_BODY)));
+            httpLogModel.errorMessage = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.ERROR_MESSAGE)));
+            httpLogModel.responseBody = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.RESPONSE_BODY)));
             httpLogModel.isCompletedRequest = cursor.getInt(cursor.getColumnIndex(NetLogTable.IS_COMPLETED_REQUEST)) == 1;
 
             Type empMapType = new TypeToken<HashMap<String, String>>() {}.getType();
-            httpLogModel.requestHeaders = gson.fromJson(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_HEADERS)), empMapType);
-            httpLogModel.responseHeaders = gson.fromJson(cursor.getString(cursor.getColumnIndex(NetLogTable.RESPONSE_HEADERS)), empMapType);
-            httpLogModel.queryParams = gson.fromJson(cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_PARAMS)), empMapType);
+            httpLogModel.requestHeaders = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_HEADERS))), empMapType);
+            httpLogModel.responseHeaders = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.RESPONSE_HEADERS))), empMapType);
+            httpLogModel.queryParams = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_PARAMS))), empMapType);
         }
 
         cursor.close();
@@ -150,10 +150,24 @@ public class HttpLogRepository {
     private void putMap(ContentValues values, String field, Map<String, String> map) {
         String val = null;
         if (map != null) {
-            val = gson.toJson(map);
+            val = sqlFormat(gson.toJson(map));
         }
 
         values.put(field, val);
+    }
+
+    private String sqlFormat(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replaceAll("'", "&shadow_39&");
+    }
+
+    private String getValidString(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replaceAll("&shadow_39&", "'");
     }
 
     private interface NetLogTable {

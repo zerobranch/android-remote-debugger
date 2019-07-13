@@ -63,9 +63,6 @@ public final class ContinuousDataBaseManager {
 
     public HttpLogModel addHttpLog(HttpLogModel model) {
         synchronized (LOCK) {
-            if (model.responseBody != null) {
-                model.responseBody = model.responseBody.replaceAll("'", "''");
-            }
             return httpLogRepository.add(model);
         }
     }

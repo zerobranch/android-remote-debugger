@@ -7,6 +7,7 @@ import android.view.View;
 import com.sarproj.example.db.DBHelper;
 import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.logging.NetLoggingInterceptor;
+import com.sarproj.remotedebugger.utils.FileUtils;
 
 import java.io.IOException;
 
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.debug).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                String val = FileUtils.getTextFromAssets(getAssets(), "test.json");
+                RemoteDebugger.d("test json", val);
+
                 int i = 4;
                 while (i > 0) {
                     RemoteDebugger.d("testTag", "[ " + i + " ] debug это уровенть отладки");
@@ -283,27 +288,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    private static String json = "{\n" +
-            "   \"menu\":{\n" +
-            "      \"id\":\"file\",\n" +
-            "      \"value\":\"File\",\n" +
-            "      \"popup\":{\n" +
-            "         \"menuitem\":[\n" +
-            "            {\n" +
-            "               \"value\":\"New\",\n" +
-            "               \"onclick\":\"CreateNewDoc()\"\n" +
-            "            },\n" +
-            "            {\n" +
-            "               \"value\":\"Open\",\n" +
-            "               \"onclick\":\"OpenDoc()\"\n" +
-            "            },\n" +
-            "            {\n" +
-            "               \"value\":\"Close\",\n" +
-            "               \"onclick\":\"CloseDoc()\"\n" +
-            "            }\n" +
-            "         ]\n" +
-            "      }\n" +
-            "   }\n" +
-            "}";
 }
