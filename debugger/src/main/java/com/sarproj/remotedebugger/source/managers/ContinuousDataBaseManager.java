@@ -1,31 +1,37 @@
-package com.sarproj.remotedebugger.source.managers.continuous;
+package com.sarproj.remotedebugger.source.managers;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
-import com.sarproj.remotedebugger.source.repository.LogRepository;
+import com.sarproj.remotedebugger.source.models.HttpLogModel;
 import com.sarproj.remotedebugger.source.models.LogModel;
+import com.sarproj.remotedebugger.source.repository.HttpLogRepository;
+import com.sarproj.remotedebugger.source.repository.LogRepository;
 
 import java.util.List;
 
-public final class LogDataBaseManager {
+public final class ContinuousDataBaseManager {
     private static final String DATABASE_NAME = "remote_debugger_data.db";
-    private static final Object LOCK = new Object();
+    private final static Object LOCK = new Object();
     private final SQLiteDatabase database;
-    private LogRepository logRepository;
-    private static LogDataBaseManager instance;
+    private static ContinuousDataBaseManager instance;
+    private final HttpLogRepository httpLogRepository;
+    private final LogRepository logRepository;
 
-    private LogDataBaseManager(Context context) {
+    private ContinuousDataBaseManager(Context context) {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
         database = context.openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READWRITE, null);
         database.setVersion(Integer.MAX_VALUE);
+
+        httpLogRepository = new HttpLogRepository(database);
+        httpLogRepository.createHttpLogsTable(database);
 
         logRepository = new LogRepository(database);
         logRepository.createLogsTable(database);
     }
 
-    public static LogDataBaseManager getInstance() {
+    public static ContinuousDataBaseManager getInstance() {
         synchronized (LOCK) {
             if (instance == null) {
                 throw new IllegalStateException("RemoteDebugger is not initialized. " +
@@ -38,7 +44,7 @@ public final class LogDataBaseManager {
     public static void init(Context context) {
         synchronized (LOCK) {
             if (instance == null) {
-                instance = new LogDataBaseManager(context);
+                instance = new ContinuousDataBaseManager(context);
             }
         }
     }
@@ -55,19 +61,40 @@ public final class LogDataBaseManager {
         }
     }
 
-    public void add(LogModel model) {
+    public HttpLogModel addHttpLog(HttpLogModel model) {
+        synchronized (LOCK) {
+            if (model.responseBody != null) {
+                model.responseBody = model.responseBody.replaceAll("'", "''");
+            }
+            return httpLogRepository.add(model);
+        }
+    }
+
+    public void updateHttpLog(HttpLogModel model) {
+        synchronized (LOCK) {
+            httpLogRepository.update(model);
+        }
+    }
+
+    public void clearAllHttpLog() {
+        synchronized (LOCK) {
+            httpLogRepository.clearAll();
+        }
+    }
+
+    public void addLog(LogModel model) {
         synchronized (LOCK) {
             logRepository.addLog(model);
         }
     }
 
-    public List<LogModel> getByFilter(int offset, String level, String tag, String search) {
+    public List<LogModel> getLogByFilter(int offset, String level, String tag, String search) {
         synchronized (LOCK) {
             return logRepository.getLogsByFilter(offset, level, tag, search);
         }
     }
 
-    public void clearAll() {
+    public void clearAllLog() {
         synchronized (LOCK) {
             logRepository.clearAllLogs();
         }

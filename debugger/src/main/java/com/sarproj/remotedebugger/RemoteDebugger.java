@@ -5,9 +5,8 @@ import android.content.Context;
 import com.sarproj.remotedebugger.logging.Logger;
 import com.sarproj.remotedebugger.logging.RemoteLog;
 import com.sarproj.remotedebugger.source.local.LogLevel;
-import com.sarproj.remotedebugger.source.managers.continuous.LogDataBaseManager;
 import com.sarproj.remotedebugger.settings.Settings;
-import com.sarproj.remotedebugger.source.managers.continuous.NetLogDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 
 public final class RemoteDebugger {
     private static boolean enabledDefaultLogging;
@@ -27,8 +26,7 @@ public final class RemoteDebugger {
         }
 
         Settings.init(builder.context.getApplicationContext());
-        LogDataBaseManager.init(builder.context.getApplicationContext());
-        NetLogDataBaseManager.init(builder.context.getApplicationContext());
+        ContinuousDataBaseManager.init(builder.context.getApplicationContext());
         ServerRunner.getInstance().init(builder.context.getApplicationContext(), builder.enabledInternalLogging);
         remoteLog = new RemoteLog();
     }
@@ -40,8 +38,7 @@ public final class RemoteDebugger {
     public synchronized static void stop() {
         ServerRunner.getInstance().stop();
         Settings.destroy();
-        LogDataBaseManager.destroy();
-        NetLogDataBaseManager.destroy();
+        ContinuousDataBaseManager.destroy();
         remoteLog = null;
     }
 

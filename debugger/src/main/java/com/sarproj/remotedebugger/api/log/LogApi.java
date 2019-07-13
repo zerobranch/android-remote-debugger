@@ -5,7 +5,7 @@ import android.content.Context;
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.settings.Settings;
-import com.sarproj.remotedebugger.source.managers.continuous.LogDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
@@ -82,7 +82,7 @@ public final class LogApi extends Api {
     }
 
     private String clearAllLogs() {
-        getLogDataBaseManager().clearAll();
+        getDataBase().clearAllLog();
         return EMPTY;
     }
 
@@ -118,11 +118,11 @@ public final class LogApi extends Api {
             primaryLevel = null;
         }
 
-        return serialize(getLogDataBaseManager().getByFilter(offset, primaryLevel, primaryTag, primarySearch));
+        return serialize(getDataBase().getLogByFilter(offset, primaryLevel, primaryTag, primarySearch));
     }
 
-    private LogDataBaseManager getLogDataBaseManager() {
-        return LogDataBaseManager.getInstance();
+    private ContinuousDataBaseManager getDataBase() {
+        return ContinuousDataBaseManager.getInstance();
     }
 
     private String getLogLevels() {

@@ -2,7 +2,7 @@ package com.sarproj.remotedebugger.logging;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.source.local.LogLevel;
-import com.sarproj.remotedebugger.source.managers.continuous.LogDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.LogModel;
 
 import java.io.PrintWriter;
@@ -31,7 +31,7 @@ public final class RemoteLog {
             }
         }
 
-        getDataBase().add(new LogModel(logLevel.name(), tag, msg));
+        getDataBase().addLog(new LogModel(logLevel.name(), tag, msg));
 
         if (RemoteDebugger.isEnabledDefaultLogging()) {
             defaultLog(logLevel.priority(), tag, msg, th);
@@ -58,7 +58,7 @@ public final class RemoteLog {
         return sw.toString();
     }
 
-    private LogDataBaseManager getDataBase() {
-        return LogDataBaseManager.getInstance();
+    private ContinuousDataBaseManager getDataBase() {
+        return ContinuousDataBaseManager.getInstance();
     }
 }

@@ -220,10 +220,10 @@ public class MainActivity extends AppCompatActivity {
 //            @Override
 //            public boolean onLongClick(View v) {
 //                Set<String> integers = new HashSet<>();
-//                integers.add("100");
-//                integers.add("1001");
-//                integers.add("10032");
-//                integers.add("910024");
+//                integers.addLog("100");
+//                integers.addLog("1001");
+//                integers.addLog("10032");
+//                integers.addLog("910024");
 //
 //                SharedPreferences sharedPref = getSharedPreferences("QWE_PREF_1", Context.MODE_PRIVATE);
 //                sharedPref.edit().putInt("key_2", 123).apply();
