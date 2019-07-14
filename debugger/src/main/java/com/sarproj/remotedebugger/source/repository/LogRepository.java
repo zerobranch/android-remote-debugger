@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class LogRepository {
-    private static final int LIMIT_LOGS_PACKS = 1000;
     private static final String REMOTE_LOGS_TABLE_NAME = "log_data";
     private final SQLiteDatabase database;
 
@@ -29,7 +28,7 @@ public final class LogRepository {
         database.insert(REMOTE_LOGS_TABLE_NAME, null, values);
     }
 
-    public List<LogModel> getLogsByFilter(int offset, String level, String tag, String search) {
+    public List<LogModel> getLogsByFilter(int offset, int limit, String level, String tag, String search) {
         final StringBuilder query = new StringBuilder()
                 .append("select ")
                 .append(LogTable.TIME + ", ")
@@ -79,7 +78,7 @@ public final class LogRepository {
         query.append(" order by ")
                 .append(LogTable.TIME)
                 .append(" limit ")
-                .append(LIMIT_LOGS_PACKS);
+                .append(limit);
 
         if (offset != -1) {
             query.append(" offset ").append(offset);

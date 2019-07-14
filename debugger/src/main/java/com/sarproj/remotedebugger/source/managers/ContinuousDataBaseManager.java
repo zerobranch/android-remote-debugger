@@ -85,9 +85,9 @@ public final class ContinuousDataBaseManager {
         }
     }
 
-    public List<LogModel> getLogByFilter(int offset, String level, String tag, String search) {
+    public List<LogModel> getLogByFilter(int offset, int limit, String level, String tag, String search) {
         synchronized (LOCK) {
-            return logRepository.getLogsByFilter(offset, level, tag, search);
+            return logRepository.getLogsByFilter(offset, limit, level, tag, search);
         }
     }
 

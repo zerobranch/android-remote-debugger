@@ -23,6 +23,7 @@ import fi.iki.elonen.NanoHTTPD;
 public final class LogApi extends Api {
     private static final int UNLIMITED_OFFSET = -1;
     private static final boolean DEFAULT_LOG_IS_DISCOLOR = false;
+    private static final int LIMIT_LOGS_PACKS = 1000;
 
     public LogApi(Context context) {
         super(context);
@@ -118,7 +119,7 @@ public final class LogApi extends Api {
             primaryLevel = null;
         }
 
-        return serialize(getDataBase().getLogByFilter(offset, primaryLevel, primaryTag, primarySearch));
+        return serialize(getDataBase().getLogByFilter(offset, LIMIT_LOGS_PACKS, primaryLevel, primaryTag, primarySearch));
     }
 
     private ContinuousDataBaseManager getDataBase() {

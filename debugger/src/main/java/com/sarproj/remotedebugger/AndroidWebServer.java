@@ -7,6 +7,7 @@ import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.database.DatabaseApi;
 import com.sarproj.remotedebugger.api.error.ErrorPage;
 import com.sarproj.remotedebugger.api.log.LogApi;
+import com.sarproj.remotedebugger.api.net.NetworkApi;
 import com.sarproj.remotedebugger.api.sharedprefs.SharedPrefsApi;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.http.HttpResponse;
@@ -25,6 +26,7 @@ final class AndroidWebServer extends NanoHTTPD {
     private Api logApi;
     private Api databaseApi;
     private Api sharedPrefsApi;
+    private Api networkApi;
     private ErrorPage errorPage;
 
     AndroidWebServer(Context context, String hostname, int port) {
@@ -63,22 +65,32 @@ final class AndroidWebServer extends NanoHTTPD {
                 destroyDatabaseApi();
                 destroySharedPrefsApi();
                 destroyErrorPage();
+                destroyNetworkApi();
                 return getSimpleResponse(Host.INDEX);
             } else if (host == Host.LOGGING) {
                 destroyDatabaseApi();
                 destroySharedPrefsApi();
                 destroyErrorPage();
+                destroyNetworkApi();
                 return HttpResponse.newFixedLengthResponse(getLogApi().execute(params));
             } else if (host == Host.DATABASE) {
                 destroyLogApi();
                 destroySharedPrefsApi();
                 destroyErrorPage();
+                destroyNetworkApi();
                 return HttpResponse.newFixedLengthResponse(getDatabaseApi().execute(params));
-            }  else if (host == Host.SHARED_REFERENCES) {
+            } else if (host == Host.SHARED_REFERENCES) {
                 destroyDatabaseApi();
                 destroyLogApi();
+                destroyNetworkApi();
                 destroyErrorPage();
                 return HttpResponse.newFixedLengthResponse(getSharedPrefsApi().execute(params));
+            } else if (host == Host.NETWORK) {
+                destroyDatabaseApi();
+                destroyLogApi();
+                destroySharedPrefsApi();
+                destroyErrorPage();
+                return HttpResponse.newFixedLengthResponse(getNetworkApi().execute(params));
             } else if (host.isCss()) {
                 return getCssResponse(host);
             } else if (host.isPng()) {
@@ -173,6 +185,20 @@ final class AndroidWebServer extends NanoHTTPD {
             sharedPrefsApi = new SharedPrefsApi(context);
         }
         return sharedPrefsApi;
+    }
+
+    private Api getNetworkApi() {
+        if (networkApi == null) {
+            networkApi = new NetworkApi(context);
+        }
+        return networkApi;
+    }
+
+    private void destroyNetworkApi() {
+        if (networkApi != null) {
+            networkApi.destroy();
+            networkApi = null;
+        }
     }
 
     private void destroyLogApi() {
