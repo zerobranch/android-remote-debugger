@@ -1,6 +1,5 @@
 package com.sarproj.remotedebugger.logging;
 
-import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.LogModel;
@@ -10,6 +9,15 @@ import java.io.StringWriter;
 
 public final class RemoteLog {
     private static final String DEFAULT_TAG = RemoteLog.class.getSimpleName();
+    private final boolean isEnabledDefaultLogging;
+    private final ContinuousDataBaseManager continuousDataBaseManager;
+    private final Logger logger;
+
+    public RemoteLog(Logger logger, ContinuousDataBaseManager continuousDataBaseManager, boolean isEnabledDefaultLogging) {
+        this.logger = (logger == null) ? new DefaultLogger() : logger;
+        this.isEnabledDefaultLogging = isEnabledDefaultLogging;
+        this.continuousDataBaseManager = continuousDataBaseManager;
+    }
 
     public void log(LogLevel logLevel, String tag, String msg, Throwable th) {
         if (tag == null) {
@@ -31,18 +39,14 @@ public final class RemoteLog {
             }
         }
 
-        getDataBase().addLog(new LogModel(logLevel.name(), tag, msg));
+        continuousDataBaseManager.addLog(new LogModel(logLevel.name(), tag, msg));
 
-        if (RemoteDebugger.isEnabledDefaultLogging()) {
+        if (isEnabledDefaultLogging) {
             defaultLog(logLevel.priority(), tag, msg, th);
         }
     }
 
     private void defaultLog(int priority, String tag, String msg, Throwable th) {
-        Logger logger = RemoteDebugger.getLogger();
-        if (logger == null) {
-            logger = new DefaultLogger();
-        }
         logger.log(priority, tag, msg, th);
     }
 
@@ -56,9 +60,5 @@ public final class RemoteLog {
         th.printStackTrace(pw);
         pw.flush();
         return sw.toString();
-    }
-
-    private ContinuousDataBaseManager getDataBase() {
-        return ContinuousDataBaseManager.getInstance();
     }
 }
