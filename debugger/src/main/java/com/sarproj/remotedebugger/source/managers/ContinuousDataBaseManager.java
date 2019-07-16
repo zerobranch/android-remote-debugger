@@ -96,4 +96,8 @@ public final class ContinuousDataBaseManager {
             logRepository.clearAllLogs();
         }
     }
+
+    public List<HttpLogModel> getHttpLogs(String logsLevel, String logsSearch) {
+        return null;
+    }
 }

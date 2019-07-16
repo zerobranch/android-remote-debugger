@@ -7,7 +7,7 @@ import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.database.DatabaseApi;
 import com.sarproj.remotedebugger.api.error.ErrorPage;
 import com.sarproj.remotedebugger.api.log.LogApi;
-import com.sarproj.remotedebugger.api.net.NetworkApi;
+import com.sarproj.remotedebugger.api.network.NetworkApi;
 import com.sarproj.remotedebugger.api.sharedprefs.SharedPrefsApi;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.http.HttpResponse;
