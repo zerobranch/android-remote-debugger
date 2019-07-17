@@ -14,7 +14,13 @@ public final class RemoteLog {
     private final Logger logger;
 
     public RemoteLog(Logger logger, ContinuousDataBaseManager continuousDataBaseManager, boolean isEnabledDefaultLogging) {
-        this.logger = (logger == null) ? new DefaultLogger() : logger;
+        if (logger != null) {
+            isEnabledDefaultLogging = true;
+            this.logger = logger;
+        } else {
+            this.logger = new DefaultLogger();
+        }
+
         this.isEnabledDefaultLogging = isEnabledDefaultLogging;
         this.continuousDataBaseManager = continuousDataBaseManager;
     }
@@ -42,12 +48,8 @@ public final class RemoteLog {
         continuousDataBaseManager.addLog(new LogModel(logLevel.name(), tag, msg));
 
         if (isEnabledDefaultLogging) {
-            defaultLog(logLevel.priority(), tag, msg, th);
+            logger.log(logLevel.priority(), tag, msg, th);
         }
-    }
-
-    private void defaultLog(int priority, String tag, String msg, Throwable th) {
-        logger.log(priority, tag, msg, th);
     }
 
     private String getStacktrace(Throwable th) {
