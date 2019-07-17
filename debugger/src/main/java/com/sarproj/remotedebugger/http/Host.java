@@ -5,11 +5,13 @@ public enum Host {
     DATABASE("/database", "database.html"),
     LOGGING("/logging", "logging.html"),
     SHARED_REFERENCES("/shared-preferences", "shared-preferences.html"),
+    NETWORK("/network", "network.html"),
     ERROR_PAGE("/error", "error.html"),
     INDEX_STYLE("/css/index.css", "css/index.css"),
     ERROR_PAGE_STYLE("/css/error.css", "css/error.css"),
     DATABASE_STYLE("/css/database.css", "css/database.css"),
     LOGGING_STYLE("/css/logging.css", "css/logging.css"),
+    NETWORK_STYLE("/css/network.css", "css/network.css"),
     SHARED_REFERENCES_STYLE("/css/shared-preferences.css", "css/shared-preferences.css");
 
     private String host;

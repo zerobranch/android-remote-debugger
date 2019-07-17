@@ -9,14 +9,9 @@ import com.sarproj.remotedebugger.settings.Settings;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 
 public final class RemoteDebugger {
-    private static boolean enabledDefaultLogging;
-    private static Logger logger;
     private static RemoteLog remoteLog;
 
-    private RemoteDebugger(Builder builder) {
-        enabledDefaultLogging = builder.enabledDefaultLogging;
-        logger = builder.logger;
-
+    public static void init(Builder builder) {
         if (isAlive()) {
             stop();
         }
@@ -28,11 +23,11 @@ public final class RemoteDebugger {
         Settings.init(builder.context.getApplicationContext());
         ContinuousDataBaseManager.init(builder.context.getApplicationContext());
         ServerRunner.getInstance().init(builder.context.getApplicationContext(), builder.enabledInternalLogging);
-        remoteLog = new RemoteLog();
+        remoteLog = new RemoteLog(builder.logger, ContinuousDataBaseManager.getInstance(), builder.enabledDefaultLogging);
     }
 
     public static void init(Context context) {
-        new Builder(context).build();
+        init(new Builder(context));
     }
 
     public synchronized static void stop() {
@@ -67,22 +62,15 @@ public final class RemoteDebugger {
             return this;
         }
 
+        public Builder enabledDefaultLogging(boolean enabledDefaultLogging) {
+            this.enabledDefaultLogging = enabledDefaultLogging;
+            return this;
+        }
+
         public Builder logger(Logger logger) {
             this.logger = logger;
             return this;
         }
-
-        public RemoteDebugger build() {
-            return new RemoteDebugger(this);
-        }
-    }
-
-    public static boolean isEnabledDefaultLogging() {
-        return enabledDefaultLogging;
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
     public static void v(Throwable th) {
@@ -190,6 +178,9 @@ public final class RemoteDebugger {
     }
 
     private static void log(LogLevel logLevel, String tag, String msg, Throwable th) {
+        // TODO: при (remoteLog == null) сделать exception
+        // TODO: протестировать при каких условиях isAlive == false, возможно тогда, когда запущен другой сервер и сделать свой exception
+
         if (!isAlive() || remoteLog == null) {
             return;
         }

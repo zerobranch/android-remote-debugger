@@ -26,12 +26,12 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new DBHelper(getApplicationContext());
 
         setContentView(R.layout.activity_main);
-        RemoteDebugger.init(getApplicationContext());
 
-        new RemoteDebugger.Builder(getApplication())
+        RemoteDebugger.init(new RemoteDebugger
+                .Builder(getApplication())
                 .enabled(true)
                 .enabledInternalLogging(true)
-                .build();
+        );
 
 //        RemoteLog.d("My debug");
 //        RemoteLog.d("My debug", "testTag");
@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 //        RemoteLog.f("My fatal");
 //        RemoteLog.f("My fatal", "testTag");
 //        RemoteLog.f("My fatal", "testTag", new RuntimeException("Null pointer"));
-
 
 
         findViewById(R.id.user).setOnClickListener(new View.OnClickListener() {
@@ -272,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                         Request request = new Request.Builder()
                                 .url("https://newsapi.org/v2/everything?q=bitcoin&from=2019-06-09&sortBy=publishedAt&apiKey=034a923c789e49dd8aed574a2e05d5f7")
 //                                .post(body)
-                                .addHeader("X-API-KEY","123123")
+                                .addHeader("API-KEY", "123123")
 
                                 .build();
 

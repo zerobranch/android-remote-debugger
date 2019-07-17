@@ -5,6 +5,8 @@ import android.net.Uri;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.HttpLogModel;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -27,9 +29,10 @@ import okio.GzipSource;
 public class NetLoggingInterceptor implements Interceptor {
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
+    @NotNull
     @Override
     @SuppressWarnings("ConstantConditions")
-    public Response intercept(Chain chain) throws IOException {
+    public Response intercept(@NotNull Chain chain) throws IOException {
         HttpLogModel httpLogModel = new HttpLogModel();
 
         Request request = chain.request();
@@ -110,8 +113,7 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         ResponseBody responseBody = response.body();
-
-        if (HttpHeaders.hasBody(response) && responseBody != null) {
+        if (HttpHeaders.promisesBody(response) && responseBody != null) {
             long responseContentLength = responseBody.contentLength();
             httpLogModel.responseBodySize = responseContentLength;
 

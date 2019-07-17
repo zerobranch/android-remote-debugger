@@ -31,10 +31,12 @@ public final class Settings {
 
     public enum Key {
         THEME(String.class),
+        NETWORK_FONT(int.class),
         LOG_FONT(int.class),
         DATABASE_FONT(int.class),
         SHARED_PREFERENCES_FONT(int.class),
-        LOG_IS_DISCOLOR(boolean.class);
+        LOG_IS_DISCOLOR(boolean.class),
+        NETWORK_LOG_IS_DISCOLOR(boolean.class);
 
         private Class<?> clazz;
 
