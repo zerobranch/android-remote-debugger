@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
                                         return chain.proceed(originalRequest);
                                     }
                                 })
-                                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+//                                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                                 .addInterceptor(new NetLoggingInterceptor())
                                 .build();
 

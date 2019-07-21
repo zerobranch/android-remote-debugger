@@ -260,21 +260,21 @@
 
     window.onload = function () {
         loadLogLevels();
-        loadDefaultsSetting();
-        onPageResize();
+        // loadDefaultsSetting();
+        // onPageResize();
 
-        window.addEventListener("keyup", onGlobalKeyUp);
-        window.addEventListener("keydown", onGlobalKeyDown);
-        onChangeThemeClick(false);
+        // window.addEventListener("keyup", onGlobalKeyUp);
+        // window.addEventListener("keydown", onGlobalKeyDown);
+        // onChangeThemeClick(false);
     };
 
-    window.onclick = function (e) {
-        if (!e.target.matches('.dropdown-btn')) {
-            if (filterDropdownContent.classList.contains('show')) {
-                filterDropdownContent.classList.remove('show');
-            }
-        }
-    };
+    // window.onclick = function (e) {
+    //     if (!e.target.matches('.dropdown-btn')) {
+    //         if (filterDropdownContent.classList.contains('show')) {
+    //             filterDropdownContent.classList.remove('show');
+    //         }
+    //     }
+    // };
 
     function onTagClick(item) {
         if (globalKeyPressed === COMMAND_KEYCODE || globalKeyPressed === CTRL_KEYCODE) {
@@ -644,38 +644,13 @@
     }
 
     function loadLogLevels() {
-        let body = 'getLogLevels=' + encodeURIComponent('');
-        httpGet('logging', body, function (response) {
-            let logLevels = JSON.parse(response);
-            clearContent(filterDropdownContent);
+        let body = 'getLogs=' + encodeURIComponent('')
+            + '&' + 'search=' + encodeURIComponent('qwe')
+            + '&' + 'level=' + encodeURIComponent('404');
 
-            if (logsLevel == null) {
-                logLevelBtn.innerHTML =
-                    logLevels[0].charAt(0).toUpperCase() + logLevels[0].toLocaleLowerCase().slice(1);
-
-                logsLevel = logLevels[0];
-                loadLogs();
-            }
-
-            logLevels.forEach(function (log) {
-                let label = document.createElement("label");
-                label.className = "dropdown-content-item";
-                let logFormattedText = log.charAt(0).toUpperCase() + log.toLocaleLowerCase().slice(1);
-                let labelText = document.createTextNode(logFormattedText);
-
-                label.onclick = function () {
-                    logLevelBtn.innerHTML = logFormattedText;
-
-                    logsOffset = -1;
-                    logsLevel = log;
-
-                    clearTimeoutHandle();
-                    loadLogs();
-                };
-
-                label.appendChild(labelText);
-                filterDropdownContent.appendChild(label);
-            });
+        httpGet('network', body, function (response) {
+            let logs = JSON.parse(response);
+            console.log(logs);
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
         });

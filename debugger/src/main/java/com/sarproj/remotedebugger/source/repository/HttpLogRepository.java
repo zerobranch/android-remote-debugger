@@ -3,13 +3,16 @@ package com.sarproj.remotedebugger.source.repository;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sarproj.remotedebugger.source.models.HttpLogModel;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HttpLogRepository {
@@ -168,6 +171,72 @@ public class HttpLogRepository {
             return null;
         }
         return value.replaceAll("&shadow_39&", "'");
+    }
+
+    public List<HttpLogModel> getHttpLogs(String level, String search) {
+        final StringBuilder query = new StringBuilder()
+                .append("select * from " + REMOTE_NET_LOGS_TABLE_NAME);
+
+//        if (!TextUtils.isEmpty(level) || !TextUtils.isEmpty(search)) {
+//            query.append(" where ");
+//        }
+
+        if (!TextUtils.isEmpty(level)) {
+//            query.append(LogRepository.LogTable.LEVEL)
+//                    .append(" = ")
+//                    .append("'")
+//                    .append(level)
+//                    .append("'");
+        }
+
+        if (!TextUtils.isEmpty(search)) {
+//            if (!TextUtils.isEmpty(level)) {
+//                query.append(" and ");
+//            }
+
+//            query.append(LogRepository.LogTable.MESSAGE)
+//                    .append(" like ")
+//                    .append("'%")
+//                    .append(search)
+//                    .append("%'");
+        }
+
+        query.append(" order by ").append(NetLogTable.ID);
+
+        final Cursor cursor = database.rawQuery(query.toString(), null);
+        final List<HttpLogModel> logModels = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            HttpLogModel httpLogModel = new HttpLogModel();
+            httpLogModel.id = cursor.getLong(cursor.getColumnIndex(NetLogTable.ID));
+            httpLogModel.method = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.METHOD)));
+            httpLogModel.code = cursor.getInt(cursor.getColumnIndex(NetLogTable.CODE));
+            httpLogModel.message = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE)));
+            httpLogModel.requestStartTime = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_START_TIME));
+            httpLogModel.requestDuration = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_DURATION));
+            httpLogModel.requestContentType = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_CONTENT_TYPE)));
+            httpLogModel.requestBodySize = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_BODY_SIZE));
+            httpLogModel.responseBodySize = cursor.getLong(cursor.getColumnIndex(NetLogTable.RESPONSE_BODY_SIZE));
+            httpLogModel.baseUrl = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.BASE_URL)));
+            httpLogModel.port = cursor.getInt(cursor.getColumnIndex(NetLogTable.PORT));
+            httpLogModel.ip = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.IP)));
+            httpLogModel.fullUrl = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.FULL_URL)));
+            httpLogModel.shortUrl = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.SHORT_URL)));
+            httpLogModel.requestBody = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_BODY)));
+            httpLogModel.errorMessage = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.ERROR_MESSAGE)));
+            httpLogModel.responseBody = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.RESPONSE_BODY)));
+            httpLogModel.isCompletedRequest = cursor.getInt(cursor.getColumnIndex(NetLogTable.IS_COMPLETED_REQUEST)) == 1;
+
+            Type empMapType = new TypeToken<HashMap<String, String>>() {}.getType();
+            httpLogModel.requestHeaders = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_HEADERS))), empMapType);
+            httpLogModel.responseHeaders = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.RESPONSE_HEADERS))), empMapType);
+            httpLogModel.queryParams = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_PARAMS))), empMapType);
+
+            logModels.add(httpLogModel);
+        }
+
+        cursor.close();
+        return logModels;
     }
 
     private interface NetLogTable {

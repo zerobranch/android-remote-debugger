@@ -98,6 +98,6 @@ public final class ContinuousDataBaseManager {
     }
 
     public List<HttpLogModel> getHttpLogs(String logsLevel, String logsSearch) {
-        return null;
+        return httpLogRepository.getHttpLogs(logsLevel, logsSearch);
     }
 }
