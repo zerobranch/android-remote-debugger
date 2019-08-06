@@ -382,7 +382,8 @@
         };
 
         metaDiv.onclick = function () {
-            // похожа вещь
+            clearContent(queryBodyDiv);
+            createDetailQueryMeta(logLine, queryBodyDiv);
         };
 
         infoDiv.appendChild(requestDiv);
@@ -399,6 +400,81 @@
         queryBodyPre.appendChild(document.createTextNode(text));
 
         queryBodyDiv.appendChild(queryBodyPre);
+    }
+
+    function createDetailQueryMeta(logLine, queryBodyDiv) {
+        let meta = document.createElement("div");
+        meta.className = "meta";
+
+        let table = document.createElement("table");
+        meta.className = "meta-table";
+
+        let headerTr = document.createElement("tr");
+        headerTr.className = "meta-table-header";
+
+        let thBase = document.createElement("th");
+        let thHeader = document.createElement("th");
+
+        thBase.appendChild(document.createTextNode("Base"));
+        thHeader.appendChild(document.createTextNode("Header"));
+
+        headerTr.appendChild(thBase);
+        headerTr.appendChild(thHeader);
+
+
+        let contentTr = document.createElement("tr");
+        contentTr.className = "meta-table-content";
+
+        let baseContentTd = document.createElement("td");
+        baseContentTd.className = "base-content";
+
+        let requestUrl = document.createElement("p");
+        requestUrl.appendChild(document.createTextNode("Request URL: " + logLine.fullUrl));
+
+        let requestMethod = document.createElement("p");
+        requestMethod.appendChild(document.createTextNode("Request Method: " + logLine.method));
+
+        let statusCode = document.createElement("p");
+        statusCode.appendChild(document.createTextNode("Status Code: " + logLine.code));
+
+        let remoteAddress = document.createElement("p");
+        remoteAddress.appendChild(document.createTextNode("Remote Address: " + logLine.ip + ":" + logLine.port));
+
+        let referrerPolicy = document.createElement("p");
+        referrerPolicy.appendChild(document.createTextNode("Referrer Policy: no-referrer-when-downgrade ПОКА ХЗ ЧТО ЭТО"));
+
+        let queryParam = document.createElement("p");
+        queryParam.appendChild(document.createTextNode("Query parameters: тут параметры get запросов (если есть)" + JSON.stringify(logLine.queryParams)));
+
+        baseContentTd.appendChild(requestUrl);
+        baseContentTd.appendChild(requestMethod);
+        baseContentTd.appendChild(statusCode);
+        baseContentTd.appendChild(remoteAddress);
+        baseContentTd.appendChild(referrerPolicy);
+        baseContentTd.appendChild(queryParam);
+
+
+        /*---------------*/
+
+        let headersContentTd = document.createElement("td");
+        headersContentTd.className = "headers-content";
+
+        let requestHeaders = document.createElement("p");
+        requestHeaders.appendChild(document.createTextNode("Request Headers: " + JSON.stringify(logLine.requestHeaders)));
+
+        let responseHeaders = document.createElement("p");
+        responseHeaders.appendChild(document.createTextNode("Response Headers: " + JSON.stringify(logLine.responseHeaders)));
+
+        headersContentTd.appendChild(requestHeaders);
+        headersContentTd.appendChild(responseHeaders);
+
+        contentTr.appendChild(baseContentTd);
+        contentTr.appendChild(headersContentTd);
+
+        table.appendChild(headerTr);
+        table.appendChild(contentTr);
+        meta.appendChild(table);
+        queryBodyDiv.appendChild(meta);
     }
 
     // function createDetailQueryInfo(text) {
