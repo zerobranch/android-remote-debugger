@@ -1,11 +1,12 @@
-package com.sarproj.remotedebugger.source.models;
+package com.sarproj.remotedebugger.source.models.httplog;
 
 import java.util.Map;
 
 public class HttpLogModel {
     public long id;
+    public long queryId;
     public String method;
-    public int code = -1;
+    public String code;
     public String message;
     public long requestStartTime = -1;
     public long requestDuration = -1;
@@ -13,14 +14,14 @@ public class HttpLogModel {
     public long requestBodySize = -1;
     public long responseBodySize = -1;
     public String baseUrl;
-    public int port = -1;
+    public String port;
     public String ip;
     public String fullUrl;
     public String shortUrl;
     public String requestBody;
     public String errorMessage;
     public String responseBody;
-    public boolean isCompletedRequest;
+    public QueryType queryType;
     public Map<String, String> requestHeaders;
     public Map<String, String> responseHeaders;
     public Map<String, String> queryParams;

@@ -4,8 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
-import com.sarproj.remotedebugger.source.models.HttpLogModel;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
 import com.sarproj.remotedebugger.source.models.LogModel;
+import com.sarproj.remotedebugger.source.models.httplog.QueryType;
 import com.sarproj.remotedebugger.source.repository.HttpLogRepository;
 import com.sarproj.remotedebugger.source.repository.LogRepository;
 
@@ -61,15 +64,15 @@ public final class ContinuousDataBaseManager {
         }
     }
 
-    public HttpLogModel addHttpLog(HttpLogModel model) {
+    public long addHttpLogRequest(HttpLogRequest logRequest) {
         synchronized (LOCK) {
-            return httpLogRepository.add(model);
+            return httpLogRepository.addWithAutoQueryId(mapToLogModel(logRequest));
         }
     }
 
-    public void updateHttpLog(HttpLogModel model) {
+    public void addHttpLogResponse(HttpLogResponse logResponse) {
         synchronized (LOCK) {
-            httpLogRepository.update(model);
+            httpLogRepository.add(mapToLogModel(logResponse));
         }
     }
 
@@ -99,5 +102,44 @@ public final class ContinuousDataBaseManager {
 
     public List<HttpLogModel> getHttpLogs(String logsLevel, String logsSearch) {
         return httpLogRepository.getHttpLogs(logsLevel, logsSearch);
+    }
+
+    private HttpLogModel mapToLogModel(HttpLogResponse httpLogResponse) {
+        HttpLogModel httpLogModel = new HttpLogModel();
+        httpLogModel.queryId = httpLogResponse.queryId;
+        httpLogModel.method = httpLogResponse.method;
+        httpLogModel.code = httpLogResponse.code;
+        httpLogModel.message = httpLogResponse.message;
+        httpLogModel.requestDuration = httpLogResponse.requestDuration;
+        httpLogModel.responseBodySize = httpLogResponse.responseBodySize;
+        httpLogModel.baseUrl = httpLogResponse.baseUrl;
+        httpLogModel.port = httpLogResponse.port;
+        httpLogModel.ip = httpLogResponse.ip;
+        httpLogModel.fullUrl = httpLogResponse.fullUrl;
+        httpLogModel.shortUrl = httpLogResponse.shortUrl;
+        httpLogModel.errorMessage = httpLogResponse.errorMessage;
+        httpLogModel.responseBody = httpLogResponse.responseBody;
+        httpLogModel.responseHeaders = httpLogResponse.responseHeaders;
+        httpLogModel.queryType = QueryType.RESPONSE;
+        return httpLogModel;
+    }
+
+    private HttpLogModel mapToLogModel(HttpLogRequest httpLogRequest) {
+        HttpLogModel httpLogModel = new HttpLogModel();
+        httpLogModel.queryId = httpLogRequest.queryId;
+        httpLogModel.method = httpLogRequest.method;
+        httpLogModel.requestStartTime = httpLogRequest.requestStartTime;
+        httpLogModel.requestContentType = httpLogRequest.requestContentType;
+        httpLogModel.requestBodySize = httpLogRequest.requestBodySize;
+        httpLogModel.baseUrl = httpLogRequest.baseUrl;
+        httpLogModel.port = httpLogRequest.port;
+        httpLogModel.ip = httpLogRequest.ip;
+        httpLogModel.fullUrl = httpLogRequest.fullUrl;
+        httpLogModel.shortUrl = httpLogRequest.shortUrl;
+        httpLogModel.requestBody = httpLogRequest.requestBody;
+        httpLogModel.requestHeaders = httpLogRequest.requestHeaders;
+        httpLogModel.queryParams = httpLogRequest.queryParams;
+        httpLogModel.queryType = QueryType.REQUEST;
+        return httpLogModel;
     }
 }
