@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class HttpLogModel {
     public long id;
-    public long queryId;
+    public long queryId = -1;
     public String method;
     public String code;
     public String message;

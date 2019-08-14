@@ -30,45 +30,20 @@ public class HttpLogRepository {
             database.beginTransaction();
             ContentValues values = new ContentValues();
 
-            values.put(NetLogTable.CODE, model.code);
-            values.put(NetLogTable.REQUEST_START_TIME, model.requestStartTime);
-            values.put(NetLogTable.REQUEST_DURATION, model.requestDuration);
-            values.put(NetLogTable.REQUEST_BODY_SIZE, model.requestBodySize);
-            values.put(NetLogTable.RESPONSE_BODY_SIZE, model.responseBodySize);
-            values.put(NetLogTable.PORT, model.port);
-            values.put(NetLogTable.METHOD, sqlFormat(model.method));
-            values.put(NetLogTable.QUERY_TYPE, sqlFormat(model.queryType.name()));
-            values.put(NetLogTable.MESSAGE, sqlFormat(model.message));
-            values.put(NetLogTable.REQUEST_CONTENT_TYPE, sqlFormat(model.requestContentType));
-            values.put(NetLogTable.BASE_URL, sqlFormat(model.baseUrl));
-            values.put(NetLogTable.IP, sqlFormat(model.ip));
-            values.put(NetLogTable.FULL_URL, sqlFormat(model.fullUrl));
-            values.put(NetLogTable.SHORT_URL, sqlFormat(model.shortUrl));
-            values.put(NetLogTable.REQUEST_BODY, sqlFormat(model.requestBody));
-            values.put(NetLogTable.ERROR_MESSAGE, sqlFormat(model.errorMessage));
-            values.put(NetLogTable.RESPONSE_BODY, sqlFormat(model.responseBody));
-            putMap(values, NetLogTable.REQUEST_HEADERS, model.requestHeaders);
-            putMap(values, NetLogTable.RESPONSE_HEADERS, model.responseHeaders);
-            putMap(values, NetLogTable.QUERY_PARAMS, model.queryParams);
-
-            long id = database.insert(REMOTE_NET_LOGS_TABLE_NAME, null, values);
-
+            long id = add(model);
             model.queryId = id;
 
-            values.clear();
             values.put(NetLogTable.QUERY_ID, model.queryId);
             database.update(REMOTE_NET_LOGS_TABLE_NAME, values, NetLogTable.ID + "=" + id, null);
             database.setTransactionSuccessful();
-
             return id;
         } finally {
             database.endTransaction();
         }
     }
 
-    public void add(HttpLogModel model) {
+    public long add(HttpLogModel model) {
         ContentValues values = new ContentValues();
-
         values.put(NetLogTable.CODE, model.code);
         values.put(NetLogTable.REQUEST_START_TIME, model.requestStartTime);
         values.put(NetLogTable.REQUEST_DURATION, model.requestDuration);
@@ -91,7 +66,7 @@ public class HttpLogRepository {
         putMap(values, NetLogTable.RESPONSE_HEADERS, model.responseHeaders);
         putMap(values, NetLogTable.QUERY_PARAMS, model.queryParams);
 
-        database.insert(REMOTE_NET_LOGS_TABLE_NAME, null, values);
+        return database.insert(REMOTE_NET_LOGS_TABLE_NAME, null, values);
     }
 
     public void clearAll() {
