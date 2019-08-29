@@ -91,7 +91,7 @@ public class NetLoggingInterceptor implements Interceptor {
         logResponse.queryId = logRequest.queryId;
 
         long startTime = System.currentTimeMillis();
-        logRequest.requestStartTime = startTime;
+        logRequest.requestTime = startTime;
 
         Response response;
         try {
@@ -102,7 +102,10 @@ public class NetLoggingInterceptor implements Interceptor {
             throw e;
         }
 
-        logResponse.requestDuration = System.currentTimeMillis() - startTime;
+        long endTime = System.currentTimeMillis();
+
+        logResponse.requestDuration = endTime - startTime;
+        logResponse.responseTime = endTime;
         logResponse.code = String.valueOf(response.code());
         logResponse.message = response.message();
         logResponse.method = logRequest.method;

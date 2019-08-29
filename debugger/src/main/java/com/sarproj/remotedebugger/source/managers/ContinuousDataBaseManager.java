@@ -113,6 +113,7 @@ public final class ContinuousDataBaseManager {
         HttpLogModel httpLogModel = new HttpLogModel();
         httpLogModel.queryId = httpLogResponse.queryId;
         httpLogModel.method = httpLogResponse.method;
+        httpLogModel.responseTime= httpLogResponse.responseTime;
         httpLogModel.code = httpLogResponse.code;
         httpLogModel.message = httpLogResponse.message;
         httpLogModel.requestDuration = httpLogResponse.requestDuration;
@@ -133,7 +134,7 @@ public final class ContinuousDataBaseManager {
         HttpLogModel httpLogModel = new HttpLogModel();
         httpLogModel.queryId = httpLogRequest.queryId;
         httpLogModel.method = httpLogRequest.method;
-        httpLogModel.requestStartTime = httpLogRequest.requestStartTime;
+        httpLogModel.requestTime = httpLogRequest.requestTime;
         httpLogModel.requestContentType = httpLogRequest.requestContentType;
         httpLogModel.requestBodySize = httpLogRequest.requestBodySize;
         httpLogModel.baseUrl = httpLogRequest.baseUrl;

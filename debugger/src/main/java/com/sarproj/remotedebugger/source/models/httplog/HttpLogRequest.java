@@ -6,7 +6,7 @@ public class HttpLogRequest {
     public long id;
     public String queryId;
     public String method;
-    public long requestStartTime;
+    public long requestTime;
     public String requestContentType;
     public long requestBodySize;
     public String baseUrl;

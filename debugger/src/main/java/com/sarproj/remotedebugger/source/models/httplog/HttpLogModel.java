@@ -8,7 +8,8 @@ public class HttpLogModel {
     public String method;
     public String code;
     public String message;
-    public long requestStartTime = -1;
+    public long requestTime = -1;
+    public long responseTime = -1;
     public long requestDuration = -1;
     public String requestContentType;
     public long requestBodySize = -1;

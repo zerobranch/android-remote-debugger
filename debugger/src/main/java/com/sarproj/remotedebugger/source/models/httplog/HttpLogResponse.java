@@ -8,6 +8,7 @@ public class HttpLogResponse {
     public String method;
     public String code;
     public String message;
+    public long responseTime;
     public long requestDuration;
     public long responseBodySize;
     public String baseUrl;

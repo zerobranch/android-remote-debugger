@@ -45,7 +45,8 @@ public class HttpLogRepository {
     public long add(HttpLogModel model) {
         ContentValues values = new ContentValues();
         values.put(NetLogTable.CODE, model.code);
-        values.put(NetLogTable.REQUEST_START_TIME, model.requestStartTime);
+        values.put(NetLogTable.REQUEST_TIME, model.requestTime);
+        values.put(NetLogTable.RESPONSE_TIME, model.responseTime);
         values.put(NetLogTable.REQUEST_DURATION, model.requestDuration);
         values.put(NetLogTable.REQUEST_BODY_SIZE, model.requestBodySize);
         values.put(NetLogTable.RESPONSE_BODY_SIZE, model.responseBodySize);
@@ -81,7 +82,8 @@ public class HttpLogRepository {
                 NetLogTable.CODE + " text," +
                 NetLogTable.MESSAGE + " text," +
                 NetLogTable.QUERY_TYPE + " text," +
-                NetLogTable.REQUEST_START_TIME + " integer," +
+                NetLogTable.REQUEST_TIME + " integer," +
+                NetLogTable.RESPONSE_TIME + " integer," +
                 NetLogTable.REQUEST_DURATION + " integer," +
                 NetLogTable.REQUEST_CONTENT_TYPE + " text," +
                 NetLogTable.REQUEST_BODY_SIZE + " integer," +
@@ -200,7 +202,8 @@ public class HttpLogRepository {
             httpLogModel.queryType = QueryType.valueOf(cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_TYPE)));
             httpLogModel.code = cursor.getString(cursor.getColumnIndex(NetLogTable.CODE));
             httpLogModel.message = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE)));
-            httpLogModel.requestStartTime = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_START_TIME));
+            httpLogModel.requestTime = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_TIME));
+            httpLogModel.responseTime = cursor.getLong(cursor.getColumnIndex(NetLogTable.RESPONSE_TIME));
             httpLogModel.requestDuration = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_DURATION));
             httpLogModel.requestContentType = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_CONTENT_TYPE)));
             httpLogModel.requestBodySize = cursor.getLong(cursor.getColumnIndex(NetLogTable.REQUEST_BODY_SIZE));
@@ -256,7 +259,8 @@ public class HttpLogRepository {
         String METHOD = "method";
         String CODE = "code";
         String MESSAGE = "message";
-        String REQUEST_START_TIME = "request_start_time";
+        String REQUEST_TIME = "request_time";
+        String RESPONSE_TIME = "response_time";
         String REQUEST_DURATION = "request_duration";
         String REQUEST_CONTENT_TYPE = "request_content_type";
         String REQUEST_BODY_SIZE = "request_body_size";
