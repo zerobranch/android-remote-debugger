@@ -11,7 +11,6 @@ import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.utils.FileUtils;
-import com.sarproj.remotedebugger.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +52,7 @@ public final class LogApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String settingsJson = getValue(params, HtmlParams.DATA);
+        final String settingsJson = getStringValue(params, HtmlParams.DATA);
         final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
 
         if (settings.isDiscolorLog == null) {
@@ -87,33 +86,11 @@ public final class LogApi extends Api {
         return EMPTY;
     }
 
-    @SuppressWarnings("ConstantConditions")
     private String getLogs(Map<String, List<String>> params) {
-        String primaryOffset = null;
-        String primaryTag = null;
-        String primaryLevel = null;
-        String primarySearch = null;
-        int offset = UNLIMITED_OFFSET;
-
-        if (containsValue(params, LogHtmlKey.LOGS_OFFSET)) {
-            primaryOffset = getValue(params, LogHtmlKey.LOGS_OFFSET);
-        }
-
-        if (containsValue(params, LogHtmlKey.LOGS_TAG)) {
-            primaryTag = getValue(params, LogHtmlKey.LOGS_TAG);
-        }
-
-        if (containsValue(params, LogHtmlKey.LOGS_LEVEL)) {
-            primaryLevel = getValue(params, LogHtmlKey.LOGS_LEVEL);
-        }
-
-        if (containsValue(params, LogHtmlKey.LOGS_SEARCH)) {
-            primarySearch = getValue(params, LogHtmlKey.LOGS_SEARCH);
-        }
-
-        if (NumberUtils.isInt(primaryOffset)) {
-            offset = Integer.parseInt(primaryOffset);
-        }
+        int offset = getIntValue(params, LogHtmlKey.LOGS_OFFSET, UNLIMITED_OFFSET);
+        String primaryTag = getStringValue(params, LogHtmlKey.LOGS_TAG);
+        String primaryLevel = getStringValue(params, LogHtmlKey.LOGS_LEVEL);
+        String primarySearch = getStringValue(params, LogHtmlKey.LOGS_SEARCH);
 
         if (LogLevel.VERBOSE.name().equalsIgnoreCase(primaryLevel)) {
             primaryLevel = null;

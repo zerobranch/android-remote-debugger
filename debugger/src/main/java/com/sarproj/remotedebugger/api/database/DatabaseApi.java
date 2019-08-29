@@ -14,7 +14,6 @@ import com.sarproj.remotedebugger.source.models.Table;
 import com.sarproj.remotedebugger.source.models.Tables;
 import com.sarproj.remotedebugger.source.models.UpdatingDatabase;
 import com.sarproj.remotedebugger.utils.FileUtils;
-import com.sarproj.remotedebugger.utils.NumberUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,17 +68,9 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String tableName = getValue(params, HtmlParams.NAME);
-        int tablePage = FIRST_PAGE;
-        int pageSize = DEFAULT_PAGE_SIZE;
-
-        if (containsValue(params, HtmlParams.PAGE) && NumberUtils.isInt(getValue(params, HtmlParams.PAGE))) {
-            tablePage = Integer.parseInt(getValue(params, HtmlParams.PAGE));
-        }
-
-        if (containsValue(params, HtmlParams.SIZE) && NumberUtils.isInt(getValue(params, HtmlParams.SIZE))) {
-            pageSize = Integer.parseInt(getValue(params, HtmlParams.SIZE));
-        }
+        final String tableName = getStringValue(params, HtmlParams.NAME);
+        int tablePage = getIntValue(params, HtmlParams.PAGE, FIRST_PAGE);
+        int pageSize = getIntValue(params, HtmlParams.SIZE, DEFAULT_PAGE_SIZE);
 
         final int tablesCount = getDBAccess().getTableDataCount(tableName);
 
@@ -97,7 +88,7 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.DATABASE);
         }
 
-        final String dbName = getValue(params, HtmlParams.DATABASE);
+        final String dbName = getStringValue(params, HtmlParams.DATABASE);
         DatabaseManager.connect(context, dbName);
 
         List<String> tables = getDBAccess().getTables();
@@ -120,9 +111,11 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String tableName = getValue(params, HtmlParams.NAME);
+        final String tableName = getStringValue(params, HtmlParams.NAME);
         final UpdatingDatabase fields = deserialize(
-                getValue(params, HtmlParams.DATA), UpdatingDatabase.class);
+                getStringValue(params, HtmlParams.DATA),
+                UpdatingDatabase.class
+        );
 
         getDBAccess().updateData(tableName, fields.headers, fields.oldValues, fields.newValues);
         return EMPTY;
@@ -137,9 +130,11 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String tableName = getValue(params, HtmlParams.NAME);
+        final String tableName = getStringValue(params, HtmlParams.NAME);
         final DeletingDatabase deletingDatabase = deserialize(
-                getValue(params, HtmlParams.DATA), DeletingDatabase.class);
+                getStringValue(params, HtmlParams.DATA),
+                DeletingDatabase.class
+        );
 
         getDBAccess().removeItems(tableName, deletingDatabase.headers, deletingDatabase.fields);
         return EMPTY;
@@ -150,7 +145,7 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String tableName = getValue(params, HtmlParams.NAME);
+        final String tableName = getStringValue(params, HtmlParams.NAME);
         getDBAccess().dropTable(tableName);
         return EMPTY;
     }
@@ -160,7 +155,7 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String databaseName = getValue(params, HtmlParams.NAME);
+        final String databaseName = getStringValue(params, HtmlParams.NAME);
         getDBAccess().dropDatabase(databaseName);
         return EMPTY;
     }
@@ -181,7 +176,7 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String query = getValue(params, HtmlParams.DATA);
+        final String query = getStringValue(params, HtmlParams.DATA);
         return serialize(getDBAccess().getTableDataByQuery(query));
     }
 
@@ -194,8 +189,8 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String tableName = getValue(params, HtmlParams.NAME);
-        final String searchText = getValue(params, HtmlParams.DATA);
+        final String tableName = getStringValue(params, HtmlParams.NAME);
+        final String searchText = getStringValue(params, HtmlParams.DATA);
 
         return serialize(getDBAccess().search(tableName, searchText));
     }
@@ -212,7 +207,7 @@ public class DatabaseApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String settingsJson = getValue(params, HtmlParams.DATA);
+        final String settingsJson = getStringValue(params, HtmlParams.DATA);
         final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
 
         if (settings.databaseFont == null) {

@@ -18,6 +18,8 @@ import fi.iki.elonen.NanoHTTPD;
 
 public final class NetworkApi extends Api {
     private static final boolean DEFAULT_LOG_IS_DISCOLOR = false;
+    private static final int UNLIMITED_OFFSET = -1;
+    private static final int LIMIT_LOGS_PACKS = 1000;
 
     public NetworkApi(Context context) {
         super(context);
@@ -46,7 +48,7 @@ public final class NetworkApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String settingsJson = getValue(params, HtmlParams.DATA);
+        final String settingsJson = getStringValue(params, HtmlParams.DATA);
         final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
 
         if (settings.isDiscolorLog == null) {
@@ -81,14 +83,13 @@ public final class NetworkApi extends Api {
     }
 
     private String getLogs(Map<String, List<String>> params) {
-        int offset = getIntValue(params, NetworkHtmlKey.OFFSET);
-        int limit = getIntValue(params, NetworkHtmlKey.LIMIT);
+        int offset = getIntValue(params, NetworkHtmlKey.OFFSET, UNLIMITED_OFFSET);
         String queryId = getStringValue(params, NetworkHtmlKey.QUERY_ID);
         String statusCode = getStringValue(params, NetworkHtmlKey.STATUS_CODE);
-        boolean isOnlyExceptions = getBooleanValue(params, NetworkHtmlKey.IS_ONLY_EXCEPTIONS);
+        boolean isOnlyExceptions = getBooleanValue(params, NetworkHtmlKey.IS_ONLY_EXCEPTIONS, false);
         String search = getStringValue(params, NetworkHtmlKey.SEARCH);
 
-        return serialize(getDataBase().getHttpLogs(offset, limit, queryId, statusCode, isOnlyExceptions, search));
+        return serialize(getDataBase().getHttpLogs(offset, LIMIT_LOGS_PACKS, queryId, statusCode, isOnlyExceptions, search));
     }
 
     private ContinuousDataBaseManager getDataBase() {

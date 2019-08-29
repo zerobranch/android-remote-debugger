@@ -31,40 +31,46 @@ public abstract class Api {
         return params.containsKey(key) && params.get(key) != null && !params.get(key).isEmpty();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    protected String getValue(Map<String, List<String>> params, String key) {
-        return params.get(key).get(0);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    protected String getStringValue(Map<String, List<String>> params, String key) {
+    @SuppressWarnings({"ConstantConditions", "SameParameterValue", "WeakerAccess"})
+    protected String getStringValue(Map<String, List<String>> params, String key, String defaultValue) {
         if (!containsValue(params, key)) {
-            return null;
+            return defaultValue;
         }
         return params.get(key).get(0);
     }
 
+    protected String getStringValue(Map<String, List<String>> params, String key) {
+        return getStringValue(params, key, null);
+    }
+
     @SuppressWarnings("ConstantConditions")
-    protected int getIntValue(Map<String, List<String>> params, String key) {
+    protected int getIntValue(Map<String, List<String>> params, String key, int defaultValue) {
         if (!containsValue(params, key)) {
-            return 0;
+            return defaultValue;
         }
 
         String rawValue = params.get(key).get(0);
         if (!NumberUtils.isInt(rawValue)) {
-            return 0;
+            return defaultValue;
         }
 
         return Integer.parseInt(rawValue);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    protected boolean getBooleanValue(Map<String, List<String>> params, String key) {
+    @SuppressWarnings({"ConstantConditions", "SameParameterValue"})
+    protected boolean getBooleanValue(Map<String, List<String>> params, String key, boolean defaultValue) {
         if (!containsValue(params, key)) {
-            return false;
+            return defaultValue;
         }
 
-        return Boolean.parseBoolean(params.get(key).get(0));
+        String rawValue = params.get(key).get(0);
+        if (rawValue.equalsIgnoreCase("true")) {
+            return true;
+        } else if (rawValue.equalsIgnoreCase("false")) {
+            return false;
+        } else {
+            return defaultValue;
+        }
     }
 
     protected String serialize(Object object) {
