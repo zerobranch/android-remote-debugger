@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.sarproj.remotedebugger.source.local.Theme;
+import com.sarproj.remotedebugger.utils.NumberUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -33,6 +34,37 @@ public abstract class Api {
     @SuppressWarnings("ConstantConditions")
     protected String getValue(Map<String, List<String>> params, String key) {
         return params.get(key).get(0);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    protected String getStringValue(Map<String, List<String>> params, String key) {
+        if (!containsValue(params, key)) {
+            return null;
+        }
+        return params.get(key).get(0);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    protected int getIntValue(Map<String, List<String>> params, String key) {
+        if (!containsValue(params, key)) {
+            return 0;
+        }
+
+        String rawValue = params.get(key).get(0);
+        if (!NumberUtils.isInt(rawValue)) {
+            return 0;
+        }
+
+        return Integer.parseInt(rawValue);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    protected boolean getBooleanValue(Map<String, List<String>> params, String key) {
+        if (!containsValue(params, key)) {
+            return false;
+        }
+
+        return Boolean.parseBoolean(params.get(key).get(0));
     }
 
     protected String serialize(Object object) {

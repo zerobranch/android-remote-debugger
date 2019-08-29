@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class HttpLogResponse {
     public long id;
-    public long queryId;
+    public String queryId;
     public String method;
     public String code;
     public String message;

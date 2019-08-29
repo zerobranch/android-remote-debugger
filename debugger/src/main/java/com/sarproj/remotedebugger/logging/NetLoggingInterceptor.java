@@ -87,7 +87,7 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         logRequest.id = getDataBase().addHttpLogRequest(logRequest);
-        logRequest.queryId = logRequest.id;
+        logRequest.queryId = String.valueOf(logRequest.id);
         logResponse.queryId = logRequest.queryId;
 
         long startTime = System.currentTimeMillis();

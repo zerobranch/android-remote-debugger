@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class HttpLogRequest {
     public long id;
-    public long queryId;
+    public String queryId;
     public String method;
     public long requestStartTime;
     public String requestContentType;

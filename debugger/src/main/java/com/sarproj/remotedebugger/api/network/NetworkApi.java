@@ -6,7 +6,6 @@ import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.Settings;
-import com.sarproj.remotedebugger.source.local.HttpLogLevel;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
@@ -26,6 +25,7 @@ public final class NetworkApi extends Api {
 
     @Override
     public String execute(Map<String, List<String>> params) throws NanoHTTPD.ResponseException {
+        getLogs(params);
         if (params == null || params.isEmpty()) {
             return FileUtils.getTextFromAssets(context.getAssets(), Host.NETWORK.getPath());
         } else if (params.containsKey(NetworkHtmlKey.GET_LOGS)) {
@@ -81,22 +81,14 @@ public final class NetworkApi extends Api {
     }
 
     private String getLogs(Map<String, List<String>> params) {
-        String logsLevel = null;
-        String logsSearch = null;
+        int offset = getIntValue(params, NetworkHtmlKey.OFFSET);
+        int limit = getIntValue(params, NetworkHtmlKey.LIMIT);
+        String queryId = getStringValue(params, NetworkHtmlKey.QUERY_ID);
+        String statusCode = getStringValue(params, NetworkHtmlKey.STATUS_CODE);
+        boolean isOnlyExceptions = getBooleanValue(params, NetworkHtmlKey.IS_ONLY_EXCEPTIONS);
+        String search = getStringValue(params, NetworkHtmlKey.SEARCH);
 
-        if (containsValue(params, NetworkHtmlKey.LOGS_LEVEL)) {
-            logsLevel = getValue(params, NetworkHtmlKey.LOGS_LEVEL);
-        }
-
-        if (containsValue(params, NetworkHtmlKey.LOGS_SEARCH)) {
-            logsSearch = getValue(params, NetworkHtmlKey.LOGS_SEARCH);
-        }
-
-        if (HttpLogLevel.ERROR.name().equalsIgnoreCase(logsLevel)) {
-            logsLevel = HttpLogLevel.ERROR.name();
-        }
-
-        return serialize(getDataBase().getHttpLogs(logsLevel, logsSearch));
+        return serialize(getDataBase().getHttpLogs(offset, limit, queryId, statusCode, isOnlyExceptions, search));
     }
 
     private ContinuousDataBaseManager getDataBase() {

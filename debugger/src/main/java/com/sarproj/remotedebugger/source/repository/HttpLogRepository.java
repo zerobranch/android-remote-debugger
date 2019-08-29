@@ -31,7 +31,7 @@ public class HttpLogRepository {
             ContentValues values = new ContentValues();
 
             long id = add(model);
-            model.queryId = id;
+            model.queryId = String.valueOf(id);
 
             values.put(NetLogTable.QUERY_ID, model.queryId);
             database.update(REMOTE_NET_LOGS_TABLE_NAME, values, NetLogTable.ID + "=" + id, null);
@@ -76,7 +76,7 @@ public class HttpLogRepository {
     public void createHttpLogsTable(SQLiteDatabase db) {
         final String query = "create table " + REMOTE_NET_LOGS_TABLE_NAME + " (" +
                 NetLogTable.ID + " integer primary key autoincrement, " +
-                NetLogTable.QUERY_ID + " integer, " +
+                NetLogTable.QUERY_ID + " text, " +
                 NetLogTable.METHOD + " text," +
                 NetLogTable.CODE + " text," +
                 NetLogTable.MESSAGE + " text," +
@@ -100,58 +100,94 @@ public class HttpLogRepository {
         db.execSQL(query);
     }
 
-    private void putMap(ContentValues values, String field, Map<String, String> map) {
-        String val = null;
-        if (map != null) {
-            val = sqlFormat(gson.toJson(map));
-        }
-
-        values.put(field, val);
-    }
-
-    private String sqlFormat(String value) {
-        if (value == null) {
-            return null;
-        }
-        return value.replaceAll("'", "&shadow_39&");
-    }
-
-    private String getValidString(String value) {
-        if (value == null) {
-            return null;
-        }
-        return value.replaceAll("&shadow_39&", "'");
-    }
-
-    public List<HttpLogModel> getHttpLogs(String level, String search) {
+    public List<HttpLogModel> getHttpLogs(int offset,
+                                          int limit,
+                                          String queryId,
+                                          String statusCode,
+                                          boolean isOnlyExceptions,
+                                          String search
+    ) {
         final StringBuilder query = new StringBuilder()
                 .append("select * from " + REMOTE_NET_LOGS_TABLE_NAME);
 
-//        if (!TextUtils.isEmpty(level) || !TextUtils.isEmpty(search)) {
-//            query.append(" where ");
-//        }
+        final StringBuilder conditionBuilder = new StringBuilder();
 
-        if (!TextUtils.isEmpty(level)) {
-//            query.append(LogRepository.LogTable.LEVEL)
-//                    .append(" = ")
-//                    .append("'")
-//                    .append(level)
-//                    .append("'");
+        if (!TextUtils.isEmpty(queryId)) {
+            conditionBuilder
+                    .append(NetLogTable.QUERY_ID)
+                    .append("=")
+                    .append("'")
+                    .append(queryId)
+                    .append("'");
+        } else {
+            if (isOnlyExceptions) {
+                conditionBuilder
+                        .append(NetLogTable.ERROR_MESSAGE)
+                        .append(" is not null ");
+            } else if (!TextUtils.isEmpty(statusCode)) {
+                conditionBuilder.append(NetLogTable.CODE)
+                        .append("=")
+                        .append("'")
+                        .append(statusCode)
+                        .append("' ");
+            }
+
+            if (!TextUtils.isEmpty(search)) {
+                final StringBuilder searchBuilder = new StringBuilder();
+
+                String[] tables = new String[]{
+                        NetLogTable.QUERY_ID,
+                        NetLogTable.METHOD,
+                        NetLogTable.CODE,
+                        NetLogTable.MESSAGE,
+                        NetLogTable.REQUEST_CONTENT_TYPE,
+                        NetLogTable.PORT,
+                        NetLogTable.IP,
+                        NetLogTable.FULL_URL,
+                        NetLogTable.REQUEST_BODY,
+                        NetLogTable.RESPONSE_BODY,
+                        NetLogTable.ERROR_MESSAGE,
+                        NetLogTable.RESPONSE_HEADERS,
+                        NetLogTable.REQUEST_HEADERS,
+                        NetLogTable.QUERY_PARAMS
+                };
+
+                for (int i = 0; i < tables.length; i++) {
+                    if (i != 0) {
+                        searchBuilder.append(" or ");
+                    }
+
+                    searchBuilder
+                            .append(tables[i])
+                            .append(" like ")
+                            .append("'%")
+                            .append(search)
+                            .append("%'");
+                }
+
+                if (conditionBuilder.length() != 0) {
+                    conditionBuilder
+                            .append(" and (")
+                            .append(searchBuilder)
+                            .append(")");
+                } else {
+                    conditionBuilder.append(searchBuilder);
+                }
+            }
         }
 
-        if (!TextUtils.isEmpty(search)) {
-//            if (!TextUtils.isEmpty(level)) {
-//                query.append(" and ");
-//            }
-
-//            query.append(LogRepository.LogTable.MESSAGE)
-//                    .append(" like ")
-//                    .append("'%")
-//                    .append(search)
-//                    .append("%'");
+        if (conditionBuilder.length() != 0) {
+            query.append(" where ").append(conditionBuilder);
         }
 
-        query.append(" order by ").append(NetLogTable.ID);
+        query.append(" order by ")
+                .append(NetLogTable.ID)
+                .append(" limit ")
+                .append(limit);
+
+        if (offset != -1) {
+            query.append(" offset ").append(offset);
+        }
 
         final Cursor cursor = database.rawQuery(query.toString(), null);
         final List<HttpLogModel> logModels = new ArrayList<>();
@@ -160,7 +196,7 @@ public class HttpLogRepository {
             HttpLogModel httpLogModel = new HttpLogModel();
             httpLogModel.id = cursor.getLong(cursor.getColumnIndex(NetLogTable.ID));
             httpLogModel.method = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.METHOD)));
-            httpLogModel.queryId = cursor.getLong(cursor.getColumnIndex(NetLogTable.QUERY_ID));
+            httpLogModel.queryId = cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_ID));
             httpLogModel.queryType = QueryType.valueOf(cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_TYPE)));
             httpLogModel.code = cursor.getString(cursor.getColumnIndex(NetLogTable.CODE));
             httpLogModel.message = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE)));
@@ -188,6 +224,29 @@ public class HttpLogRepository {
 
         cursor.close();
         return logModels;
+    }
+
+    private void putMap(ContentValues values, String field, Map<String, String> map) {
+        String val = null;
+        if (map != null) {
+            val = sqlFormat(gson.toJson(map));
+        }
+
+        values.put(field, val);
+    }
+
+    private String sqlFormat(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replaceAll("'", "&shadow_39&");
+    }
+
+    private String getValidString(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replaceAll("&shadow_39&", "'");
     }
 
     private interface NetLogTable {
