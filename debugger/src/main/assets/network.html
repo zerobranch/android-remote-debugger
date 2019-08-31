@@ -133,8 +133,119 @@
 
 <div id="logContent">
     <div id="loader"></div>
-
+    <!--    let rawResponse = "[{\"baseUrl\":\"newsapi.org\",\"fullUrl\":\"https://newsapi.org/v2/everything\",\"id\":1,\"ip\":\"167.114.118.40\",\"method\":\"GET\",\"port\":\"443\",\"queryId\":\"1\",\"queryParams\":{},\"queryType\":\"REQUEST\",\"requestBodySize\":0,\"requestDuration\":-1,\"requestHeaders\":{},\"requestStartTime\":0,\"responseBodySize\":-1,\"shortUrl\":\"/v2/everything\"},{\"baseUrl\":\"newsapi.org\",\"code\":\"401\",\"fullUrl\":\"https://newsapi.org/v2/everything\",\"id\":2,\"ip\":\"167.114.118.40\",\"message\":\"Unauthorized\",\"method\":\"GET\",\"port\":\"443\",\"queryId\":\"1\",\"queryType\":\"RESPONSE\",\"requestBodySize\":-1,\"requestDuration\":830,\"requestStartTime\":-1,\"responseBody\":\"{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"apiKeyMissing\\\",\\\"message\\\":\\\"Your API key is missing. Append this to the URL with the apiKey param, or use the x-api-key HTTP header.\\\"}\",\"responseBodySize\":158,\"responseHeaders\":{\"Cache-Control\":\"no-cache\",\"Access-Control-Allow-Origin\":\"*\",\"Access-Control-Allow-Methods\":\"GET\",\"Pragma\":\"no-cache\",\"Expires\":\"-1\",\"Content-Length\":\"158\",\"Access-Control-Allow-Headers\":\"x-api-key, authorization\",\"Date\":\"Thu, 29 Aug 2019 10:56:00 GMT\",\"Content-Type\":\"application/json; charset\u003dutf-8\"},\"shortUrl\":\"/v2/everything\"}]";-->
     <table id="logTable">
+        <tr class="darkVerbose">
+            <td class="log-item tooltip log-item-dark-style">
+                <svg width="20" height="20" viewBox="0 0 24 24" class="copy-img copy-img-dark-style"><path d="M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z"></path></svg>
+                <span class="tooltip-text">Copied!</span></td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">14:03:07:586</td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">Num: 2</td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">
+                <div>
+                    <p><span class="log-type-secondary-request">░░░░░░░░░░░░░░</span><span class="log-type-primary-request"> Request </span><span class="log-type-secondary-request">░░░░░░░░░░░░░░</span></p>
+                    <br/>
+                    <p><span class="log-content-title-request">URL:</span> https://apistage.mobile-kassa.ru/v1.7/dictionary/stations/version</p>
+                    <p><span class="log-content-title-request">Method:</span> GET</p>
+                    <p><span class="log-content-title-request">Content-Type:</span> application/json; charset=UTF-8</p>
+                    <p><span class="log-content-title-request">Body size:</span> 74 byte</p>
+                    <br/>
+                </div>
+                <div class="log-content-border-request">
+                    <br/>
+                    <p>&nbsp;&nbsp;<span class="log-content-title-request">Headers:</span></p>
+                    <p>&nbsp;&nbsp;X-API-Key: AKIAINOPBIPKA5OEOIHA</p>
+                    <p>&nbsp;&nbsp;Device-Info: AndroidVersion: 9, SdkVersion: 28, SystemVersion: PKQ1.180917.001.V10.0.11.0.PDHMIXM, Brand: xiaomi, Model: Mi A1</p>
+                    <p>&nbsp;&nbsp;X-Device-ID: 1d85sdf7a308</p>
+                    <p>&nbsp;&nbsp;User-Agent: app android 2.7.0-debug</p>
+                    <br/>
+                    <hr class="default-hr hr-request-dark-style">
+                    <br/>
+                    <p>&nbsp;&nbsp;<span class="log-content-title-request">Body:</span></p>
+                    <pre>
+  {
+    "version": 11,
+    "destination": "dictionary/station/11/station.json"
+  }
+                    </pre>
+                </div>
+            </td>
+        </tr>
+        <tr class="darkVerbose">
+            <td class="log-item tooltip log-item-dark-style">
+                <svg width="20" height="20" viewBox="0 0 24 24" class="copy-img copy-img-dark-style"><path d="M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z"></path></svg>
+                <span class="tooltip-text">Copied!</span></td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">14:03:07:586</td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">Num: 2</td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">
+                <div>
+                    <p><span class="log-type-secondary-response">░░░░░░░░░░░░░░</span><span class="log-type-primary-response"> Response </span><span class="log-type-secondary-response">░░░░░░░░░░░░░░</span></p>
+                    <br/>
+                    <p><span class="log-content-title-response">URL:</span> https://apistage.mobile-kassa.ru/v1.7/dictionary/stations/version</p>
+                    <p><span class="log-content-title-response">Method:</span> GET</p>
+                    <p><span class="log-content-title-response">Status:</span> 200 OK</p>
+                    <p><span class="log-content-title-response">Duration:</span> 200ms</p>
+                    <p><span class="log-content-title-response">Body size:</span> 74 byte</p>
+                    <br/>
+                </div>
+                <div class="log-content-border-response">
+                    <br/>
+                    <p>&nbsp;&nbsp;<span class="log-content-title-response">Headers:</span></p>
+                    <p>&nbsp;&nbsp;X-API-Key: AKIAINOPBIPKA5OEOIHA</p>
+                    <p>&nbsp;&nbsp;Device-Info: AndroidVersion: 9, SdkVersion: 28, SystemVersion: PKQ1.180917.001.V10.0.11.0.PDHMIXM, Brand: xiaomi, Model: Mi A1</p>
+                    <p>&nbsp;&nbsp;X-Device-ID: 1d85sdf7a308</p>
+                    <p>&nbsp;&nbsp;User-Agent: app android 2.7.0-debug</p>
+                    <br/>
+                    <hr class="default-hr hr-response-dark-style">
+                    <br/>
+                    <p>&nbsp;&nbsp;<span class="log-content-title-response">Body:</span></p>
+                    <pre>
+  {
+    "version": 11,
+    "destination": "dictionary/station/11/station.json"
+  }
+                    </pre>
+                </div>
+            </td>
+        </tr>
+        <tr class="darkVerbose">
+            <td class="log-item tooltip log-item-dark-style">
+                <svg width="20" height="20" viewBox="0 0 24 24" class="copy-img copy-img-dark-style"><path d="M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z"></path></svg>
+                <span class="tooltip-text">Copied!</span></td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">14:03:07:586</td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">Num: 2</td>
+            <td class="log-item log-item-dark-style" style="font-size: 12pt;">
+                <div>
+                    <p><span class="log-type-secondary-error-response">░░░░░░░░░░░░░░</span><span class="log-type-primary-error-response"> Response </span><span class="log-type-secondary-response">░░░░░░░░░░░░░░</span></p>
+                    <br/>
+                    <p><span class="log-content-title-error-response">URL:</span> https://apistage.mobile-kassa.ru/v1.7/dictionary/stations/version</p>
+                    <p><span class="log-content-title-error-response">Method:</span> GET</p>
+                    <p><span class="log-content-title-error-response">Status:</span> 200 OK</p>
+                    <p><span class="log-content-title-error-response">Duration:</span> 200ms</p>
+                    <p><span class="log-content-title-error-response">Body size:</span> 74 byte</p>
+                    <p><span class="log-content-title-error-response">Error message:</span> TimeoutException</p>
+                    <br/>
+                </div>
+                <div class="log-content-error-response-border">
+                    <br/>
+                    <p>&nbsp;&nbsp;<span class="log-content-title-error-response">Headers:</span></p>
+                    <p>&nbsp;&nbsp;X-API-Key: AKIAINOPBIPKA5OEOIHA</p>
+                    <p>&nbsp;&nbsp;Device-Info: AndroidVersion: 9, SdkVersion: 28, SystemVersion: PKQ1.180917.001.V10.0.11.0.PDHMIXM, Brand: xiaomi, Model: Mi A1</p>
+                    <p>&nbsp;&nbsp;X-Device-ID: 1d85sdf7a308</p>
+                    <p>&nbsp;&nbsp;User-Agent: app android 2.7.0-debug</p>
+                    <br/>
+                    <hr class="default-hr hr-error-response-dark-style">
+                    <br/>
+                    <p>&nbsp;&nbsp;<span class="log-content-title-error-response">Body:</span></p>
+                    <pre>
+  {
+    "version": 11,
+    "destination": "dictionary/station/11/station.json"
+  }
+                    </pre>
+                </div>
+            </td>
+        </tr>
     </table>
 </div>
 
@@ -296,7 +407,7 @@
         logsSearchText = searchText.value;
 
         clearTimeoutHandle();
-        loadLogs();
+        // loadLogs();
     }
 
     function executeSearchByTag(tag) {
@@ -586,20 +697,22 @@
         return logDate.getHours() + ':' + logDate.getMinutes() + ':' + logDate.getSeconds() + ':' + logDate.getMilliseconds();
     }
 
+    let rawResponse = "[{\"baseUrl\":\"newsapi.org\",\"fullUrl\":\"https://newsapi.org/v2/everything\",\"id\":1,\"ip\":\"167.114.118.40\",\"method\":\"GET\",\"port\":\"443\",\"queryId\":\"1\",\"queryParams\":{},\"queryType\":\"REQUEST\",\"requestBodySize\":0,\"requestDuration\":-1,\"requestHeaders\":{},\"requestStartTime\":0,\"responseBodySize\":-1,\"shortUrl\":\"/v2/everything\"},{\"baseUrl\":\"newsapi.org\",\"code\":\"401\",\"fullUrl\":\"https://newsapi.org/v2/everything\",\"id\":2,\"ip\":\"167.114.118.40\",\"message\":\"Unauthorized\",\"method\":\"GET\",\"port\":\"443\",\"queryId\":\"1\",\"queryType\":\"RESPONSE\",\"requestBodySize\":-1,\"requestDuration\":830,\"requestStartTime\":-1,\"responseBody\":\"{\\\"status\\\":\\\"error\\\",\\\"code\\\":\\\"apiKeyMissing\\\",\\\"message\\\":\\\"Your API key is missing. Append this to the URL with the apiKey param, or use the x-api-key HTTP header.\\\"}\",\"responseBodySize\":158,\"responseHeaders\":{\"Cache-Control\":\"no-cache\",\"Access-Control-Allow-Origin\":\"*\",\"Access-Control-Allow-Methods\":\"GET\",\"Pragma\":\"no-cache\",\"Expires\":\"-1\",\"Content-Length\":\"158\",\"Access-Control-Allow-Headers\":\"x-api-key, authorization\",\"Date\":\"Thu, 29 Aug 2019 10:56:00 GMT\",\"Content-Type\":\"application/json; charset\u003dutf-8\"},\"shortUrl\":\"/v2/everything\"}]";
+
     function loadLogs() {
-        if (isConnectionLost) {
-            loadOfflineLogs();
-            return;
-        }
+        // if (isConnectionLost) {
+        //     loadOfflineLogs();
+        //     return;
+        // }
 
-        if (logRequestLock) {
-            return;
-        }
-        logRequestLock = true;
+        // if (logRequestLock) {
+        //     return;
+        // }
+        // logRequestLock = true;
 
-        let body = 'getLogs=' + encodeURIComponent('')
-            + '&' + 'offset=' + encodeURIComponent(logsOffset);
-
+        // let body = 'getLogs=' + encodeURIComponent('')
+        //     + '&' + 'offset=' + encodeURIComponent(logsOffset);
+        //
         // if (logsTag != null) {
         //     body += '&' + 'queryId=' + encodeURIComponent(queryId);
         //     body += '&' + 'statusCode=' + encodeURIComponent(statusCode);
@@ -609,139 +722,140 @@
         //     body += '&' + 'logsSearch=' + encodeURIComponent(logsSearchText);
         // }
 
-        httpGet('network', body, function (response) {
-            hideElement(loader);
+        // httpGet('network', body, function (response) {
+        let response = rawResponse; // убрать потом
+        hideElement(loader);
 
+        // if (logsOffset === -1) {
+        //     clearContent(logTable);
+        // }
+
+        let parsedLogs = {};
+
+        if (response !== '') {
+            parsedLogs = JSON.parse(response);
+        }
+
+        if (parsedLogs.length !== 0) {
             if (logsOffset === -1) {
-                clearContent(logTable);
+                logsOffset = parsedLogs.length;
+            } else {
+                logsOffset += parsedLogs.length;
             }
 
-            let parsedLogs = {};
+            console.log(parsedLogs);
 
-            if (response !== '') {
-                parsedLogs = JSON.parse(response);
+            // parsedLogs.forEach(function (logLine) {
+            //     let currentTime = getFormattedTime(new Date(logLine.time));
+            //
+            //     let tr = document.createElement("tr");
+            //     let copyImgTd = document.createElement("td");
+            //     let tooltipSpan = document.createElement("span");
+            //     let timeTd = document.createElement("td");
+            //     let levelTd = document.createElement("td");
+            //     let tagTd = document.createElement("td");
+            //     let messageTd = document.createElement("td");
+            //     let messagePre = document.createElement("pre");
+            //
+            //     tooltipSpan.className = "tooltip-text";
+            //     tooltipSpan.innerText = "Copied!";
+            //
+            //     let copyImg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            //     copyImg.setAttribute("width", "20");
+            //     copyImg.setAttribute("height", "20");
+            //     copyImg.setAttribute("viewBox", "0 0 24 24");
+            //
+            //     if (isDarkTheme) {
+            //         copyImg.setAttribute("class", "copy-img copy-img-dark-style");
+            //     } else {
+            //         copyImg.setAttribute("class", "copy-img copy-img-white-style");
+            //     }
+            //
+            //     let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            //     path.setAttributeNS(null, "d", "M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z");
+            //     copyImg.appendChild(path);
+            //
+            //     copyImg.onclick = function () {
+            //         copyToClipboard(getFormattedTime(logLine.time) + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
+            //         visibleElement(tooltipSpan);
+            //
+            //         let tooltipTimeout = setTimeout(function () {
+            //             clearInterval(tooltipTimeout);
+            //             invisibleElement(tooltipSpan);
+            //         }, 800);
+            //     };
+            //
+            //     copyImgTd.className = "log-item tooltip";
+            //     timeTd.className = "log-item";
+            //     levelTd.className = "log-item";
+            //     tagTd.className = "log-item";
+            //     messageTd.className = "log-item";
+            //
+            //     if (isDarkTheme) {
+            //         copyImgTd.classList.add("log-item-dark-style");
+            //         timeTd.classList.add("log-item-dark-style");
+            //         levelTd.classList.add("log-item-dark-style");
+            //         tagTd.classList.add("log-item-dark-style");
+            //         messageTd.classList.add("log-item-dark-style");
+            //     } else {
+            //         copyImgTd.classList.add("log-item-white-style");
+            //         timeTd.classList.add("log-item-white-style");
+            //         levelTd.classList.add("log-item-white-style");
+            //         tagTd.classList.add("log-item-white-style");
+            //         messageTd.classList.add("log-item-white-style");
+            //     }
+            //
+            //     let timeText = document.createTextNode(currentTime);
+            //     let levelText = document.createTextNode(logLine.level);
+            //     let tagText = document.createTextNode(logLine.tag);
+            //     let messageText = document.createTextNode(logLine.message);
+            //
+            //     tagTd.onmousemove = function () {
+            //         onTagMouseMove(tagTd);
+            //     };
+            //
+            //     tagTd.onclick = function () {
+            //         onTagClick(tagTd)
+            //     };
+            //
+            //     tagTd.onmouseleave = function () {
+            //         onTagMouseLeave(tagTd)
+            //     };
+            //
+            //     copyImgTd.appendChild(copyImg);
+            //     copyImgTd.appendChild(tooltipSpan);
+            //     timeTd.appendChild(timeText);
+            //     levelTd.appendChild(levelText);
+            //     tagTd.appendChild(tagText);
+            //     messagePre.appendChild(messageText);
+            //     messageTd.appendChild(messagePre);
+            //
+            //     tr.appendChild(copyImgTd);
+            //     tr.appendChild(timeTd);
+            //     tr.appendChild(levelTd);
+            //     tr.appendChild(tagTd);
+            //     tr.appendChild(messageTd);
+            //
+            //     timeTd.style.fontSize = currentContentFont + "pt";
+            //     levelTd.style.fontSize = currentContentFont + "pt";
+            //     tagTd.style.fontSize = currentContentFont + "pt";
+            //     messageTd.style.fontSize = currentContentFont + "pt";
+            //
+            //     setLogLineColor(logLine.level, tr);
+            //
+            //     logTable.appendChild(tr);
+            // });
+
+            if (isFollowLogs) {
+                scrollToBottom();
             }
+        }
 
-            if (parsedLogs.length !== 0) {
-                if (logsOffset === -1) {
-                    logsOffset = parsedLogs.length;
-                } else {
-                    logsOffset += parsedLogs.length;
-                }
-
-                console.log(response);
-
-                // parsedLogs.forEach(function (logLine) {
-                //     let currentTime = getFormattedTime(new Date(logLine.time));
-                //
-                //     let tr = document.createElement("tr");
-                //     let copyImgTd = document.createElement("td");
-                //     let tooltipSpan = document.createElement("span");
-                //     let timeTd = document.createElement("td");
-                //     let levelTd = document.createElement("td");
-                //     let tagTd = document.createElement("td");
-                //     let messageTd = document.createElement("td");
-                //     let messagePre = document.createElement("pre");
-                //
-                //     tooltipSpan.className = "tooltip-text";
-                //     tooltipSpan.innerText = "Copied!";
-                //
-                //     let copyImg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                //     copyImg.setAttribute("width", "20");
-                //     copyImg.setAttribute("height", "20");
-                //     copyImg.setAttribute("viewBox", "0 0 24 24");
-                //
-                //     if (isDarkTheme) {
-                //         copyImg.setAttribute("class", "copy-img copy-img-dark-style");
-                //     } else {
-                //         copyImg.setAttribute("class", "copy-img copy-img-white-style");
-                //     }
-                //
-                //     let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                //     path.setAttributeNS(null, "d", "M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z");
-                //     copyImg.appendChild(path);
-                //
-                //     copyImg.onclick = function () {
-                //         copyToClipboard(getFormattedTime(logLine.time) + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
-                //         visibleElement(tooltipSpan);
-                //
-                //         let tooltipTimeout = setTimeout(function () {
-                //             clearInterval(tooltipTimeout);
-                //             invisibleElement(tooltipSpan);
-                //         }, 800);
-                //     };
-                //
-                //     copyImgTd.className = "log-item tooltip";
-                //     timeTd.className = "log-item";
-                //     levelTd.className = "log-item";
-                //     tagTd.className = "log-item";
-                //     messageTd.className = "log-item";
-                //
-                //     if (isDarkTheme) {
-                //         copyImgTd.classList.add("log-item-dark-style");
-                //         timeTd.classList.add("log-item-dark-style");
-                //         levelTd.classList.add("log-item-dark-style");
-                //         tagTd.classList.add("log-item-dark-style");
-                //         messageTd.classList.add("log-item-dark-style");
-                //     } else {
-                //         copyImgTd.classList.add("log-item-white-style");
-                //         timeTd.classList.add("log-item-white-style");
-                //         levelTd.classList.add("log-item-white-style");
-                //         tagTd.classList.add("log-item-white-style");
-                //         messageTd.classList.add("log-item-white-style");
-                //     }
-                //
-                //     let timeText = document.createTextNode(currentTime);
-                //     let levelText = document.createTextNode(logLine.level);
-                //     let tagText = document.createTextNode(logLine.tag);
-                //     let messageText = document.createTextNode(logLine.message);
-                //
-                //     tagTd.onmousemove = function () {
-                //         onTagMouseMove(tagTd);
-                //     };
-                //
-                //     tagTd.onclick = function () {
-                //         onTagClick(tagTd)
-                //     };
-                //
-                //     tagTd.onmouseleave = function () {
-                //         onTagMouseLeave(tagTd)
-                //     };
-                //
-                //     copyImgTd.appendChild(copyImg);
-                //     copyImgTd.appendChild(tooltipSpan);
-                //     timeTd.appendChild(timeText);
-                //     levelTd.appendChild(levelText);
-                //     tagTd.appendChild(tagText);
-                //     messagePre.appendChild(messageText);
-                //     messageTd.appendChild(messagePre);
-                //
-                //     tr.appendChild(copyImgTd);
-                //     tr.appendChild(timeTd);
-                //     tr.appendChild(levelTd);
-                //     tr.appendChild(tagTd);
-                //     tr.appendChild(messageTd);
-                //
-                //     timeTd.style.fontSize = currentContentFont + "pt";
-                //     levelTd.style.fontSize = currentContentFont + "pt";
-                //     tagTd.style.fontSize = currentContentFont + "pt";
-                //     messageTd.style.fontSize = currentContentFont + "pt";
-                //
-                //     setLogLineColor(logLine.level, tr);
-                //
-                //     logTable.appendChild(tr);
-                // });
-
-                if (isFollowLogs) {
-                    scrollToBottom();
-                }
-            }
-
-            timeoutHandle = setTimeout(loadLogs, REFRESH_TIME);
-            logRequestLock = false;
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
+        // timeoutHandle = setTimeout(loadLogs, REFRESH_TIME);
+        // logRequestLock = false;
+        // }, function (status, statusText, responseText) {
+        //     failedConnection(status, statusText, responseText);
+        // });
     }
 
     function onErrorTextClick() {
