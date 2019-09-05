@@ -12,8 +12,10 @@ import com.sarproj.remotedebugger.utils.FileUtils;
 import java.io.IOException;
 
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -267,12 +269,13 @@ public class MainActivity extends AppCompatActivity {
                                 .addInterceptor(new NetLoggingInterceptor())
                                 .build();
 
-//                        RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+                        RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "{\"planet\":\"earth\",\"star\":\"sun\",\"nextStar\":\"proxima\"}");
                         Request request = new Request.Builder()
-                                .url("https://newsapi.org/v2/everything?q=bitcoin&from=2019-06-09&sortBy=publishedAt&apiKey=034a923c789e49dd8aed574a2e05d5f7")
-//                                .post(body)
-                                .addHeader("API-KEY", "123123")
-
+                                .url("http://www.mocky.io/v2/5d70fef13300003920779665?type=everType&profile=sky")
+                                .post(body)
+                                .addHeader("Api-key", "j4hg45k3lk2")
+                                .addHeader("Token", "gj3h2k4923hb4k2")
+                                .addHeader("DeviceId", "Samsung")
                                 .build();
 
                         try {

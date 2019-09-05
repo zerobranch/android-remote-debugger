@@ -31,7 +31,7 @@ public class HttpLogRepository {
             ContentValues values = new ContentValues();
 
             long id = add(model);
-            model.queryId = String.valueOf(id);
+            model.queryId = String.valueOf(id / 2 + 1);
 
             values.put(NetLogTable.QUERY_ID, model.queryId);
             database.update(REMOTE_NET_LOGS_TABLE_NAME, values, NetLogTable.ID + "=" + id, null);
