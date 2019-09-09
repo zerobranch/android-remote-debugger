@@ -100,32 +100,17 @@ h1, h2, h3, h4, h5, h6 {
     overflow-y: scroll;
 }
 
-tr.verbose {
-    color: #000000;
+tr.whiteLogItem {
+    color: #717171;
 }
 
-tr.darkVerbose {
-    color: #bdbdbd;
+tr.darkLogItem {
+    color: #a8a8a8;
 }
 
-tr.error {
-    color: red;
-}
-
-tr.fatal {
-    color: #d32f2f;
-}
-
-tr.warn {
-    color: #fca823;
-}
-
-tr.debug {
-    color: #70A6DD;
-}
-
-tr.info {
-    color: #00c700;
+th, td {
+    padding: 0;
+    text-align: left;
 }
 
 tr {
@@ -171,12 +156,7 @@ tr {
 
 td:nth-child(2) {
     text-align: center;
-    min-width: 70px;
-}
-
-td:nth-child(3) {
-    text-align: center;
-    max-width: 200px;
+    max-width: 150px;
     white-space: normal;
     overflow-x: auto;
     padding-left: 10px;
@@ -462,67 +442,55 @@ body {
 }
 
 
-.hr-request-dark-style {
-    background-image: linear-gradient(to right, rgba(138, 166, 211, 1), rgba(138, 166, 211, 1), rgba(0, 0, 0, 0));
-}
-
-.hr-request-white-style {
-    background-image: linear-gradient(to right, rgba(138, 166, 211, 1), rgba(138, 166, 211, 1), rgba(0, 0, 0, 0));
+.hr-request {
+    background-image: linear-gradient(to right, rgba(0, 154, 234, 1), rgba(0, 154, 234, 1), rgba(0, 0, 0, 0));
 }
 
 .log-content-border-request {
-    border-top: rgb(138, 166, 211) solid 1px;
-    border-bottom: rgb(138, 166, 211) solid 1px;
-    border-left: rgb(138, 166, 211) solid 1px;
+    border-top: rgb(0, 154, 234) solid 1px;
+    border-bottom: rgb(0, 154, 234) solid 1px;
+    border-left: rgb(0, 154, 234) solid 1px;
 }
 
 .log-content-title-request {
-    color: rgb(138, 166, 211);
+    color: rgb(0, 154, 234);
 }
 
 .log-type-primary-request {
-    color: rgb(138, 166, 211);
+    color: rgb(0, 154, 234);
 }
 
 .log-type-secondary-request {
-    color: rgba(138, 166, 211, 0.43);
+    color: rgba(0, 154, 234, 0.6);
 }
 
 
 
-.hr-response-dark-style {
-    background-image: linear-gradient(to right, rgba(192, 140, 100, 1), rgba(192, 140, 100, 1), rgba(0,0,0, 0));
-}
-
-.hr-response-white-style {
-    background-image: linear-gradient(to right, rgba(192, 140, 100, 1), rgba(192, 140, 100, 1), rgba(0, 0, 0, 0));
+.hr-response {
+    background-image: linear-gradient(to right, rgba(212, 155, 110, 1), rgba(212, 155, 110, 1), rgba(0,0,0, 0));
 }
 
 .log-content-border-response {
-    border-top: rgb(192,140,100) solid 1px;
-    border-bottom: rgb(192,140,100) solid 1px;
-    border-left: rgb(192,140,100) solid 1px;
+    border-top: rgb(212, 155, 110) solid 1px;
+    border-bottom: rgb(212, 155, 110) solid 1px;
+    border-left: rgb(212, 155, 110) solid 1px;
 }
 
 .log-content-title-response {
-    color: rgb(192, 140, 100);
+    color: rgb(212, 155, 110);
 }
 
 .log-type-primary-response {
-    color: rgb(192, 140, 100);
+    color: rgb(212, 155, 110);
 }
 
 .log-type-secondary-response {
-    color: rgba(192, 140, 100, 0.43);
+    color: rgba(212, 155, 110, 0.6);
 }
 
 
-.hr-error-response-dark-style {
+.hr-error-response {
     background-image: linear-gradient(to right, rgba(192, 62, 73, 255), rgba(192, 62, 73, 255), rgba(0,0,0, 0));
-}
-
-.hr-error-response-white-style {
-    background-image: linear-gradient(to right, rgba(192, 62, 73, 0.75), rgba(192, 62, 73, 0.75), rgba(0, 0, 0, 0));
 }
 
 .log-content-error-response-border {
@@ -540,5 +508,9 @@ body {
 }
 
 .log-type-secondary-error-response {
-    color: rgba(192, 62, 73, 0.43);
+    color: rgba(192, 62, 73, 0.6);
+}
+
+.default-item-space {
+    padding-left: 18px;
 }
