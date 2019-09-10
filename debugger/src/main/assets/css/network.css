@@ -450,21 +450,16 @@ body {
     border-top: rgb(0, 154, 234) solid 1px;
     border-bottom: rgb(0, 154, 234) solid 1px;
     border-left: rgb(0, 154, 234) solid 1px;
-}
-
-.log-content-title-request {
-    color: rgb(0, 154, 234);
-}
-
-.log-type-primary-request {
-    color: rgb(0, 154, 234);
+    margin-top: 20px;
 }
 
 .log-type-secondary-request {
     color: rgba(0, 154, 234, 0.6);
 }
 
-
+.primary-color-request {
+    color: rgb(0, 154, 234);
+}
 
 .hr-response {
     background-image: linear-gradient(to right, rgba(212, 155, 110, 1), rgba(212, 155, 110, 1), rgba(0,0,0, 0));
@@ -474,18 +469,15 @@ body {
     border-top: rgb(212, 155, 110) solid 1px;
     border-bottom: rgb(212, 155, 110) solid 1px;
     border-left: rgb(212, 155, 110) solid 1px;
-}
-
-.log-content-title-response {
-    color: rgb(212, 155, 110);
-}
-
-.log-type-primary-response {
-    color: rgb(212, 155, 110);
+    margin-top: 20px;
 }
 
 .log-type-secondary-response {
     color: rgba(212, 155, 110, 0.6);
+}
+
+.primary-color-response {
+    color: rgb(212, 155, 110);
 }
 
 
@@ -493,24 +485,32 @@ body {
     background-image: linear-gradient(to right, rgba(192, 62, 73, 255), rgba(192, 62, 73, 255), rgba(0,0,0, 0));
 }
 
-.log-content-error-response-border {
+.log-content-border-error-response {
     border-top: rgb(192, 62, 73) solid 1px;
     border-bottom: rgb(192, 62, 73) solid 1px;
     border-left: rgb(192, 62, 73) solid 1px;
-}
-
-.log-content-title-error-response {
-    color: rgb(192, 62, 73);
-}
-
-.log-type-primary-error-response {
-    color: rgb(192, 62, 73);
+    margin-top: 20px;
 }
 
 .log-type-secondary-error-response {
     color: rgba(192, 62, 73, 0.6);
 }
 
+.primary-color-error-response {
+    color: rgb(192, 62, 73);
+}
+
 .default-item-space {
     padding-left: 18px;
+}
+
+.detail-log-item {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-right: 60%;
+    cursor: pointer;
+}
+
+.detail-log-item:hover {
+    text-decoration: underline;
 }
