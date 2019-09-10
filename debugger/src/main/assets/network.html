@@ -286,14 +286,14 @@
         "      \"type\": \"everType\"\n" +
         "    },\n" +
         "    \"queryType\": \"REQUEST\",\n" +
-        // "    \"requestBody\": \"{\\\"planet\\\":\\\"earth\\\",\\\"star\\\":\\\"sun\\\",\\\"nextStar\\\":\\\"proxima\\\"}\",\n" +
-        "    \"requestBodySize\": -1,\n" +
+        "    \"requestBody\": \"{\\\"planet\\\":\\\"earth\\\",\\\"star\\\":\\\"sun\\\",\\\"nextStar\\\":\\\"proxima\\\"}\",\n" +
+        "    \"requestBodySize\": 12,\n" +
         "    \"requestDuration\": -1,\n" +
-        // "    \"requestHeaders\": {\n" +
-        // "      \"DeviceId\": \"Samsung\",\n" +
-        // "      \"Token\": \"gj3h2k4923hb4k2\",\n" +
-        // "      \"Api-key\": \"j4hg45k3lk2\"\n" +
-        // "    },\n" +
+        "    \"requestHeaders\": {\n" +
+        "      \"DeviceId\": \"Samsung\",\n" +
+        "      \"Token\": \"gj3h2k4923hb4k2\",\n" +
+        "      \"Api-key\": \"j4hg45k3lk2\"\n" +
+        "    },\n" +
         "    \"requestTime\": 1567689327059,\n" +
         "    \"responseBodySize\": -1,\n" +
         "    \"responseTime\": -1,\n" +
@@ -315,6 +315,34 @@
         "    \"requestTime\": -1,\n" +
         "    \"responseBody\": \"{ \\n    \\\"animal\\\": \\\"dog\\\",\\n    \\\"time\\\": \\\"now\\\",\\n    \\\"date\\\": \\\"today\\\"\\n}\",\n" +
         "    \"responseBodySize\": 64,\n" +
+        "    \"responseHeaders\": {\n" +
+        "      \"Server\": \"Cowboy\",\n" +
+        "      \"Connection\": \"keep-alive\",\n" +
+        "      \"Content-Length\": \"64\",\n" +
+        "      \"Date\": \"Thu, 05 Sep 2019 13:15:27 GMT\",\n" +
+        "      \"Content-Type\": \"application/json\",\n" +
+        "      \"Via\": \"1.1 vegur\"\n" +
+        "    },\n" +
+        "    \"responseTime\": 1567689327280,\n" +
+        "    \"shortUrl\": \"/v2/5d70fef13300003920779665?type\u003deverType\u0026profile\u003dsky\"\n" +
+        "  },\n" +
+        "{\n" +
+        "    \"baseUrl\": \"www.mocky.io\",\n" +
+        "    \"code\": \"401\",\n" +
+        "    \"fullUrl\": \"http://www.mocky.io/v2/5d70fef13300003920779665?type\u003deverType\u0026profile\u003dsky\",\n" +
+        "    \"id\": 2,\n" +
+        "    \"ip\": \"34.253.21.225\",\n" +
+        "    \"message\": \"OK\",\n" +
+        "    \"method\": \"POST\",\n" +
+        "    \"port\": \"80\",\n" +
+        "    \"queryId\": \"1\",\n" +
+        "    \"queryType\": \"RESPONSE\",\n" +
+        "    \"requestBodySize\": -1,\n" +
+        "    \"requestDuration\": 195,\n" +
+        "    \"requestTime\": -1,\n" +
+        "    \"responseBody\": \"{ \\n    \\\"animal\\\": \\\"dog\\\",\\n    \\\"time\\\": \\\"now\\\",\\n    \\\"date\\\": \\\"today\\\"\\n}\",\n" +
+        "    \"responseBodySize\": 64,\n" +
+        "    \"errorMessage\": \"RuntimeException\",\n" +
         "    \"responseHeaders\": {\n" +
         "      \"Server\": \"Cowboy\",\n" +
         "      \"Connection\": \"keep-alive\",\n" +
@@ -399,10 +427,9 @@
 
                 if (logLine.queryType === "REQUEST") {
                     tr.appendChild(requestBodyTd(logLine));
-                } else if (logLine.queryType === "RESPONSE" && logLine.code >= 400) {
+                } else if (logLine.queryType === "RESPONSE" && (logLine.code >= 400 || logLine.errorMessage)) {
                     tr.appendChild(errorResponseBodyTd(logLine));
                 } else if (logLine.queryType === "RESPONSE") {
-                    // tr.appendChild(errorResponseBodyTd(logLine));
                     tr.appendChild(responseBodyTd(logLine));
                 }
 
@@ -511,15 +538,16 @@
                     detailSpan.innerHTML = "Hide details";
                 }
             };
-
-            let headersP = document.createElement("p");
-            let headersSpan = document.createElement("span");
-            headersSpan.className = "primary-color-request";
-            headersSpan.innerHTML = "Headers:";
-            headersP.className = "default-item-space";
-            headersP.appendChild(headersSpan);
+            requestRootTd.appendChild(detailSpan);
 
             if (logLine.requestHeaders) {
+                let headersP = document.createElement("p");
+                let headersSpan = document.createElement("span");
+                headersSpan.className = "primary-color-request";
+                headersSpan.innerHTML = "Headers:";
+                headersP.className = "default-item-space";
+                headersP.appendChild(headersSpan);
+
                 requestBodyDiv.appendChild(document.createElement("br"));
                 requestBodyDiv.appendChild(headersP);
 
@@ -557,8 +585,6 @@
             }
 
             requestBodyDiv.appendChild(document.createElement("br"));
-
-            requestRootTd.appendChild(detailSpan);
             requestRootTd.appendChild(requestBodyDiv);
         } else {
             let emptyBodySpan = document.createElement("span");
@@ -597,6 +623,8 @@
         responseHeaderP.appendChild(responseLeftHeaderSpan);
         responseHeaderP.appendChild(responseCenterHeaderSpan);
         responseHeaderP.appendChild(responseRightHeaderSpan);
+        responseInfoDiv.appendChild(responseHeaderP);
+        responseInfoDiv.appendChild(document.createElement("br"));
 
         let urlP = document.createElement("p");
         let urlSpan = document.createElement("span");
@@ -604,6 +632,7 @@
         urlSpan.innerHTML = "URL: ";
         urlP.appendChild(urlSpan);
         urlP.innerHTML += logLine.fullUrl;
+        responseInfoDiv.appendChild(urlP);
 
         let methodP = document.createElement("p");
         let methodSpan = document.createElement("span");
@@ -611,96 +640,114 @@
         methodSpan.innerHTML = "Method: ";
         methodP.appendChild(methodSpan);
         methodP.innerHTML += logLine.method;
-
-        let statusP = document.createElement("p");
-        let statusSpan = document.createElement("span");
-        statusSpan.className = "primary-color-response";
-        statusSpan.innerHTML = "Status: ";
-        statusP.appendChild(statusSpan);
-        statusP.innerHTML += logLine.code + " " + logLine.message;
-
-        let durationP = document.createElement("p");
-        let durationSpan = document.createElement("span");
-        durationSpan.className = "primary-color-response";
-        durationSpan.innerHTML = "Duration: ";
-        durationP.appendChild(durationSpan);
-        durationP.innerHTML += logLine.requestDuration + "ms";
-
-        let bodySizeP = document.createElement("p");
-        let bodySizeSpan = document.createElement("span");
-        bodySizeSpan.className = "primary-color-response";
-        bodySizeSpan.innerHTML = "Body size: ";
-        bodySizeP.appendChild(bodySizeSpan);
-        bodySizeP.innerHTML += logLine.responseBodySize + " byte";
-
-        responseInfoDiv.appendChild(responseHeaderP);
-        responseInfoDiv.appendChild(document.createElement("br"));
-        responseInfoDiv.appendChild(urlP);
         responseInfoDiv.appendChild(methodP);
-        responseInfoDiv.appendChild(statusP);
-        responseInfoDiv.appendChild(durationP);
-        responseInfoDiv.appendChild(bodySizeP);
-        responseInfoDiv.appendChild(document.createElement("br"));
 
-        let responseBodyDiv = document.createElement("div");
-        responseBodyDiv.className = "log-content-border-response";
-        hideElement(responseBodyDiv);
-
-        let detailSpan = document.createElement("span");
-        detailSpan.className = "detail-log-item primary-color-response";
-        detailSpan.innerHTML = "Show details";
-
-        detailSpan.onclick = function () {
-            if (isVisibleElement(responseBodyDiv)) {
-                hideElement(responseBodyDiv);
-                detailSpan.innerHTML = "Show details";
-            } else {
-                showElement(responseBodyDiv);
-                detailSpan.innerHTML = "Hide details";
-            }
-        };
-
-        let headersP = document.createElement("p");
-        let headersSpan = document.createElement("span");
-        headersSpan.className = "primary-color-response";
-        headersSpan.innerHTML = "Headers:";
-        headersP.className = "default-item-space";
-        headersP.appendChild(headersSpan);
-
-        responseBodyDiv.appendChild(document.createElement("br"));
-        responseBodyDiv.appendChild(headersP);
-
-        for (let header in logLine.responseHeaders) {
-            let headerP = document.createElement("p");
-            headerP.className = "default-item-space";
-            headerP.innerHTML = header + ": " + logLine.responseHeaders[header];
-            responseBodyDiv.appendChild(headerP);
+        if (logLine.code) {
+            let statusP = document.createElement("p");
+            let statusSpan = document.createElement("span");
+            statusSpan.className = "primary-color-response";
+            statusSpan.innerHTML = "Status: ";
+            statusP.appendChild(statusSpan);
+            statusP.innerHTML += logLine.code + " " + logLine.message;
+            responseInfoDiv.appendChild(statusP);
         }
 
-        let hr = document.createElement("hr");
-        hr.className = "default-hr hr-response";
+        if (logLine.requestDuration) {
+            let durationP = document.createElement("p");
+            let durationSpan = document.createElement("span");
+            durationSpan.className = "primary-color-response";
+            durationSpan.innerHTML = "Duration: ";
+            durationP.appendChild(durationSpan);
+            durationP.innerHTML += logLine.requestDuration + "ms";
+            responseInfoDiv.appendChild(durationP);
+        }
 
-        let bodyP = document.createElement("p");
-        let bodySpan = document.createElement("span");
-        bodySpan.className = "primary-color-response";
-        bodySpan.innerHTML = 'Body:';
-        bodyP.className = "default-item-space";
-        bodyP.appendChild(bodySpan);
+        if (logLine.responseBodySize && logLine.responseBodySize !== 0 && logLine.responseBodySize !== -1) {
+            let bodySizeP = document.createElement("p");
+            let bodySizeSpan = document.createElement("span");
+            bodySizeSpan.className = "primary-color-response";
+            bodySizeSpan.innerHTML = "Body size: ";
+            bodySizeP.appendChild(bodySizeSpan);
+            bodySizeP.innerHTML += logLine.responseBodySize + " byte";
+            responseInfoDiv.appendChild(bodySizeP);
+        }
 
-        let bodyPre = document.createElement("pre");
-        bodyPre.innerHTML = logLine.responseBody;
-        bodyPre.className = "default-item-space";
-
-        responseBodyDiv.appendChild(document.createElement("br"));
-        responseBodyDiv.appendChild(hr);
-        responseBodyDiv.appendChild(document.createElement("br"));
-        responseBodyDiv.appendChild(bodyP);
-        responseBodyDiv.appendChild(bodyPre);
-        responseBodyDiv.appendChild(document.createElement("br"));
-
+        responseInfoDiv.appendChild(document.createElement("br"));
         responseRootTd.appendChild(responseInfoDiv);
-        responseRootTd.appendChild(detailSpan);
-        responseRootTd.appendChild(responseBodyDiv);
+
+        if (logLine.responseHeaders || logLine.responseBody) {
+            let responseBodyDiv = document.createElement("div");
+            responseBodyDiv.className = "log-content-border-response";
+            hideElement(responseBodyDiv);
+
+            let detailSpan = document.createElement("span");
+            detailSpan.className = "detail-log-item primary-color-response";
+            detailSpan.innerHTML = "Show details";
+
+            detailSpan.onclick = function () {
+                if (isVisibleElement(responseBodyDiv)) {
+                    hideElement(responseBodyDiv);
+                    detailSpan.innerHTML = "Show details";
+                } else {
+                    showElement(responseBodyDiv);
+                    detailSpan.innerHTML = "Hide details";
+                }
+            };
+            responseRootTd.appendChild(detailSpan);
+
+            if (logLine.responseHeaders) {
+                let headersP = document.createElement("p");
+                let headersSpan = document.createElement("span");
+                headersSpan.className = "primary-color-response";
+                headersSpan.innerHTML = "Headers:";
+                headersP.className = "default-item-space";
+                headersP.appendChild(headersSpan);
+
+                responseBodyDiv.appendChild(document.createElement("br"));
+                responseBodyDiv.appendChild(headersP);
+
+                for (let header in logLine.responseHeaders) {
+                    let headerP = document.createElement("p");
+                    headerP.className = "default-item-space";
+                    headerP.innerHTML = header + ": " + logLine.responseHeaders[header];
+                    responseBodyDiv.appendChild(headerP);
+                }
+
+                if (logLine.responseBody) {
+                    let hr = document.createElement("hr");
+                    hr.className = "default-hr hr-response";
+
+                    responseBodyDiv.appendChild(document.createElement("br"));
+                    responseBodyDiv.appendChild(hr);
+                }
+            }
+
+            if (logLine.responseBody) {
+                let bodyP = document.createElement("p");
+                let bodySpan = document.createElement("span");
+                bodySpan.className = "primary-color-response";
+                bodySpan.innerHTML = 'Body:';
+                bodyP.className = "default-item-space";
+                bodyP.appendChild(bodySpan);
+
+                let bodyPre = document.createElement("pre");
+                bodyPre.innerHTML = logLine.responseBody;
+                bodyPre.className = "default-item-space";
+
+                responseBodyDiv.appendChild(document.createElement("br"));
+                responseBodyDiv.appendChild(bodyP);
+                responseBodyDiv.appendChild(bodyPre);
+            }
+
+            responseBodyDiv.appendChild(document.createElement("br"));
+            responseRootTd.appendChild(responseBodyDiv);
+        } else {
+            let emptyBodySpan = document.createElement("span");
+            emptyBodySpan.className = "primary-color-response";
+            emptyBodySpan.innerHTML = "Empty body";
+            responseRootTd.appendChild(emptyBodySpan);
+        }
+
         return responseRootTd;
     }
 
@@ -731,6 +778,8 @@
         responseHeaderP.appendChild(responseLeftHeaderSpan);
         responseHeaderP.appendChild(responseCenterHeaderSpan);
         responseHeaderP.appendChild(responseRightHeaderSpan);
+        responseInfoDiv.appendChild(responseHeaderP);
+        responseInfoDiv.appendChild(document.createElement("br"));
 
         let urlP = document.createElement("p");
         let urlSpan = document.createElement("span");
@@ -738,6 +787,7 @@
         urlSpan.innerHTML = "URL: ";
         urlP.appendChild(urlSpan);
         urlP.innerHTML += logLine.fullUrl;
+        responseInfoDiv.appendChild(urlP);
 
         let methodP = document.createElement("p");
         let methodSpan = document.createElement("span");
@@ -745,103 +795,122 @@
         methodSpan.innerHTML = "Method: ";
         methodP.appendChild(methodSpan);
         methodP.innerHTML += logLine.method;
-
-        let statusP = document.createElement("p");
-        let statusSpan = document.createElement("span");
-        statusSpan.className = "primary-color-error-response";
-        statusSpan.innerHTML = "Status: ";
-        statusP.appendChild(statusSpan);
-        statusP.innerHTML += logLine.code + " " + logLine.message;
-
-        let durationP = document.createElement("p");
-        let durationSpan = document.createElement("span");
-        durationSpan.className = "primary-color-error-response";
-        durationSpan.innerHTML = "Duration: ";
-        durationP.appendChild(durationSpan);
-        durationP.innerHTML += logLine.requestDuration + "ms";
-
-        let bodySizeP = document.createElement("p");
-        let bodySizeSpan = document.createElement("span");
-        bodySizeSpan.className = "primary-color-error-response";
-        bodySizeSpan.innerHTML = "Body size: ";
-        bodySizeP.appendChild(bodySizeSpan);
-        bodySizeP.innerHTML += logLine.responseBodySize + " byte";
-
-        let errorMessageP = document.createElement("p");
-        let errorMessageSpan = document.createElement("span");
-        errorMessageSpan.className = "primary-color-error-response";
-        errorMessageSpan.innerHTML = "Error message: ";
-        errorMessageP.appendChild(errorMessageSpan);
-        errorMessageP.innerHTML += logLine.errorMessage;
-
-        responseInfoDiv.appendChild(responseHeaderP);
-        responseInfoDiv.appendChild(document.createElement("br"));
-        responseInfoDiv.appendChild(urlP);
         responseInfoDiv.appendChild(methodP);
-        responseInfoDiv.appendChild(statusP);
-        responseInfoDiv.appendChild(durationP);
-        responseInfoDiv.appendChild(bodySizeP);
-        responseInfoDiv.appendChild(document.createElement("br"));
 
-        let responseBodyDiv = document.createElement("div");
-        responseBodyDiv.className = "log-content-border-error-response";
-        hideElement(responseBodyDiv);
-
-        let detailSpan = document.createElement("span");
-        detailSpan.className = "detail-log-item primary-color-error-response";
-        detailSpan.innerHTML = "Show details";
-
-        detailSpan.onclick = function () {
-            if (isVisibleElement(responseBodyDiv)) {
-                hideElement(responseBodyDiv);
-                detailSpan.innerHTML = "Show details";
-            } else {
-                showElement(responseBodyDiv);
-                detailSpan.innerHTML = "Hide details";
-            }
-        };
-
-        let headersP = document.createElement("p");
-        let headersSpan = document.createElement("span");
-        headersSpan.className = "primary-color-error-response";
-        headersSpan.innerHTML = "Headers:";
-        headersP.className = "default-item-space";
-        headersP.appendChild(headersSpan);
-
-        responseBodyDiv.appendChild(document.createElement("br"));
-        responseBodyDiv.appendChild(headersP);
-
-        for (let header in logLine.responseHeaders) {
-            let headerP = document.createElement("p");
-            headerP.innerHTML = header + ": " + logLine.responseHeaders[header];
-            headerP.className = "default-item-space";
-            responseBodyDiv.appendChild(headerP);
+        if (logLine.code) {
+            let statusP = document.createElement("p");
+            let statusSpan = document.createElement("span");
+            statusSpan.className = "primary-color-error-response";
+            statusSpan.innerHTML = "Status: ";
+            statusP.appendChild(statusSpan);
+            statusP.innerHTML += logLine.code + " " + logLine.message;
+            responseInfoDiv.appendChild(statusP);
         }
 
-        let hr = document.createElement("hr");
-        hr.className = "default-hr hr-error-response";
+        if (logLine.requestDuration) {
+            let durationP = document.createElement("p");
+            let durationSpan = document.createElement("span");
+            durationSpan.className = "primary-color-error-response";
+            durationSpan.innerHTML = "Duration: ";
+            durationP.appendChild(durationSpan);
+            durationP.innerHTML += logLine.requestDuration + "ms";
+            responseInfoDiv.appendChild(durationP);
+        }
 
-        let bodyP = document.createElement("p");
-        let bodySpan = document.createElement("span");
-        bodySpan.className = "primary-color-error-response";
-        bodySpan.innerHTML = 'Body:';
-        bodyP.className = "default-item-space";
-        bodyP.appendChild(bodySpan);
+        if (logLine.responseBodySize && logLine.responseBodySize !== 0 && logLine.responseBodySize !== -1) {
+            let bodySizeP = document.createElement("p");
+            let bodySizeSpan = document.createElement("span");
+            bodySizeSpan.className = "primary-color-error-response";
+            bodySizeSpan.innerHTML = "Body size: ";
+            bodySizeP.appendChild(bodySizeSpan);
+            bodySizeP.innerHTML += logLine.responseBodySize + " byte";
+            responseInfoDiv.appendChild(bodySizeP);
+        }
 
-        let bodyPre = document.createElement("pre");
-        bodyPre.innerHTML = logLine.responseBody;
-        bodyPre.className = "default-item-space";
+        if (logLine.errorMessage) {
+            let errorMessageP = document.createElement("p");
+            let errorMessageSpan = document.createElement("span");
+            errorMessageSpan.className = "primary-color-error-response";
+            errorMessageSpan.innerHTML = "Error message: " + logLine.errorMessage;
+            errorMessageP.appendChild(errorMessageSpan);
+            responseInfoDiv.appendChild(errorMessageP);
+        }
 
-        responseBodyDiv.appendChild(document.createElement("br"));
-        responseBodyDiv.appendChild(hr);
-        responseBodyDiv.appendChild(document.createElement("br"));
-        responseBodyDiv.appendChild(bodyP);
-        responseBodyDiv.appendChild(bodyPre);
-        responseBodyDiv.appendChild(document.createElement("br"));
-
+        responseInfoDiv.appendChild(document.createElement("br"));
         responseRootTd.appendChild(responseInfoDiv);
-        responseRootTd.appendChild(detailSpan);
-        responseRootTd.appendChild(responseBodyDiv);
+
+        if (logLine.responseHeaders || logLine.responseBody) {
+            let responseBodyDiv = document.createElement("div");
+            responseBodyDiv.className = "log-content-border-error-response";
+            hideElement(responseBodyDiv);
+
+            let detailSpan = document.createElement("span");
+            detailSpan.className = "detail-log-item primary-color-error-response";
+            detailSpan.innerHTML = "Show details";
+
+            detailSpan.onclick = function () {
+                if (isVisibleElement(responseBodyDiv)) {
+                    hideElement(responseBodyDiv);
+                    detailSpan.innerHTML = "Show details";
+                } else {
+                    showElement(responseBodyDiv);
+                    detailSpan.innerHTML = "Hide details";
+                }
+            };
+            responseRootTd.appendChild(detailSpan);
+
+            if (logLine.responseHeaders) {
+                let headersP = document.createElement("p");
+                let headersSpan = document.createElement("span");
+                headersSpan.className = "primary-color-error-response";
+                headersSpan.innerHTML = "Headers:";
+                headersP.className = "default-item-space";
+                headersP.appendChild(headersSpan);
+
+                responseBodyDiv.appendChild(document.createElement("br"));
+                responseBodyDiv.appendChild(headersP);
+
+                for (let header in logLine.responseHeaders) {
+                    let headerP = document.createElement("p");
+                    headerP.innerHTML = header + ": " + logLine.responseHeaders[header];
+                    headerP.className = "default-item-space";
+                    responseBodyDiv.appendChild(headerP);
+                }
+
+                if (logLine.responseBody) {
+                    let hr = document.createElement("hr");
+                    hr.className = "default-hr hr-error-response";
+                    responseBodyDiv.appendChild(document.createElement("br"));
+                    responseBodyDiv.appendChild(hr);
+                }
+            }
+
+            if (logLine.responseBody) {
+                let bodyP = document.createElement("p");
+                let bodySpan = document.createElement("span");
+                bodySpan.className = "primary-color-error-response";
+                bodySpan.innerHTML = 'Body:';
+                bodyP.className = "default-item-space";
+                bodyP.appendChild(bodySpan);
+
+                let bodyPre = document.createElement("pre");
+                bodyPre.innerHTML = logLine.responseBody;
+                bodyPre.className = "default-item-space";
+
+                responseBodyDiv.appendChild(document.createElement("br"));
+                responseBodyDiv.appendChild(bodyP);
+                responseBodyDiv.appendChild(bodyPre);
+            }
+
+            responseBodyDiv.appendChild(document.createElement("br"));
+            responseRootTd.appendChild(responseBodyDiv);
+        } else {
+            let emptyBodySpan = document.createElement("span");
+            emptyBodySpan.className = "primary-color-error-response";
+            emptyBodySpan.innerHTML = "Empty body";
+            responseRootTd.appendChild(emptyBodySpan);
+        }
+
         return responseRootTd;
     }
 
