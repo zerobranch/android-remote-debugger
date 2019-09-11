@@ -1,7 +1,5 @@
 package com.sarproj.remotedebugger.logging;
 
-import android.net.Uri;
-
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
@@ -13,7 +11,6 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Set;
 
 import okhttp3.Headers;
 import okhttp3.Interceptor;
@@ -41,30 +38,24 @@ public class NetLoggingInterceptor implements Interceptor {
         RequestBody requestBody = request.body();
 
         logRequest.method = request.method();
-        logRequest.fullUrl = request.url().toString();
-        logRequest.baseUrl = request.url().host();
+        logRequest.url = request.url().toString();
 
-        String query = request.url().url().getQuery();
-        logRequest.shortUrl = request.url().url().getPath() + (query != null ? "?" + query : "");
         logRequest.port = String.valueOf(request.url().port());
 
         InetAddress address = InetAddress.getByName(new URL(request.url().toString()).getHost());
         logRequest.ip = address.getHostAddress();
 
-        logRequest.queryParams = new HashMap<>();
-        Uri requestUri = Uri.parse(request.url().toString());
-        Set<String> queryParamNames = requestUri.getQueryParameterNames();
-        for (String param : queryParamNames) {
-            logRequest.queryParams.put(param, requestUri.getQueryParameter(param));
-        }
-
         Headers headers = request.headers();
-        logRequest.requestHeaders = new HashMap<>();
+        logRequest.headers = new HashMap<>();
         for (int i = 0, count = headers.size(); i < count; i++) {
             String name = headers.name(i);
             if (!"Content-Type".equalsIgnoreCase(name) && !"Content-Length".equalsIgnoreCase(name)) {
-                logRequest.requestHeaders.put(headers.name(i), headers.value(i));
+                logRequest.headers.put(headers.name(i), headers.value(i));
             }
+        }
+
+        if (logRequest.headers.isEmpty()) {
+            logRequest.headers = null;
         }
 
         if (requestBody != null) {
@@ -72,7 +63,7 @@ public class NetLoggingInterceptor implements Interceptor {
                 logRequest.requestContentType = requestBody.contentType().toString();
             }
 
-            logRequest.requestBodySize = requestBody.contentLength();
+            logRequest.bodySize = String.valueOf(requestBody.contentLength());
 
             Buffer buffer = new Buffer();
             requestBody.writeTo(buffer);
@@ -83,10 +74,10 @@ public class NetLoggingInterceptor implements Interceptor {
                 charset = contentType.charset(UTF8);
             }
 
-            logRequest.requestBody = buffer.readString(charset);
+            logRequest.body = buffer.readString(charset);
         }
 
-        logRequest.requestTime = System.currentTimeMillis();
+        logRequest.time = System.currentTimeMillis();
         logRequest.id = getDataBase().addHttpLogRequest(logRequest);
         logRequest.queryId = String.valueOf(logRequest.id / 2 + 1);
         logResponse.queryId = logRequest.queryId;
@@ -104,27 +95,29 @@ public class NetLoggingInterceptor implements Interceptor {
 
         long endTime = System.currentTimeMillis();
 
-        logResponse.requestDuration = endTime - startTime;
-        logResponse.responseTime = endTime;
+        logResponse.duration = String.valueOf(endTime - startTime);
+        logResponse.time = endTime;
         logResponse.code = String.valueOf(response.code());
         logResponse.message = response.message();
         logResponse.method = logRequest.method;
-        logResponse.baseUrl = logRequest.baseUrl;
         logResponse.port = logRequest.port;
         logResponse.ip = logRequest.ip;
-        logResponse.fullUrl = logRequest.fullUrl;
-        logResponse.shortUrl = logRequest.shortUrl;
+        logResponse.url = logRequest.url;
 
         Headers responseHeaders = response.headers();
-        logResponse.responseHeaders = new HashMap<>();
+        logResponse.headers = new HashMap<>();
         for (int i = 0, count = responseHeaders.size(); i < count; i++) {
-            logResponse.responseHeaders.put(responseHeaders.name(i), responseHeaders.value(i));
+            logResponse.headers.put(responseHeaders.name(i), responseHeaders.value(i));
+        }
+
+        if (logResponse.headers.isEmpty()) {
+            logResponse.headers = null;
         }
 
         ResponseBody responseBody = response.body();
         if (HttpHeaders.promisesBody(response) && responseBody != null) {
             long responseContentLength = responseBody.contentLength();
-            logResponse.responseBodySize = responseContentLength;
+            logResponse.bodySize = String.valueOf(responseContentLength);
 
             BufferedSource source = responseBody.source();
             source.request(Long.MAX_VALUE);
@@ -144,7 +137,7 @@ public class NetLoggingInterceptor implements Interceptor {
             }
 
             if (responseContentLength != 0) {
-                logResponse.responseBody = buffer.clone().readString(charset);
+                logResponse.body = buffer.clone().readString(charset);
             }
         }
 

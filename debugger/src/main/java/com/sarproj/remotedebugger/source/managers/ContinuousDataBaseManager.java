@@ -24,7 +24,7 @@ public final class ContinuousDataBaseManager {
 
     private ContinuousDataBaseManager(Context context) {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
-        database = context.openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READWRITE, null);
+        database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
         database.setVersion(Integer.MAX_VALUE);
 
         httpLogRepository = new HttpLogRepository(database);
@@ -113,19 +113,17 @@ public final class ContinuousDataBaseManager {
         HttpLogModel httpLogModel = new HttpLogModel();
         httpLogModel.queryId = httpLogResponse.queryId;
         httpLogModel.method = httpLogResponse.method;
-        httpLogModel.responseTime= httpLogResponse.responseTime;
+        httpLogModel.time = httpLogResponse.time;
         httpLogModel.code = httpLogResponse.code;
         httpLogModel.message = httpLogResponse.message;
-        httpLogModel.requestDuration = httpLogResponse.requestDuration;
-        httpLogModel.responseBodySize = httpLogResponse.responseBodySize;
-        httpLogModel.baseUrl = httpLogResponse.baseUrl;
+        httpLogModel.duration = httpLogResponse.duration;
+        httpLogModel.bodySize = httpLogResponse.bodySize;
         httpLogModel.port = httpLogResponse.port;
         httpLogModel.ip = httpLogResponse.ip;
-        httpLogModel.fullUrl = httpLogResponse.fullUrl;
-        httpLogModel.shortUrl = httpLogResponse.shortUrl;
+        httpLogModel.url = httpLogResponse.url;
         httpLogModel.errorMessage = httpLogResponse.errorMessage;
-        httpLogModel.responseBody = httpLogResponse.responseBody;
-        httpLogModel.responseHeaders = httpLogResponse.responseHeaders;
+        httpLogModel.body = httpLogResponse.body;
+        httpLogModel.headers = httpLogResponse.headers;
         httpLogModel.queryType = QueryType.RESPONSE;
         return httpLogModel;
     }
@@ -134,17 +132,14 @@ public final class ContinuousDataBaseManager {
         HttpLogModel httpLogModel = new HttpLogModel();
         httpLogModel.queryId = httpLogRequest.queryId;
         httpLogModel.method = httpLogRequest.method;
-        httpLogModel.requestTime = httpLogRequest.requestTime;
+        httpLogModel.time = httpLogRequest.time;
         httpLogModel.requestContentType = httpLogRequest.requestContentType;
-        httpLogModel.requestBodySize = httpLogRequest.requestBodySize;
-        httpLogModel.baseUrl = httpLogRequest.baseUrl;
+        httpLogModel.bodySize = httpLogRequest.bodySize;
         httpLogModel.port = httpLogRequest.port;
         httpLogModel.ip = httpLogRequest.ip;
-        httpLogModel.fullUrl = httpLogRequest.fullUrl;
-        httpLogModel.shortUrl = httpLogRequest.shortUrl;
-        httpLogModel.requestBody = httpLogRequest.requestBody;
-        httpLogModel.requestHeaders = httpLogRequest.requestHeaders;
-        httpLogModel.queryParams = httpLogRequest.queryParams;
+        httpLogModel.url = httpLogRequest.url;
+        httpLogModel.body = httpLogRequest.body;
+        httpLogModel.headers = httpLogRequest.headers;
         httpLogModel.queryType = QueryType.REQUEST;
         return httpLogModel;
     }
