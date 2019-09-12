@@ -117,7 +117,6 @@ public class NetLoggingInterceptor implements Interceptor {
         ResponseBody responseBody = response.body();
         if (HttpHeaders.promisesBody(response) && responseBody != null) {
             long responseContentLength = responseBody.contentLength();
-            logResponse.bodySize = String.valueOf(responseContentLength);
 
             BufferedSource source = responseBody.source();
             source.request(Long.MAX_VALUE);
@@ -137,6 +136,7 @@ public class NetLoggingInterceptor implements Interceptor {
             }
 
             if (responseContentLength != 0) {
+                logResponse.bodySize = String.valueOf(responseContentLength);
                 logResponse.body = buffer.clone().readString(charset);
             }
         }
