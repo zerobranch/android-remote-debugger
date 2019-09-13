@@ -82,6 +82,11 @@ public class NetLoggingInterceptor implements Interceptor {
         logRequest.queryId = String.valueOf(logRequest.id / 2 + 1);
         logResponse.queryId = logRequest.queryId;
 
+        logResponse.method = logRequest.method;
+        logResponse.port = logRequest.port;
+        logResponse.ip = logRequest.ip;
+        logResponse.url = logRequest.url;
+
         long startTime = System.currentTimeMillis();
 
         Response response;
@@ -99,10 +104,6 @@ public class NetLoggingInterceptor implements Interceptor {
         logResponse.time = endTime;
         logResponse.code = String.valueOf(response.code());
         logResponse.message = response.message();
-        logResponse.method = logRequest.method;
-        logResponse.port = logRequest.port;
-        logResponse.ip = logRequest.ip;
-        logResponse.url = logRequest.url;
 
         Headers responseHeaders = response.headers();
         logResponse.headers = new HashMap<>();

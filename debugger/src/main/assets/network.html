@@ -307,6 +307,16 @@
         return logLine.queryType === "RESPONSE" && (logLine.code >= 400 || logLine.errorMessage);
     }
 
+    function setLogItemClassName(logLine, item) {
+        if (isRequest(logLine)) {
+            item.className = "primary-color-request";
+        } else if (isErrorResponse(logLine)) {
+            item.className = "primary-color-error-response";
+        } else if (isResponse(logLine)) {
+            item.className = "primary-color-response";
+        }
+    }
+
     function bodyTd(logLine) {
         let requestRootTd = document.createElement("td");
         let requestInfoDiv = document.createElement("div");
@@ -315,19 +325,7 @@
         let requestCenterHeaderSpan = document.createElement("span");
         let requestRightHeaderSpan = document.createElement("span");
 
-        if (isRequest(logLine)) {
-            requestLeftHeaderSpan.className = "log-type-secondary-request";
-            requestCenterHeaderSpan.className = "primary-color-request";
-            requestRightHeaderSpan.className = "log-type-secondary-request";
-        } else if (isErrorResponse(logLine)) {
-            requestLeftHeaderSpan.className = "log-type-secondary-error-response";
-            requestCenterHeaderSpan.className = "primary-color-error-response";
-            requestRightHeaderSpan.className = "log-type-secondary-error-response";
-        } else if (isResponse(logLine)) {
-            requestLeftHeaderSpan.className = "log-type-secondary-response";
-            requestCenterHeaderSpan.className = "primary-color-response";
-            requestRightHeaderSpan.className = "log-type-secondary-response";
-        }
+        requestRootTd.style.fontSize = currentContentFont + "pt";
 
         if (isDarkTheme) {
             requestRootTd.className = "log-item log-item-dark-style";
@@ -335,16 +333,27 @@
             requestRootTd.className = "log-item log-item-white-style";
         }
 
-        requestRootTd.style.fontSize = currentContentFont + "pt";
+        setLogItemClassName(logLine, requestCenterHeaderSpan);
 
         if (isRequest(logLine)) {
-            requestLeftHeaderSpan.innerHTML = "░░░░░░░░░░░░░░";
-            requestCenterHeaderSpan.innerHTML = " Request ";
-            requestRightHeaderSpan.innerHTML = "░░░░░░░░░░░░░░";
+            requestLeftHeaderSpan.className = "log-type-secondary-request";
+            requestRightHeaderSpan.className = "log-type-secondary-request";
+        } else if (isErrorResponse(logLine)) {
+            requestLeftHeaderSpan.className = "log-type-secondary-error-response";
+            requestRightHeaderSpan.className = "log-type-secondary-error-response";
         } else if (isResponse(logLine)) {
-            requestLeftHeaderSpan.innerHTML = "░░░░░░░░░░░░░░";
-            requestCenterHeaderSpan.innerHTML = " Response ";
-            requestRightHeaderSpan.innerHTML = "░░░░░░░░░░░░░░";
+            requestLeftHeaderSpan.className = "log-type-secondary-response";
+            requestRightHeaderSpan.className = "log-type-secondary-response";
+        }
+
+        if (isRequest(logLine)) {
+            requestLeftHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+            requestCenterHeaderSpan.appendChild(document.createTextNode(" Request "));
+            requestRightHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+        } else if (isResponse(logLine)) {
+            requestLeftHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+            requestCenterHeaderSpan.appendChild(document.createTextNode(" Response "));
+            requestRightHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
         }
 
         requestHeaderP.appendChild(requestLeftHeaderSpan);
@@ -359,14 +368,7 @@
         urlP.appendChild(urlSpan);
         urlP.appendChild(document.createTextNode(logLine.url));
         requestInfoDiv.appendChild(urlP);
-
-        if (isRequest(logLine)) {
-            urlSpan.className = "primary-color-request";
-        } else if (isErrorResponse(logLine)) {
-            urlSpan.className = "primary-color-error-response";
-        } else if (isResponse(logLine)) {
-            urlSpan.className = "primary-color-response";
-        }
+        setLogItemClassName(logLine, urlSpan);
 
         let methodP = document.createElement("p");
         let methodSpan = document.createElement("span");
@@ -374,14 +376,15 @@
         methodP.appendChild(methodSpan);
         methodP.appendChild(document.createTextNode(logLine.method));
         requestInfoDiv.appendChild(methodP);
+        setLogItemClassName(logLine, methodSpan);
 
-        if (isRequest(logLine)) {
-            methodSpan.className = "primary-color-request";
-        } else if (isErrorResponse(logLine)) {
-            methodSpan.className = "primary-color-error-response";
-        } else if (isResponse(logLine)) {
-            methodSpan.className = "primary-color-response";
-        }
+        let ipP = document.createElement("p");
+        let ipSpan = document.createElement("span");
+        ipSpan.appendChild(document.createTextNode("Remote Address: "));
+        ipP.appendChild(ipSpan);
+        ipP.appendChild(document.createTextNode(logLine.ip + ":" + logLine.port));
+        requestInfoDiv.appendChild(ipP);
+        setLogItemClassName(logLine, ipSpan);
 
         if (isRequest(logLine) && logLine.requestContentType) {
             let contentTypeP = document.createElement("p");
@@ -402,9 +405,9 @@
             requestInfoDiv.appendChild(statusP);
 
             if (isErrorResponse(logLine)) {
-                statusSpan.className = "primary-color-error-response";
-            } else if (isResponse(logLine)) {
-                statusSpan.className = "primary-color-response";
+                setLogItemClassName(logLine, statusP);
+            } else {
+                setLogItemClassName(logLine, statusSpan);
             }
         }
 
@@ -415,12 +418,7 @@
             durationP.appendChild(durationSpan);
             durationP.appendChild(document.createTextNode(logLine.duration + " ms"));
             requestInfoDiv.appendChild(durationP);
-
-            if (isErrorResponse(logLine)) {
-                durationSpan.className = "primary-color-error-response";
-            } else if (isResponse(logLine)) {
-                durationSpan.className = "primary-color-response";
-            }
+            setLogItemClassName(logLine, durationSpan);
         }
 
         if (logLine.bodySize && logLine.bodySize !== 0 && logLine.bodySize !== -1) {
@@ -430,14 +428,7 @@
             bodySizeP.appendChild(bodySizeSpan);
             bodySizeP.appendChild(document.createTextNode(logLine.bodySize + " byte"));
             requestInfoDiv.appendChild(bodySizeP);
-
-            if (isRequest(logLine)) {
-                bodySizeSpan.className = "primary-color-request";
-            } else if (isErrorResponse(logLine)) {
-                bodySizeSpan.className = "primary-color-error-response";
-            } else if (isResponse(logLine)) {
-                bodySizeSpan.className = "primary-color-response";
-            }
+            setLogItemClassName(logLine, bodySizeSpan);
         }
 
         if (isErrorResponse(logLine) && logLine.errorMessage) {
@@ -488,13 +479,7 @@
                 headersP.className = "default-item-space";
                 headersP.appendChild(headersSpan);
 
-                if (isRequest(logLine)) {
-                    headersSpan.className = "primary-color-request";
-                } else if (isErrorResponse(logLine)) {
-                    headersSpan.className = "primary-color-error-response";
-                } else if (isResponse(logLine)) {
-                    headersSpan.className = "primary-color-response";
-                }
+                setLogItemClassName(logLine, headersSpan);
 
                 requestBodyDiv.appendChild(document.createElement("br"));
                 requestBodyDiv.appendChild(headersP);
@@ -528,14 +513,7 @@
                 bodySpan.appendChild(document.createTextNode("Body:"));
                 bodyP.className = "default-item-space";
                 bodyP.appendChild(bodySpan);
-
-                if (isRequest(logLine)) {
-                    bodySpan.className = "primary-color-request";
-                } else if (isErrorResponse(logLine)) {
-                    bodySpan.className = "primary-color-error-response";
-                } else if (isResponse(logLine)) {
-                    bodySpan.className = "primary-color-response";
-                }
+                setLogItemClassName(logLine, bodySpan);
 
                 let bodyPre = document.createElement("pre");
                 bodyPre.appendChild(document.createTextNode(logLine.body));
@@ -552,14 +530,7 @@
             let emptyBodySpan = document.createElement("span");
             emptyBodySpan.appendChild(document.createTextNode("Empty body"));
             requestRootTd.appendChild(emptyBodySpan);
-
-            if (isRequest(logLine)) {
-                emptyBodySpan.className = "primary-color-request";
-            } else if (isErrorResponse(logLine)) {
-                emptyBodySpan.className = "primary-color-error-response";
-            } else if (isResponse(logLine)) {
-                emptyBodySpan.className = "primary-color-response";
-            }
+            setLogItemClassName(logLine, emptyBodySpan);
         }
 
         return requestRootTd;
