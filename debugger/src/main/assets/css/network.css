@@ -514,3 +514,19 @@ body {
 .detail-log-item:hover {
     text-decoration: underline;
 }
+
+.default-url {
+    text-decoration: none;
+}
+
+.default-url-white-style {
+    color: #717171;
+}
+
+.default-url-dark-style {
+    color: #a8a8a8;
+}
+
+.default-url:hover {
+    text-decoration: underline;
+}

@@ -261,7 +261,6 @@
             console.log(parsedLogs);
 
             // todo удалить console.log и все TODO
-            // todo добавить Remote Address ip + port
             // todo setLogLineColor(logLine.level, tr);
 
             let tbody = document.createElement("tbody");
@@ -364,9 +363,20 @@
 
         let urlP = document.createElement("p");
         let urlSpan = document.createElement("span");
+        let urlA = document.createElement("a");
+        urlA.appendChild(document.createTextNode(logLine.url));
+        urlA.target = "_blank";
+        urlA.href = logLine.url;
         urlSpan.appendChild(document.createTextNode("URL: "));
         urlP.appendChild(urlSpan);
-        urlP.appendChild(document.createTextNode(logLine.url));
+        urlP.appendChild(urlA);
+
+        if (isDarkTheme) {
+            urlA.className = "default-url default-url-dark-style";
+        } else {
+            urlA.className = "default-url default-url-white-style";
+        }
+
         requestInfoDiv.appendChild(urlP);
         setLogItemClassName(logLine, urlSpan);
 
