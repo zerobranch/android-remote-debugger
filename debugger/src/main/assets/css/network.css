@@ -530,3 +530,13 @@ body {
 .default-url:hover {
     text-decoration: underline;
 }
+
+
+.body-url {
+    text-decoration: none;
+    color: #4152ff;
+}
+
+.body-url:hover {
+    text-decoration: underline;
+}

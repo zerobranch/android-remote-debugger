@@ -316,6 +316,11 @@
         }
     }
 
+    function setBodyLinkable(inputText) {
+        let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+        return inputText.replace(replacePattern1, '<a href="$1" class="body-url" target="_blank">$1</a>');
+    }
+
     function bodyTd(logLine) {
         let requestRootTd = document.createElement("td");
         let requestInfoDiv = document.createElement("div");
@@ -526,7 +531,7 @@
                 setLogItemClassName(logLine, bodySpan);
 
                 let bodyPre = document.createElement("pre");
-                bodyPre.appendChild(document.createTextNode(logLine.body));
+                bodyPre.innerHTML = setBodyLinkable(logLine.body);
                 bodyPre.className = "default-item-space";
 
                 requestBodyDiv.appendChild(document.createElement("br"));
