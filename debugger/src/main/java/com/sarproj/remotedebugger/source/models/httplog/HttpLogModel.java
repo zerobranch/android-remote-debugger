@@ -8,7 +8,7 @@ public class HttpLogModel {
     public String queryId;
     public String url;
     public String method;
-    public String code;
+    public Integer code;
     public String message;
     public String port;
     public String ip;

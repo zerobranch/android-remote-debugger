@@ -10,7 +10,7 @@ public class HttpLogResponse {
     public String port;
     public String ip;
     public String method;
-    public String code;
+    public int code;
     public String message;
     public String duration;
     public String bodySize;

@@ -7,7 +7,6 @@ interface NetworkHtmlKey {
     String SAVE_DEFAULTS_SETTING = "saveDefaultsSetting";
 
     String OFFSET = "offset";
-    String QUERY_ID = "queryId";
     String STATUS_CODE = "statusCode";
     String IS_ONLY_EXCEPTIONS = "isOnlyExceptions";
     String SEARCH = "search";

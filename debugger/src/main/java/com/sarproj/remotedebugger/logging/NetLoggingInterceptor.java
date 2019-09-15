@@ -102,7 +102,7 @@ public class NetLoggingInterceptor implements Interceptor {
 
         logResponse.duration = String.valueOf(endTime - startTime);
         logResponse.time = endTime;
-        logResponse.code = String.valueOf(response.code());
+        logResponse.code = response.code();
         logResponse.message = response.message();
 
         Headers responseHeaders = response.headers();

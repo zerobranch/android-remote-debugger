@@ -102,11 +102,10 @@ public final class ContinuousDataBaseManager {
 
     public List<HttpLogModel> getHttpLogs(int offset,
                                           int limit,
-                                          String queryId,
                                           String statusCode,
                                           boolean isOnlyExceptions,
                                           String search) {
-        return httpLogRepository.getHttpLogs(offset, limit, queryId, statusCode, isOnlyExceptions, search);
+        return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyExceptions, search);
     }
 
     private HttpLogModel mapToLogModel(HttpLogResponse httpLogResponse) {

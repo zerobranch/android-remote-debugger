@@ -72,7 +72,7 @@ public class HttpLogRepository {
                 NetLogTable.ID + " integer primary key autoincrement, " +
                 NetLogTable.QUERY_ID + " text, " +
                 NetLogTable.METHOD + " text," +
-                NetLogTable.CODE + " text," +
+                NetLogTable.CODE + " integer," +
                 NetLogTable.MESSAGE + " text," +
                 NetLogTable.QUERY_TYPE + " text," +
                 NetLogTable.TIME + " integer," +
@@ -90,7 +90,6 @@ public class HttpLogRepository {
 
     public List<HttpLogModel> getHttpLogs(int offset,
                                           int limit,
-                                          String queryId,
                                           String statusCode,
                                           boolean isOnlyExceptions,
                                           String search
@@ -100,64 +99,55 @@ public class HttpLogRepository {
 
         final StringBuilder conditionBuilder = new StringBuilder();
 
-        if (!TextUtils.isEmpty(queryId)) {
+        if (isOnlyExceptions) {
             conditionBuilder
-                    .append(NetLogTable.QUERY_ID)
+                    .append(NetLogTable.ERROR_MESSAGE)
+                    .append(" is not null ");
+        } else if (!TextUtils.isEmpty(statusCode)) {
+            conditionBuilder.append(NetLogTable.CODE)
                     .append("=")
                     .append("'")
-                    .append(queryId)
-                    .append("'");
-        } else {
-            if (isOnlyExceptions) {
-                conditionBuilder
-                        .append(NetLogTable.ERROR_MESSAGE)
-                        .append(" is not null ");
-            } else if (!TextUtils.isEmpty(statusCode)) {
-                conditionBuilder.append(NetLogTable.CODE)
-                        .append("=")
-                        .append("'")
-                        .append(statusCode)
-                        .append("' ");
+                    .append(statusCode)
+                    .append("' ");
+        }
+
+        if (!TextUtils.isEmpty(search)) {
+            final StringBuilder searchBuilder = new StringBuilder();
+
+            String[] tables = new String[]{
+                    NetLogTable.QUERY_ID,
+                    NetLogTable.METHOD,
+                    NetLogTable.CODE,
+                    NetLogTable.MESSAGE,
+                    NetLogTable.REQUEST_CONTENT_TYPE,
+                    NetLogTable.PORT,
+                    NetLogTable.IP,
+                    NetLogTable.URL,
+                    NetLogTable.BODY,
+                    NetLogTable.ERROR_MESSAGE,
+                    NetLogTable.HEADERS
+            };
+
+            for (int i = 0; i < tables.length; i++) {
+                if (i != 0) {
+                    searchBuilder.append(" or ");
+                }
+
+                searchBuilder
+                        .append(tables[i])
+                        .append(" like ")
+                        .append("'%")
+                        .append(search)
+                        .append("%'");
             }
 
-            if (!TextUtils.isEmpty(search)) {
-                final StringBuilder searchBuilder = new StringBuilder();
-
-                String[] tables = new String[]{
-                        NetLogTable.QUERY_ID,
-                        NetLogTable.METHOD,
-                        NetLogTable.CODE,
-                        NetLogTable.MESSAGE,
-                        NetLogTable.REQUEST_CONTENT_TYPE,
-                        NetLogTable.PORT,
-                        NetLogTable.IP,
-                        NetLogTable.URL,
-                        NetLogTable.BODY,
-                        NetLogTable.ERROR_MESSAGE,
-                        NetLogTable.HEADERS
-                };
-
-                for (int i = 0; i < tables.length; i++) {
-                    if (i != 0) {
-                        searchBuilder.append(" or ");
-                    }
-
-                    searchBuilder
-                            .append(tables[i])
-                            .append(" like ")
-                            .append("'%")
-                            .append(search)
-                            .append("%'");
-                }
-
-                if (conditionBuilder.length() != 0) {
-                    conditionBuilder
-                            .append(" and (")
-                            .append(searchBuilder)
-                            .append(")");
-                } else {
-                    conditionBuilder.append(searchBuilder);
-                }
+            if (conditionBuilder.length() != 0) {
+                conditionBuilder
+                        .append(" and (")
+                        .append(searchBuilder)
+                        .append(")");
+            } else {
+                conditionBuilder.append(searchBuilder);
             }
         }
 
@@ -183,7 +173,10 @@ public class HttpLogRepository {
             httpLogModel.method = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.METHOD)));
             httpLogModel.queryId = cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_ID));
             httpLogModel.queryType = QueryType.valueOf(cursor.getString(cursor.getColumnIndex(NetLogTable.QUERY_TYPE)));
-            httpLogModel.code = cursor.getString(cursor.getColumnIndex(NetLogTable.CODE));
+
+            int code = cursor.getInt(cursor.getColumnIndex(NetLogTable.CODE));
+            httpLogModel.code = (code != 0) ? code : null;
+
             httpLogModel.message = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE)));
             httpLogModel.time = cursor.getLong(cursor.getColumnIndex(NetLogTable.TIME));
             httpLogModel.duration = cursor.getString(cursor.getColumnIndex(NetLogTable.DURATION));

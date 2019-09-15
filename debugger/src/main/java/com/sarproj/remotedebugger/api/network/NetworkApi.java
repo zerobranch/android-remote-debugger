@@ -84,12 +84,11 @@ public final class NetworkApi extends Api {
 
     private String getLogs(Map<String, List<String>> params) {
         int offset = getIntValue(params, NetworkHtmlKey.OFFSET, UNLIMITED_OFFSET);
-        String queryId = getStringValue(params, NetworkHtmlKey.QUERY_ID);
         String statusCode = getStringValue(params, NetworkHtmlKey.STATUS_CODE);
         boolean isOnlyExceptions = getBooleanValue(params, NetworkHtmlKey.IS_ONLY_EXCEPTIONS, false);
         String search = getStringValue(params, NetworkHtmlKey.SEARCH);
 
-        return serialize(getDataBase().getHttpLogs(offset, LIMIT_LOGS_PACKS, queryId, statusCode, isOnlyExceptions, search));
+        return serialize(getDataBase().getHttpLogs(offset, LIMIT_LOGS_PACKS, statusCode, isOnlyExceptions, search));
     }
 
     private ContinuousDataBaseManager getDataBase() {
