@@ -52,9 +52,16 @@
 
 <div id="header">
     <div id="controlPanel">
-        <button class="dropdown-btn" id="logLevelBtn" onclick="onShowFilter()">Verbose<i></i></button>
         <input type="text" id="searchByTag" class="default-input" onkeyup="onSearchByTag(this)"
-               placeholder="Filter by tag" title="Type in a text">
+               placeholder="Status code" title="Type in a text">
+
+        <span id="isShowOnlyErrorsWrapper">
+            Only errors<br>
+            <label id="isShowOnlyErrorsLabel" class="switch">
+                <input id="isShowOnlyErrors" type="checkbox" onchange="/*todo тут функция*/">
+                <span class="check-box-slider check-box-round"></span>
+            </label>
+        </span>
 
         <div id="scrollControlPanel">
             <svg onclick="onFollowClick(this)" class="default-btn" height="28" viewBox="0 0 24 24" width="28"
@@ -125,6 +132,7 @@
             </div>
         </div>
 
+        <!--         todo это наверное лишнее -->
         <div class="dropdown-content" id="filterDropdownContent">
         </div>
 
@@ -227,9 +235,9 @@
 
         let body = 'getLogs=' + encodeURIComponent('')
             + '&' + 'offset=' + encodeURIComponent(logsOffset)
-            + '&' + 'statusCode=' + encodeURIComponent("400, 500")
-            // + '&' + 'isOnlyErrors=' + false
-            + '&' + 'search=' + encodeURIComponent("text");
+            + '&' + 'statusCode=' + encodeURIComponent("400, 500") // проверять чтобы не был пустой
+            + '&' + 'isOnlyErrors=' + "false"// проверять чтобы не был пустой
+            + '&' + 'search=' + encodeURIComponent("text");// проверять чтобы не был пустой
 
         // if (logsTag != null) {
         //     body += '&' + 'queryId=' + encodeURIComponent(queryId);
@@ -240,10 +248,8 @@
         //     body += '&' + 'logsSearch=' + encodeURIComponent(logsSearchText);
         // }
 
-        console.log(body);
 
         httpGet('network', body, function (response) {
-            // let response = rawResponse; // убрать потом
             hideElement(loader);
 
             if (logsOffset === -1) {
@@ -265,6 +271,7 @@
 
                 console.log(parsedLogs);
 
+                // todo остановился на 61 строке (там комментарий)
                 // todo сделать фильтрацию:
                 // todo 1. поиск по тексту
                 // todo 2. поиск по коду ошибки. типа вводим: 401 или 401,402 или 401 - 402
