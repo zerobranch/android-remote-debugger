@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
+import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
@@ -102,10 +103,10 @@ public final class ContinuousDataBaseManager {
 
     public List<HttpLogModel> getHttpLogs(int offset,
                                           int limit,
-                                          String statusCode,
-                                          boolean isOnlyExceptions,
+                                          StatusCodeFilter statusCode,
+                                          boolean isOnlyErrors,
                                           String search) {
-        return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyExceptions, search);
+        return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyErrors, search);
     }
 
     private HttpLogModel mapToLogModel(HttpLogResponse httpLogResponse) {

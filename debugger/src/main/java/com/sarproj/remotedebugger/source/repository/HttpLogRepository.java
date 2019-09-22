@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.source.models.httplog.QueryType;
 
@@ -90,8 +91,8 @@ public class HttpLogRepository {
 
     public List<HttpLogModel> getHttpLogs(int offset,
                                           int limit,
-                                          String statusCode,
-                                          boolean isOnlyExceptions,
+                                          StatusCodeFilter statusCodeFilter,
+                                          boolean isOnlyErrors,
                                           String search
     ) {
         final StringBuilder query = new StringBuilder()
@@ -99,16 +100,28 @@ public class HttpLogRepository {
 
         final StringBuilder conditionBuilder = new StringBuilder();
 
-        if (isOnlyExceptions) {
+        if (isOnlyErrors) {
             conditionBuilder
                     .append(NetLogTable.ERROR_MESSAGE)
-                    .append(" is not null ");
-        } else if (!TextUtils.isEmpty(statusCode)) {
-            conditionBuilder.append(NetLogTable.CODE)
-                    .append("=")
-                    .append("'")
-                    .append(statusCode)
-                    .append("' ");
+                    .append(" is not null ")
+                    .append(" or ")
+                    .append(" (")
+                    .append(NetLogTable.CODE)
+                    .append(" >= 400 ")
+                    .append(" and ")
+                    .append(NetLogTable.CODE)
+                    .append(" <= 599)");
+        } else if (statusCodeFilter != null && statusCodeFilter.isExistCondition()) {
+            conditionBuilder
+                    .append("(")
+                    .append(NetLogTable.CODE)
+                    .append(" >= ")
+                    .append(statusCodeFilter.minStatusCode)
+                    .append(" and ")
+                    .append(NetLogTable.CODE)
+                    .append(" <= ")
+                    .append(statusCodeFilter.maxStatusCode)
+                    .append(")");
         }
 
         if (!TextUtils.isEmpty(search)) {

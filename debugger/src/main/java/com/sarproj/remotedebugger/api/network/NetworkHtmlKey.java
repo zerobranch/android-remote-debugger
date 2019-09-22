@@ -8,6 +8,6 @@ interface NetworkHtmlKey {
 
     String OFFSET = "offset";
     String STATUS_CODE = "statusCode";
-    String IS_ONLY_EXCEPTIONS = "isOnlyExceptions";
+    String IS_ONLY_ERRORS = "isOnlyErrors";
     String SEARCH = "search";
 }

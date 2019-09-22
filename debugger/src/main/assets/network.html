@@ -226,7 +226,10 @@
         // logRequestLock = true;
 
         let body = 'getLogs=' + encodeURIComponent('')
-            + '&' + 'offset=' + encodeURIComponent(logsOffset);
+            + '&' + 'offset=' + encodeURIComponent(logsOffset)
+            + '&' + 'statusCode=' + encodeURIComponent("400, 500")
+            // + '&' + 'isOnlyErrors=' + false
+            + '&' + 'search=' + encodeURIComponent("text");
 
         // if (logsTag != null) {
         //     body += '&' + 'queryId=' + encodeURIComponent(queryId);
@@ -237,58 +240,67 @@
         //     body += '&' + 'logsSearch=' + encodeURIComponent(logsSearchText);
         // }
 
+        console.log(body);
+
         httpGet('network', body, function (response) {
-        // let response = rawResponse; // убрать потом
-        hideElement(loader);
+            // let response = rawResponse; // убрать потом
+            hideElement(loader);
 
-        if (logsOffset === -1) {
-            clearContent(logTable);
-        }
-
-        let parsedLogs = {};
-
-        if (response !== '') {
-            parsedLogs = JSON.parse(response);
-        }
-
-        if (parsedLogs.length !== 0) {
             if (logsOffset === -1) {
-                logsOffset = parsedLogs.length;
-            } else {
-                logsOffset += parsedLogs.length;
+                clearContent(logTable);
             }
 
-            console.log(parsedLogs);
+            let parsedLogs = {};
 
-            // todo удалить console.log и все TODO
-            // todo setLogLineColor(logLine.level, tr);
+            if (response !== '') {
+                parsedLogs = JSON.parse(response);
+            }
 
-            let tbody = document.createElement("tbody");
-            logTable.appendChild(tbody);
-
-            parsedLogs.forEach(function (logLine) {
-                let tr = document.createElement("tr");
-
-                if (isDarkTheme) {
-                    tr.className = "darkLogItem";
+            if (parsedLogs.length !== 0) {
+                if (logsOffset === -1) {
+                    logsOffset = parsedLogs.length;
                 } else {
-                    tr.className = "whiteLogItem";
+                    logsOffset += parsedLogs.length;
                 }
 
-                tr.appendChild(timeTd(logLine.time));
-                tr.appendChild(queryNumberTd(logLine.queryId));
-                tr.appendChild(bodyTd(logLine));
+                console.log(parsedLogs);
 
-                tbody.appendChild(tr);
-            });
+                // todo сделать фильтрацию:
+                // todo 1. поиск по тексту
+                // todo 2. поиск по коду ошибки. типа вводим: 401 или 401,402 или 401 - 402
+                // todo 3. поиск по флагу, что быводить только ошиьбки
+                // todo сделать изменение шрифта
+                // todo сделать изменение темы
 
-            if (isFollowLogs) {
-                scrollToBottom();
+                // todo удалить console.log и все TODO
+                // todo setLogLineColor(logLine.level, tr);
+
+                let tbody = document.createElement("tbody");
+                logTable.appendChild(tbody);
+
+                parsedLogs.forEach(function (logLine) {
+                    let tr = document.createElement("tr");
+
+                    if (isDarkTheme) {
+                        tr.className = "darkLogItem";
+                    } else {
+                        tr.className = "whiteLogItem";
+                    }
+
+                    tr.appendChild(timeTd(logLine.time));
+                    tr.appendChild(queryNumberTd(logLine.queryId));
+                    tr.appendChild(bodyTd(logLine));
+
+                    tbody.appendChild(tr);
+                });
+
+                if (isFollowLogs) {
+                    scrollToBottom();
+                }
             }
-        }
 
-        timeoutHandle = setTimeout(loadLogs, REFRESH_TIME);
-        logRequestLock = false;
+            timeoutHandle = setTimeout(loadLogs, REFRESH_TIME);
+            logRequestLock = false;
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
         });
