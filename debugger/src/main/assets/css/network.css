@@ -340,7 +340,7 @@ td:nth-child(2) {
     width: 40px;
 }
 
-#searchByTag {
+#searchByStatusCode {
     width: 120px;
     float: left;
     margin-left: 10px;

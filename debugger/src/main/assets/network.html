@@ -52,13 +52,13 @@
 
 <div id="header">
     <div id="controlPanel">
-        <input type="text" id="searchByTag" class="default-input" onkeyup="onSearchByTag(this)"
+        <input type="text" id="searchByStatusCode" class="default-input" onkeyup="onSearchByStatusCode(this)"
                placeholder="Status code" title="Type in a text">
 
         <span id="isShowOnlyErrorsWrapper">
             Only errors<br>
             <label id="isShowOnlyErrorsLabel" class="switch">
-                <input id="isShowOnlyErrors" type="checkbox" onchange="/*todo тут функция*/">
+                <input id="isShowOnlyErrors" type="checkbox" onchange="onErrorSwitchChange(this)">
                 <span class="check-box-slider check-box-round"></span>
             </label>
         </span>
@@ -172,12 +172,15 @@
     const COMMAND_KEYCODE = 91;
 
     let logsOffset = -1;
-    let logsLevel = null;
-    let logsTag = null;
-    let logsSearchText = null;
+    let statusCode = null;
+    let isOnlyError = false;
+    let searchText = null;
+
     let logRequestLock = false;
     let timeoutHandle;
+    let logsTag = null;
     let isFollowLogs = false;
+    let logsLevel = null;
     let isDiscolorActive = false;
     let isDarkTheme = true; // todo удалить
 
@@ -202,7 +205,8 @@
     let header = getElementById('header');
     let copyErrorContent = getElementById('copyErrorContent');
     let errorTextCopied = getElementById('errorTextCopied');
-    let searchByTag = getElementById('searchByTag');
+    // let searchByTag = getElementById('searchByStatusCode');
+    let searchByStatusCode = getElementById('searchByStatusCode');
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
@@ -222,32 +226,36 @@
         }
     };
 
-    function loadLogs() {
-        // if (isConnectionLost) {
-        //     loadOfflineLogs();
-        //     return;
-        // }
+    function onErrorSwitchChange(item) {
+        isOnlyError = item.checked;
+        logsOffset = -1;
 
-        // if (logRequestLock) {
-        //     return;
-        // }
-        // logRequestLock = true;
+        clearTimeoutHandle();
+        loadLogs();
+    }
+
+    function loadLogs() {
+        if (isConnectionLost) {
+            // loadOfflineLogs();
+            return;
+        }
+
+        if (logRequestLock) {
+            return;
+        }
+        logRequestLock = true;
 
         let body = 'getLogs=' + encodeURIComponent('')
             + '&' + 'offset=' + encodeURIComponent(logsOffset)
-            + '&' + 'statusCode=' + encodeURIComponent("400, 500") // проверять чтобы не был пустой
-            + '&' + 'isOnlyErrors=' + "false"// проверять чтобы не был пустой
-            + '&' + 'search=' + encodeURIComponent("text");// проверять чтобы не был пустой
+            + '&' + 'isOnlyErrors=' + encodeURIComponent(isOnlyError.toString());
 
-        // if (logsTag != null) {
-        //     body += '&' + 'queryId=' + encodeURIComponent(queryId);
-        //     body += '&' + 'statusCode=' + encodeURIComponent(statusCode);
-        //     body += '&' + 'isOnlyExceptions=' + encodeURIComponent(isOnlyExceptions);
-        // }
-        // if (logsSearchText != null) {
-        //     body += '&' + 'logsSearch=' + encodeURIComponent(logsSearchText);
-        // }
+        if (statusCode != null) {
+            body += '&' + 'statusCode=' + encodeURIComponent(statusCode);
+        }
 
+        if (searchText != null) {
+            body += '&' + 'search=' + encodeURIComponent(searchText);
+        }
 
         httpGet('network', body, function (response) {
             hideElement(loader);
@@ -270,14 +278,6 @@
                 }
 
                 console.log(parsedLogs);
-
-                // todo остановился на 61 строке (там комментарий)
-                // todo сделать фильтрацию:
-                // todo 1. поиск по тексту
-                // todo 2. поиск по коду ошибки. типа вводим: 401 или 401,402 или 401 - 402
-                // todo 3. поиск по флагу, что быводить только ошиьбки
-                // todo сделать изменение шрифта
-                // todo сделать изменение темы
 
                 // todo удалить console.log и все TODO
                 // todo setLogLineColor(logLine.level, tr);
@@ -680,20 +680,20 @@
         }
     }
 
-    function onSearchLogs(searchText) {
+    function onSearchLogs(search) {
         logsOffset = -1;
-        logsSearchText = searchText.value;
-
-        clearTimeoutHandle();
-        // loadLogs();
-    }
-
-    function executeSearchByTag(tag) {
-        logsOffset = -1;
-        logsTag = tag;
+        searchText = search.value;
 
         clearTimeoutHandle();
         loadLogs();
+    }
+
+    function executeSearchByTag(tag) {
+        // logsOffset = -1;
+        // logsTag = tag;
+        //
+        // clearTimeoutHandle();
+        // loadLogs();
     }
 
     function onDiscolorClick(isDiscolorActive) {
@@ -708,7 +708,7 @@
         logsOffset = -1;
 
         let body = 'clearAllLogs=' + encodeURIComponent('');
-        httpPost('logging', body, function () {
+        httpPost('network', body, function () {
             loadLogs();
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
@@ -736,8 +736,12 @@
         saveDefaultsSetting();
     }
 
-    function onSearchByTag(tag) {
-        executeSearchByTag(tag.value);
+    function onSearchByStatusCode(statusCodeInput) {
+        statusCode = statusCodeInput.value;
+        logsOffset = -1;
+
+        clearTimeoutHandle();
+        loadLogs();
     }
 
     function onCloseErrorContentClick() {
@@ -1026,7 +1030,7 @@
 
             let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
             let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
-            let searchTextCheck = logsSearchText == null || logsSearchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
+            let searchTextCheck = searchText == null || searchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
 
             if (levelCheck && tagCheck && searchTextCheck) {
                 showElement(tr[i]);

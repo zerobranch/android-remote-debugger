@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.Headers;
 import okhttp3.Interceptor;
@@ -26,6 +27,7 @@ import okio.GzipSource;
 
 public class NetLoggingInterceptor implements Interceptor {
     private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static AtomicInteger queryNumber = new AtomicInteger(0);
 
     @NotNull
     @Override
@@ -78,9 +80,10 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         logRequest.time = System.currentTimeMillis();
-        logRequest.id = getDataBase().addHttpLogRequest(logRequest);
-        logRequest.queryId = String.valueOf(logRequest.id / 2 + 1);
+        logRequest.queryId = String.valueOf(queryNumber.incrementAndGet());
         logResponse.queryId = logRequest.queryId;
+
+        logRequest.id = getDataBase().addHttpLogRequest(logRequest);
 
         logResponse.method = logRequest.method;
         logResponse.port = logRequest.port;

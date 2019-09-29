@@ -26,23 +26,6 @@ public class HttpLogRepository {
         this.database = database;
     }
 
-    public long addWithAutoQueryId(HttpLogModel model) {
-        try {
-            database.beginTransaction();
-            ContentValues values = new ContentValues();
-
-            long id = add(model);
-            model.queryId = String.valueOf(id / 2 + 1);
-
-            values.put(NetLogTable.QUERY_ID, model.queryId);
-            database.update(REMOTE_NET_LOGS_TABLE_NAME, values, NetLogTable.ID + "=" + id, null);
-            database.setTransactionSuccessful();
-            return id;
-        } finally {
-            database.endTransaction();
-        }
-    }
-
     public long add(HttpLogModel model) {
         ContentValues values = new ContentValues();
         values.put(NetLogTable.CODE, model.code);

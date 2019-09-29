@@ -67,7 +67,7 @@ public final class ContinuousDataBaseManager {
 
     public long addHttpLogRequest(HttpLogRequest logRequest) {
         synchronized (LOCK) {
-            return httpLogRepository.addWithAutoQueryId(mapToLogModel(logRequest));
+            return httpLogRepository.add(mapToLogModel(logRequest));
         }
     }
 
