@@ -71,10 +71,60 @@
         android:text="fatal"
         android:textAlignment="center" />
 
-    <Button
-        android:id="@+id/network"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Network" />
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/network1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="link and query" />
+
+        <Button
+            android:id="@+id/network2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="difficult link" />
+
+        <Button
+            android:id="@+id/network3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="empty" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/network4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="just link" />
+
+        <Button
+            android:id="@+id/network5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="error" />
+
+        <Button
+            android:id="@+id/network6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Пока пусто" />
+
+    </LinearLayout>
 
 </LinearLayout>

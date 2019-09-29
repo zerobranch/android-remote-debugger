@@ -412,13 +412,15 @@
         requestInfoDiv.appendChild(methodP);
         setLogItemClassName(logLine, methodSpan);
 
-        let ipP = document.createElement("p");
-        let ipSpan = document.createElement("span");
-        ipSpan.appendChild(document.createTextNode("Remote Address: "));
-        ipP.appendChild(ipSpan);
-        ipP.appendChild(document.createTextNode(logLine.ip + ":" + logLine.port));
-        requestInfoDiv.appendChild(ipP);
-        setLogItemClassName(logLine, ipSpan);
+        if (logLine.ip) {
+            let ipP = document.createElement("p");
+            let ipSpan = document.createElement("span");
+            ipSpan.appendChild(document.createTextNode("Remote Address: "));
+            ipP.appendChild(ipSpan);
+            ipP.appendChild(document.createTextNode(logLine.ip + ":" + logLine.port));
+            requestInfoDiv.appendChild(ipP);
+            setLogItemClassName(logLine, ipSpan);
+        }
 
         if (isRequest(logLine) && logLine.requestContentType) {
             let contentTypeP = document.createElement("p");

@@ -36,6 +36,8 @@ public class NetLoggingInterceptor implements Interceptor {
         HttpLogRequest logRequest = new HttpLogRequest();
         HttpLogResponse logResponse = new HttpLogResponse();
 
+        logRequest.time = System.currentTimeMillis();
+
         Request request = chain.request();
         RequestBody requestBody = request.body();
 
@@ -43,9 +45,6 @@ public class NetLoggingInterceptor implements Interceptor {
         logRequest.url = request.url().toString();
 
         logRequest.port = String.valueOf(request.url().port());
-
-        InetAddress address = InetAddress.getByName(new URL(request.url().toString()).getHost());
-        logRequest.ip = address.getHostAddress();
 
         Headers headers = request.headers();
         logRequest.headers = new HashMap<>();
@@ -79,11 +78,17 @@ public class NetLoggingInterceptor implements Interceptor {
             logRequest.body = buffer.readString(charset);
         }
 
-        logRequest.time = System.currentTimeMillis();
         logRequest.queryId = String.valueOf(queryNumber.incrementAndGet());
         logResponse.queryId = logRequest.queryId;
 
-        logRequest.id = getDataBase().addHttpLogRequest(logRequest);
+        try {
+            InetAddress address = InetAddress.getByName(new URL(request.url().toString()).getHost());
+            logRequest.ip = address.getHostAddress();
+        } catch (Exception ignored) {
+            // ignore
+        } finally {
+            logRequest.id = getDataBase().addHttpLogRequest(logRequest);
+        }
 
         logResponse.method = logRequest.method;
         logResponse.port = logRequest.port;
