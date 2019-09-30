@@ -591,29 +591,29 @@ body {
     text-decoration: underline;
 }
 
-.default-url {
+.log-header-url {
     text-decoration: none;
 }
 
-.default-url-white-style {
+.log-header-url:hover {
+    text-decoration: underline;
+    color: #3875cd;
+}
+
+.log-header-url-white-style {
     color: #717171;
 }
 
-.default-url-dark-style {
+.log-header-url-dark-style {
     color: #a8a8a8;
 }
 
-.default-url:hover {
-    text-decoration: underline;
-}
-
-
-.body-url {
+.log-body-url {
     text-decoration: none;
-    color: #4152ff;
+    color: #3875cd;
 }
 
-.body-url:hover {
+.log-body-url:hover {
     text-decoration: underline;
 }
 

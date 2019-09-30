@@ -315,7 +315,7 @@
 
     function setBodyLinkable(inputText) {
         let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-        return inputText.replace(replacePattern1, '<a href="$1" class="body-url" target="_blank">$1</a>');
+        return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
     }
 
     function bodyTd(logLine) {
@@ -375,9 +375,9 @@
         urlP.appendChild(urlA);
 
         if (isDarkTheme) {
-            urlA.className = "default-url log-content-url default-url-dark-style";
+            urlA.className = "default-url log-header-url log-header-url-dark-style";
         } else {
-            urlA.className = "default-url log-content-url default-url-white-style";
+            urlA.className = "default-url log-header-url log-header-url-white-style";
         }
 
         requestInfoDiv.appendChild(urlP);
@@ -772,14 +772,14 @@
             }
         }
 
-        let logContentUrls = getElementsByClassName("log-content-url");
+        let logContentUrls = getElementsByClassName("log-header-url");
         for (let i = 0; i < logContentUrls.length; i++) {
             if (isDarkTheme) {
-                logContentUrls[i].classList.remove("default-url-white-style");
-                logContentUrls[i].classList.add("default-url-dark-style");
+                logContentUrls[i].classList.remove("log-header-url-white-style");
+                logContentUrls[i].classList.add("log-header-url-dark-style");
             } else {
-                logContentUrls[i].classList.remove("default-url-dark-style");
-                logContentUrls[i].classList.add("default-url-white-style");
+                logContentUrls[i].classList.remove("log-header-url-dark-style");
+                logContentUrls[i].classList.add("log-header-url-white-style");
             }
         }
 
