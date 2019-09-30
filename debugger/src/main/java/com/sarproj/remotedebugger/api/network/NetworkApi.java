@@ -18,7 +18,6 @@ import java.util.Map;
 import fi.iki.elonen.NanoHTTPD;
 
 public final class NetworkApi extends Api {
-    private static final boolean DEFAULT_LOG_IS_DISCOLOR = false;
     private static final int UNLIMITED_OFFSET = -1;
     private static final int LIMIT_LOGS_PACKS = 1000;
 
@@ -51,10 +50,6 @@ public final class NetworkApi extends Api {
         final String settingsJson = getStringValue(params, HtmlParams.DATA);
         final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
 
-        if (settings.isDiscolorLog == null) {
-            settings.isDiscolorLog = DEFAULT_LOG_IS_DISCOLOR;
-        }
-
         if (settings.logFont == null) {
             settings.logFont = DEFAULT_FONT_SIZE;
         }
@@ -65,14 +60,12 @@ public final class NetworkApi extends Api {
 
         Settings.Key.THEME.save(settings.theme);
         Settings.Key.NETWORK_FONT.save(settings.logFont);
-        Settings.Key.NETWORK_LOG_IS_DISCOLOR.save(settings.isDiscolorLog);
         return EMPTY;
     }
 
     private String getDefaultSettings() {
         final DefaultSettings settings = new DefaultSettings();
         settings.logFont = Settings.Key.NETWORK_FONT.get(DEFAULT_FONT_SIZE);
-        settings.isDiscolorLog = Settings.Key.NETWORK_LOG_IS_DISCOLOR.get(DEFAULT_LOG_IS_DISCOLOR);
         settings.theme = Settings.Key.THEME.get(DEFAULT_THEME.name());
         return serialize(settings);
     }

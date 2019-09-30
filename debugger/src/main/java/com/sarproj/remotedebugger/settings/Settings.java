@@ -35,8 +35,7 @@ public final class Settings {
         LOG_FONT(int.class),
         DATABASE_FONT(int.class),
         SHARED_PREFERENCES_FONT(int.class),
-        LOG_IS_DISCOLOR(boolean.class),
-        NETWORK_LOG_IS_DISCOLOR(boolean.class);
+        LOG_IS_DISCOLOR(boolean.class);
 
         private Class<?> clazz;
 

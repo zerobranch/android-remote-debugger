@@ -81,21 +81,6 @@
             </svg>
         </div>
 
-        <div id="discolor">
-            <svg id="discolorActive" onclick="onDiscolorClick(false)" height="30" viewBox="0 0 24 24" width="30"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                <path d="M7 10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8.01-1c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3zm0 4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM16.5 3C13.47 3 11 5.47 11 8.5s2.47 5.5 5.5 5.5S22 11.53 22 8.5 19.53 3 16.5 3zm0 9c-1.93 0-3.5-1.57-3.5-3.5S14.57 5 16.5 5 20 6.57 20 8.5 18.43 12 16.5 12z"></path>
-            </svg>
-            <svg id="discolorInactive" onclick="onDiscolorClick(true)" height="30" viewBox="0 0 24 24" width="30"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0h24v24H0z" fill="none"></path>
-                <circle cx="7.2" cy="14.4" r="3.2"></circle>
-                <circle cx="14.8" cy="18" r="2"></circle>
-                <circle cx="15.2" cy="8.8" r="4.8"></circle>
-            </svg>
-        </div>
-
         <svg onclick="onClearAllClick()" id="clearAllBtn" class="default-btn" height="28" viewBox="0 0 24 24"
              width="28" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"></path>
@@ -178,10 +163,7 @@
 
     let logRequestLock = false;
     let timeoutHandle;
-    let logsTag = null;
     let isFollowLogs = false;
-    let logsLevel = null;
-    let isDiscolorActive = false;
     let isDarkTheme = true; // todo удалить
 
     let currentContentFont = DEFAULT_FONT_SIZE;
@@ -193,10 +175,7 @@
     let lightTheme = getElementById("lightTheme");
     let darkTheme = getElementById("darkTheme");
     let logContent = getElementById("logContent");
-    let discolorInactive = getElementById("discolorInactive");
-    let discolorActive = getElementById("discolorActive");
     let connectionStatus = getElementById("connectionStatus");
-    let logLevelBtn = getElementById("logLevelBtn");
     let loader = getElementById("loader");
     let filterDropdownContent = getElementById("filterDropdownContent");
     let errorContent = getElementById('errorContent');
@@ -205,13 +184,12 @@
     let header = getElementById('header');
     let copyErrorContent = getElementById('copyErrorContent');
     let errorTextCopied = getElementById('errorTextCopied');
-    // let searchByTag = getElementById('searchByStatusCode');
     let searchByStatusCode = getElementById('searchByStatusCode');
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
         loadLogs();
-        // loadDefaultsSetting();
+        loadDefaultsSetting();
         // onPageResize();
 
         window.addEventListener("keyup", onGlobalKeyUp);
@@ -605,37 +583,12 @@
         return timeTd;
     }
 
-    function onTagClick(item) {
-        if (globalKeyPressed === COMMAND_KEYCODE || globalKeyPressed === CTRL_KEYCODE) {
-            searchByTag.value = item.innerText;
-            executeSearchByTag(searchByTag.value);
-        }
-    }
-
-    function onTagMouseMove(item) {
-        if (globalKeyPressed === COMMAND_KEYCODE || globalKeyPressed === CTRL_KEYCODE) {
-            item.style.cursor = "pointer";
-            item.style.fontWeight = "900";
-            item.style.fontSize = currentContentFont + 1+ "pt";
-        } else {
-            item.style.cursor = "default";
-            item.style.fontWeight = 'normal';
-            item.style.fontSize = currentContentFont + "pt";
-        }
-    }
-
     function onGlobalKeyUp() {
         globalKeyPressed = null;
     }
 
     function onGlobalKeyDown(event) {
         globalKeyPressed = event.keyCode;
-    }
-
-    function onTagMouseLeave(item) {
-        item.style.cursor = "default";
-        item.style.fontWeight = 'normal';
-        item.style.fontSize = currentContentFont + "pt";
     }
 
     // region Ui events
@@ -649,10 +602,6 @@
             logContent.style.top = "81px";
             rightHeader.style.marginTop = "0px";
         }
-    }
-
-    function onShowFilter() {
-        filterDropdownContent.classList.toggle("show");
     }
 
     function onFollowClick(svgElement) {
@@ -688,19 +637,6 @@
 
         clearTimeoutHandle();
         loadLogs();
-    }
-
-    function executeSearchByTag(tag) {
-        // logsOffset = -1;
-        // logsTag = tag;
-        //
-        // clearTimeoutHandle();
-        // loadLogs();
-    }
-
-    function onDiscolorClick(isDiscolorActive) {
-        setDiscolorContent(isDiscolorActive);
-        saveDefaultsSetting();
     }
 
     function onClearAllClick() {
@@ -755,14 +691,12 @@
 
     function loadDefaultsSetting() {
         let body = 'getDefaultsSettings=' + encodeURIComponent('');
-        httpGet('logging', body, function (response) {
+        httpGet('network', body, function (response) {
             let logLevels = JSON.parse(response);
             currentContentFont = logLevels['logFont'];
             isDarkTheme = logLevels['theme'] === DARK_THEME;
-            isDiscolorActive = logLevels['isDiscolorLog'];
 
             changeTheme(isDarkTheme);
-            setDiscolorContent(isDiscolorActive);
             setContentFont(currentContentFont);
 
             if (currentContentFont !== DEFAULT_FONT_SIZE) {
@@ -806,23 +740,20 @@
         let setting = {};
         setting.theme = isDarkTheme === true ? DARK_THEME : LIGHT_THEME;
         setting.logFont = currentContentFont;
-        setting.isDiscolorLog = isDiscolorActive;
 
         let body = 'saveDefaultsSetting=' + encodeURIComponent('')
             + '&' + 'data=' + encodeURIComponent(JSON.stringify(setting));
 
-        httpPost('logging', body, function () {
+        httpPost('network', body, function () {
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
         });
     }
 
     function setContentFont(fontSize) {
-        for (let i = 0, n = logTable.rows.length; i < n; i++) {
-            logTable.rows[i].cells.item(1).style.fontSize = fontSize + "pt";
-            logTable.rows[i].cells.item(2).style.fontSize = fontSize + "pt";
-            logTable.rows[i].cells.item(3).style.fontSize = fontSize + "pt";
-            logTable.rows[i].cells.item(4).style.fontSize = fontSize + "pt";
+        let logItems = getElementsByClassName("log-item");
+        for (let i = 0; i < logItems.length; i++) {
+            logItems[i].style.fontSize = fontSize + "pt";
         }
     }
 
@@ -878,59 +809,6 @@
             for (let i = 0; i < copyImages.length; i++) {
                 copyImages[i].classList.remove("copy-img-dark-style");
                 copyImages[i].classList.add("copy-img-white-style");
-            }
-        }
-
-        discolorExecute(true);
-    }
-
-    function setDiscolorContent(isDiscolor) {
-        isDiscolorActive = isDiscolor;
-
-        discolorExecute(false);
-
-        if (isDiscolorActive) {
-            hideElement(discolorInactive);
-            showElement(discolorActive);
-        } else {
-            showElement(discolorInactive);
-            hideElement(discolorActive);
-        }
-    }
-
-    function discolorExecute(isIncludeVerboseLog) {
-        for (let i = 0, n = logTable.rows.length; i < n; i++) {
-            if (isDiscolorActive) {
-                if (logTable.rows[i].cells.item(2).innerText === 'INFO'
-                    || logTable.rows[i].cells.item(2).innerText === 'DEBUG'
-                    || logTable.rows[i].cells.item(2).innerText === 'WARN') {
-
-                    if (isDarkTheme) {
-                        logTable.rows[i].className = "darkVerbose";
-                    } else {
-                        logTable.rows[i].className = "verbose";
-                    }
-                }
-            } else {
-                switch (logTable.rows[i].cells.item(2).innerText) {
-                    case 'INFO':
-                        logTable.rows[i].className = "info";
-                        break;
-                    case 'WARN':
-                        logTable.rows[i].className = "warn";
-                        break;
-                    case 'DEBUG':
-                        logTable.rows[i].className = "debug";
-                        break;
-                }
-            }
-
-            if (isIncludeVerboseLog && logTable.rows[i].cells.item(2).innerText === 'VERBOSE') {
-                if (isDarkTheme) {
-                    logTable.rows[i].className = "darkVerbose";
-                } else {
-                    logTable.rows[i].className = "verbose";
-                }
             }
         }
     }
@@ -1021,26 +899,26 @@
         }
     }
 
-    function loadOfflineLogs() {
-        let logsLevelTd, logsTagTd, logsSearchTextTd, i;
-        let tr = logTable.getElementsByTagName("tr");
-
-        for (i = 0; i < tr.length; i++) {
-            logsLevelTd = tr[i].getElementsByTagName("td")[2];
-            logsTagTd = tr[i].getElementsByTagName("td")[3];
-            logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
-
-            let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
-            let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
-            let searchTextCheck = searchText == null || searchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
-
-            if (levelCheck && tagCheck && searchTextCheck) {
-                showElement(tr[i]);
-            } else {
-                hideElement(tr[i]);
-            }
-        }
-    }
+    // function loadOfflineLogs() {
+    //     let logsLevelTd, logsTagTd, logsSearchTextTd, i;
+    //     let tr = logTable.getElementsByTagName("tr");
+    //
+    //     for (i = 0; i < tr.length; i++) {
+    //         logsLevelTd = tr[i].getElementsByTagName("td")[2];
+    //         logsTagTd = tr[i].getElementsByTagName("td")[3];
+    //         logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
+    //
+    //         let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
+    //         let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
+    //         let searchTextCheck = searchText == null || searchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
+    //
+    //         if (levelCheck && tagCheck && searchTextCheck) {
+    //             showElement(tr[i]);
+    //         } else {
+    //             hideElement(tr[i]);
+    //         }
+    //     }
+    // }
 
     function setLogLineColor(logLevel, tr) {
         if (isDiscolorActive) {
