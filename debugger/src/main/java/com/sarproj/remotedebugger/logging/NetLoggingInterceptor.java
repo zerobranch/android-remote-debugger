@@ -144,8 +144,11 @@ public class NetLoggingInterceptor implements Interceptor {
                 charset = contentType.charset(UTF8);
             }
 
+            if (buffer.size() != 0) {
+                logResponse.bodySize = String.valueOf(buffer.size());
+            }
+
             if (responseContentLength != 0) {
-                logResponse.bodySize = String.valueOf(responseContentLength);
                 logResponse.body = buffer.clone().readString(charset);
             }
         }
