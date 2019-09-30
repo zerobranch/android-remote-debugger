@@ -60,13 +60,10 @@ public class MainActivity extends AppCompatActivity {
 //        RemoteLog.f("My fatal", "testTag", new RuntimeException("Null pointer"));
 
 
-        findViewById(R.id.user).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        findViewById(R.id.user).setOnClickListener(v -> {
 //                dbHelper.insertUser();
 //                RemoteDebugger.init(getApplicationContext(), true, true);
-                dbHelper.insertUser();
-            }
+            dbHelper.insertUser();
         });
 
         findViewById(R.id.debug).setOnClickListener(v -> {
@@ -251,37 +248,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void send(String url) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .addNetworkInterceptor(new Interceptor() {
-                            @Override
-                            public Response intercept(Chain chain) throws IOException {
-                                Request originalRequest = chain.request();
-                                return chain.proceed(originalRequest);
-                            }
-                        })
+        new Thread(() -> {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addNetworkInterceptor(chain -> {
+                        Request originalRequest = chain.request();
+                        return chain.proceed(originalRequest);
+                    })
 //                                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                        .addInterceptor(new NetLoggingInterceptor())
-                        .build();
+                    .addInterceptor(new NetLoggingInterceptor())
+                    .build();
 
-                RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "{\"planet\":\"earth\",\"star\":\"sun\",\"nextStar\":\"proxima\"}");
-                Request request = new Request.Builder()
-                        .url(url)
-                        .post(body)
-                        .addHeader("Api-key", "j4hg45k3lk2")
-                        .addHeader("Token", "gj3h2k4923hb4k2")
-                        .addHeader("DeviceId", "Samsung")
-                        .build();
+            RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "{\"planet\":\"earth\",\"star\":\"sun\",\"nextStar\":\"proxima\"}");
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .addHeader("Api-key", "j4hg45k3lk2")
+                    .addHeader("Token", "gj3h2k4923hb4k2")
+                    .addHeader("DeviceId", "Samsung")
+                    .build();
 
-                try {
-                    Response response = client.newCall(request)
-                            .execute();
-                    response.body().string();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                Response response = client.newCall(request)
+                        .execute();
+                response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }).start();
     }
