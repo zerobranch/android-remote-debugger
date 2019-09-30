@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.sarproj.remotedebugger.source.local.Theme;
+import com.sarproj.remotedebugger.utils.NumberUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -30,9 +31,46 @@ public abstract class Api {
         return params.containsKey(key) && params.get(key) != null && !params.get(key).isEmpty();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    protected String getValue(Map<String, List<String>> params, String key) {
+    @SuppressWarnings({"ConstantConditions", "SameParameterValue", "WeakerAccess"})
+    protected String getStringValue(Map<String, List<String>> params, String key, String defaultValue) {
+        if (!containsValue(params, key)) {
+            return defaultValue;
+        }
         return params.get(key).get(0);
+    }
+
+    protected String getStringValue(Map<String, List<String>> params, String key) {
+        return getStringValue(params, key, null);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    protected int getIntValue(Map<String, List<String>> params, String key, int defaultValue) {
+        if (!containsValue(params, key)) {
+            return defaultValue;
+        }
+
+        String rawValue = params.get(key).get(0);
+        if (!NumberUtils.isInt(rawValue)) {
+            return defaultValue;
+        }
+
+        return Integer.parseInt(rawValue);
+    }
+
+    @SuppressWarnings({"ConstantConditions", "SameParameterValue"})
+    protected boolean getBooleanValue(Map<String, List<String>> params, String key, boolean defaultValue) {
+        if (!containsValue(params, key)) {
+            return defaultValue;
+        }
+
+        String rawValue = params.get(key).get(0);
+        if (rawValue.equalsIgnoreCase("true")) {
+            return true;
+        } else if (rawValue.equalsIgnoreCase("false")) {
+            return false;
+        } else {
+            return defaultValue;
+        }
     }
 
     protected String serialize(Object object) {

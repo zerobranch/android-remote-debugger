@@ -52,9 +52,16 @@
 
 <div id="header">
     <div id="controlPanel">
-        <button class="dropdown-btn" id="logLevelBtn" onclick="onShowFilter()">Verbose<i></i></button>
-        <input type="text" id="searchByTag" class="default-input" onkeyup="onSearchByTag(this)"
-               placeholder="Filter by tag" title="Type in a text">
+        <input type="text" id="searchByStatusCode" class="default-input" onkeyup="onSearchByStatusCode(this)"
+               placeholder="Status code" title="Type in a text">
+
+        <span id="isShowOnlyErrorsWrapper">
+            Only errors<br>
+            <label id="isShowOnlyErrorsLabel" class="switch">
+                <input id="isShowOnlyErrors" type="checkbox" onchange="onErrorSwitchChange(this)">
+                <span class="check-box-slider check-box-round"></span>
+            </label>
+        </span>
 
         <div id="scrollControlPanel">
             <svg onclick="onFollowClick(this)" class="default-btn" height="28" viewBox="0 0 24 24" width="28"
@@ -71,21 +78,6 @@
                  xmlns="http://www.w3.org/2000/svg">
                 <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
                 <path d="M0 0h24v24H0z" fill="none"></path>
-            </svg>
-        </div>
-
-        <div id="discolor">
-            <svg id="discolorActive" onclick="onDiscolorClick(false)" height="30" viewBox="0 0 24 24" width="30"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                <path d="M7 10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8.01-1c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3zm0 4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM16.5 3C13.47 3 11 5.47 11 8.5s2.47 5.5 5.5 5.5S22 11.53 22 8.5 19.53 3 16.5 3zm0 9c-1.93 0-3.5-1.57-3.5-3.5S14.57 5 16.5 5 20 6.57 20 8.5 18.43 12 16.5 12z"></path>
-            </svg>
-            <svg id="discolorInactive" onclick="onDiscolorClick(true)" height="30" viewBox="0 0 24 24" width="30"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0h24v24H0z" fill="none"></path>
-                <circle cx="7.2" cy="14.4" r="3.2"></circle>
-                <circle cx="14.8" cy="18" r="2"></circle>
-                <circle cx="15.2" cy="8.8" r="4.8"></circle>
             </svg>
         </div>
 
@@ -125,6 +117,7 @@
             </div>
         </div>
 
+        <!--         todo это наверное лишнее -->
         <div class="dropdown-content" id="filterDropdownContent">
         </div>
 
@@ -134,69 +127,8 @@
 <div id="logContent">
     <div id="loader"></div>
 
-    <div class="row">
-        <div class="table-row">
-            <div class="cell time">19:18:59:498</div>
-            <div class="cell status">200</div>
-            <div class="cell method">GET</div>
-            <div class="cell path">logging?getLogs=&logsOffset=16&logsLevel=VERBOSE</div>
-            <div class="cell status">204 ms</div>
-            <div class="cell status">195 B</div>
-        </div>
-        <div class="info">
-            <div class="cell time">Body</div>
-            <div class="cell status">Meta</div>
-        </div>
-
-        <div class="body">
-                <pre>
-{
-   "menu":{
-      "id":"file",
-      "value":"File",
-      "popup":{
-         "menuitem":[
-            {
-               "value":"New",
-               "onclick":"CreateNewDoc()"
-            },
-            {
-               "value":"Open",
-               "onclick":"OpenDoc()"
-            },
-            {
-               "value":"Close",
-               "onclick":"CloseDoc()"
-            }
-         ]
-      }
-   }
-}
-                </pre>
-        </div>
-        <div class="meta">
-            <table class="meta-table">
-                <tr>
-                    <th>Base</th>
-                    <th>Header</th>
-                </tr>
-                <tr>
-                    <td class="base-content">
-                        <p>Request URL: https://vk.com/css/al/datepicker.css?26303068495</p>
-                        <p>Request Method: GET</p>
-                        <p>Status Code: 200  (from disk cache)</p>
-                        <p>Remote Address: 93.186.225.197:443</p>
-                        <p>Referrer Policy: no-referrer-when-downgrade</p>
-                    </td>
-                    <td class="headers-content">
-                        <p>Provisional headers are shown</p>
-                        <p>Referer: https://vk.com/feed</p>
-                        <p>User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.90 Safari/537.36</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
+    <table id="logTable">
+    </table>
 </div>
 
 <div id="errorContent" class="error-content-dark-style">
@@ -225,14 +157,14 @@
     const COMMAND_KEYCODE = 91;
 
     let logsOffset = -1;
-    let logsLevel = null;
-    let logsTag = null;
-    let logsSearchText = null;
+    let statusCode = null;
+    let isOnlyError = false;
+    let searchText = null;
+
     let logRequestLock = false;
     let timeoutHandle;
     let isFollowLogs = false;
-    let isDiscolorActive = false;
-    let isDarkTheme = true;
+    let isDarkTheme = true; // todo удалить
 
     let currentContentFont = DEFAULT_FONT_SIZE;
     let isConnectionLost = false;
@@ -243,10 +175,7 @@
     let lightTheme = getElementById("lightTheme");
     let darkTheme = getElementById("darkTheme");
     let logContent = getElementById("logContent");
-    let discolorInactive = getElementById("discolorInactive");
-    let discolorActive = getElementById("discolorActive");
     let connectionStatus = getElementById("connectionStatus");
-    let logLevelBtn = getElementById("logLevelBtn");
     let loader = getElementById("loader");
     let filterDropdownContent = getElementById("filterDropdownContent");
     let errorContent = getElementById('errorContent');
@@ -255,17 +184,16 @@
     let header = getElementById('header');
     let copyErrorContent = getElementById('copyErrorContent');
     let errorTextCopied = getElementById('errorTextCopied');
-    let searchByTag = getElementById('searchByTag');
+    let closeErrorContent = getElementById('closeErrorContent');
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
-        loadLogLevels();
+        loadLogs();
         loadDefaultsSetting();
-        onPageResize();
+        // onPageResize();
 
         window.addEventListener("keyup", onGlobalKeyUp);
         window.addEventListener("keydown", onGlobalKeyDown);
-        onChangeThemeClick(false);
     };
 
     window.onclick = function (e) {
@@ -276,23 +204,384 @@
         }
     };
 
-    function onTagClick(item) {
-        if (globalKeyPressed === COMMAND_KEYCODE || globalKeyPressed === CTRL_KEYCODE) {
-            searchByTag.value = item.innerText;
-            executeSearchByTag(searchByTag.value);
+    function onErrorSwitchChange(item) {
+        isOnlyError = item.checked;
+        logsOffset = -1;
+
+        clearTimeoutHandle();
+        loadLogs();
+    }
+
+    function loadLogs() {
+        if (isConnectionLost) {
+            // loadOfflineLogs();
+            return;
+        }
+
+        if (logRequestLock) {
+            return;
+        }
+        logRequestLock = true;
+
+        let body = 'getLogs=' + encodeURIComponent('')
+            + '&' + 'offset=' + encodeURIComponent(logsOffset)
+            + '&' + 'isOnlyErrors=' + encodeURIComponent(isOnlyError.toString());
+
+        if (statusCode != null) {
+            body += '&' + 'statusCode=' + encodeURIComponent(statusCode);
+        }
+
+        if (searchText != null) {
+            body += '&' + 'search=' + encodeURIComponent(searchText);
+        }
+
+        httpGet('network', body, function (response) {
+            hideElement(loader);
+
+            if (logsOffset === -1) {
+                clearContent(logTable);
+            }
+
+            let parsedLogs = {};
+
+            if (response !== '') {
+                parsedLogs = JSON.parse(response);
+            }
+
+            if (parsedLogs.length !== 0) {
+                if (logsOffset === -1) {
+                    logsOffset = parsedLogs.length;
+                } else {
+                    logsOffset += parsedLogs.length;
+                }
+
+                console.log(parsedLogs);
+
+                // todo удалить console.log и все TODO
+                // todo setLogLineColor(logLine.level, tr);
+
+                let tbody = document.createElement("tbody");
+                logTable.appendChild(tbody);
+
+                parsedLogs.forEach(function (logLine) {
+                    let tr = document.createElement("tr");
+
+                    if (isDarkTheme) {
+                        tr.className = "table-log-line table-log-line-dark-style";
+                    } else {
+                        tr.className = "table-log-line table-log-line-white-style";
+                    }
+
+                    tr.appendChild(timeTd(logLine.time));
+                    tr.appendChild(queryNumberTd(logLine.queryId));
+                    tr.appendChild(bodyTd(logLine));
+
+                    tbody.appendChild(tr);
+                });
+
+                if (isFollowLogs) {
+                    scrollToBottom();
+                }
+            }
+
+            timeoutHandle = setTimeout(loadLogs, REFRESH_TIME);
+            logRequestLock = false;
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function isRequest(logLine) {
+        return logLine.queryType === "REQUEST"
+    }
+
+    function isResponse(logLine) {
+        return logLine.queryType === "RESPONSE"
+    }
+
+    function isErrorResponse(logLine) {
+        return logLine.queryType === "RESPONSE" && (logLine.code >= 400 || logLine.errorMessage);
+    }
+
+    function setLogItemClassName(logLine, item) {
+        if (isRequest(logLine)) {
+            item.className = "primary-color-request";
+        } else if (isErrorResponse(logLine)) {
+            item.className = "primary-color-error-response";
+        } else if (isResponse(logLine)) {
+            item.className = "primary-color-response";
         }
     }
 
-    function onTagMouseMove(item) {
-        if (globalKeyPressed === COMMAND_KEYCODE || globalKeyPressed === CTRL_KEYCODE) {
-            item.style.cursor = "pointer";
-            item.style.fontWeight = "900";
-            item.style.fontSize = currentContentFont + 1 + "pt";
+    function setBodyLinkable(inputText) {
+        let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+        return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
+    }
+
+    function bodyTd(logLine) {
+        let requestRootTd = document.createElement("td");
+        let requestInfoDiv = document.createElement("div");
+        let requestHeaderP = document.createElement("p");
+        let requestLeftHeaderSpan = document.createElement("span");
+        let requestCenterHeaderSpan = document.createElement("span");
+        let requestRightHeaderSpan = document.createElement("span");
+
+        requestRootTd.style.fontSize = currentContentFont + "pt";
+
+        requestHeaderP.className = "main-query-title";
+
+        if (isDarkTheme) {
+            requestRootTd.className = "log-item log-item-dark-style";
         } else {
-            item.style.cursor = "default";
-            item.style.fontWeight = 'normal';
-            item.style.fontSize = currentContentFont + "pt";
+            requestRootTd.className = "log-item log-item-white-style";
         }
+
+        setLogItemClassName(logLine, requestCenterHeaderSpan);
+
+        if (isRequest(logLine)) {
+            requestLeftHeaderSpan.className = "log-type-secondary-request";
+            requestRightHeaderSpan.className = "log-type-secondary-request";
+        } else if (isErrorResponse(logLine)) {
+            requestLeftHeaderSpan.className = "log-type-secondary-error-response";
+            requestRightHeaderSpan.className = "log-type-secondary-error-response";
+        } else if (isResponse(logLine)) {
+            requestLeftHeaderSpan.className = "log-type-secondary-response";
+            requestRightHeaderSpan.className = "log-type-secondary-response";
+        }
+
+        if (isRequest(logLine)) {
+            requestLeftHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+            requestCenterHeaderSpan.appendChild(document.createTextNode(" Request "));
+            requestRightHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+        } else if (isResponse(logLine)) {
+            requestLeftHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+            requestCenterHeaderSpan.appendChild(document.createTextNode(" Response "));
+            requestRightHeaderSpan.appendChild(document.createTextNode("░░░░░░░░░░░░░░"));
+        }
+
+        requestHeaderP.appendChild(requestLeftHeaderSpan);
+        requestHeaderP.appendChild(requestCenterHeaderSpan);
+        requestHeaderP.appendChild(requestRightHeaderSpan);
+        requestInfoDiv.appendChild(requestHeaderP);
+
+        let urlP = document.createElement("p");
+        let urlSpan = document.createElement("span");
+        let urlA = document.createElement("a");
+        urlA.appendChild(document.createTextNode(logLine.url));
+        urlA.target = "_blank";
+        urlA.href = logLine.url;
+        urlSpan.appendChild(document.createTextNode("URL: "));
+        urlP.appendChild(urlSpan);
+        urlP.appendChild(urlA);
+
+        if (isDarkTheme) {
+            urlA.className = "default-url log-header-url log-header-url-dark-style";
+        } else {
+            urlA.className = "default-url log-header-url log-header-url-white-style";
+        }
+
+        requestInfoDiv.appendChild(urlP);
+        setLogItemClassName(logLine, urlSpan);
+
+        let methodP = document.createElement("p");
+        let methodSpan = document.createElement("span");
+        methodSpan.appendChild(document.createTextNode("Method: "));
+        methodP.appendChild(methodSpan);
+        methodP.appendChild(document.createTextNode(logLine.method));
+        requestInfoDiv.appendChild(methodP);
+        setLogItemClassName(logLine, methodSpan);
+
+        if (logLine.ip) {
+            let ipP = document.createElement("p");
+            let ipSpan = document.createElement("span");
+            ipSpan.appendChild(document.createTextNode("Remote Address: "));
+            ipP.appendChild(ipSpan);
+            ipP.appendChild(document.createTextNode(logLine.ip + ":" + logLine.port));
+            requestInfoDiv.appendChild(ipP);
+            setLogItemClassName(logLine, ipSpan);
+        }
+
+        if (isRequest(logLine) && logLine.requestContentType) {
+            let contentTypeP = document.createElement("p");
+            let contentTypeSpan = document.createElement("span");
+            contentTypeSpan.className = "primary-color-request";
+            contentTypeSpan.appendChild(document.createTextNode("Content-Type: "));
+            contentTypeP.appendChild(contentTypeSpan);
+            contentTypeP.appendChild(document.createTextNode(logLine.requestContentType));
+            requestInfoDiv.appendChild(contentTypeP);
+        }
+
+        if (isResponse(logLine) && logLine.code) {
+            let statusP = document.createElement("p");
+            let statusSpan = document.createElement("span");
+            statusSpan.appendChild(document.createTextNode("Status: "));
+            statusP.appendChild(statusSpan);
+            statusP.appendChild(document.createTextNode(logLine.code + " " + logLine.message));
+            requestInfoDiv.appendChild(statusP);
+
+            if (isErrorResponse(logLine)) {
+                setLogItemClassName(logLine, statusP);
+            } else {
+                setLogItemClassName(logLine, statusSpan);
+            }
+        }
+
+        if (isResponse(logLine) && logLine.duration) {
+            let durationP = document.createElement("p");
+            let durationSpan = document.createElement("span");
+            durationSpan.appendChild(document.createTextNode("Duration: "));
+            durationP.appendChild(durationSpan);
+            durationP.appendChild(document.createTextNode(logLine.duration + " ms"));
+            requestInfoDiv.appendChild(durationP);
+            setLogItemClassName(logLine, durationSpan);
+        }
+
+        if (logLine.bodySize && logLine.bodySize !== 0 && logLine.bodySize !== -1) {
+            let bodySizeP = document.createElement("p");
+            let bodySizeSpan = document.createElement("span");
+            bodySizeSpan.appendChild(document.createTextNode("Body size: "));
+            bodySizeP.appendChild(bodySizeSpan);
+            bodySizeP.appendChild(document.createTextNode(logLine.bodySize + " byte"));
+            requestInfoDiv.appendChild(bodySizeP);
+            setLogItemClassName(logLine, bodySizeSpan);
+        }
+
+        if (isErrorResponse(logLine) && logLine.errorMessage) {
+            let errorMessageP = document.createElement("p");
+            let errorMessageSpan = document.createElement("span");
+            errorMessageSpan.className = "primary-color-error-response";
+            errorMessageSpan.appendChild(document.createTextNode("Error message: " + logLine.errorMessage));
+            errorMessageP.appendChild(errorMessageSpan);
+            requestInfoDiv.appendChild(errorMessageP);
+        }
+
+        requestInfoDiv.appendChild(document.createElement("br"));
+        requestRootTd.appendChild(requestInfoDiv);
+
+        if (logLine.headers || logLine.body) {
+            let requestBodyDiv = document.createElement("div");
+            hideElement(requestBodyDiv);
+
+            let detailSpan = document.createElement("span");
+            detailSpan.innerHTML = "Show details";
+
+            if (isRequest(logLine)) {
+                requestBodyDiv.className = "log-content-border-request";
+                detailSpan.className = "detail-log-item primary-color-request";
+            } else if (isErrorResponse(logLine)) {
+                requestBodyDiv.className = "log-content-border-error-response";
+                detailSpan.className = "detail-log-item primary-color-error-response";
+            } else if (isResponse(logLine)) {
+                requestBodyDiv.className = "log-content-border-response";
+                detailSpan.className = "detail-log-item primary-color-response";
+            }
+
+            detailSpan.onclick = function () {
+                if (isVisibleElement(requestBodyDiv)) {
+                    hideElement(requestBodyDiv);
+                    detailSpan.innerHTML = "Show details";
+                } else {
+                    showElement(requestBodyDiv);
+                    detailSpan.innerHTML = "Hide details";
+                }
+            };
+            requestRootTd.appendChild(detailSpan);
+
+            if (logLine.headers) {
+                let headersP = document.createElement("p");
+                let headersSpan = document.createElement("span");
+                headersSpan.appendChild(document.createTextNode("Headers:"));
+                headersP.className = "default-item-space";
+                headersP.appendChild(headersSpan);
+
+                setLogItemClassName(logLine, headersSpan);
+
+                requestBodyDiv.appendChild(document.createElement("br"));
+                requestBodyDiv.appendChild(headersP);
+
+                for (let header in logLine.headers) {
+                    let headerP = document.createElement("p");
+                    headerP.className = "default-item-space";
+                    headerP.appendChild(document.createTextNode(header + ": " + logLine.headers[header]));
+                    requestBodyDiv.appendChild(headerP);
+                }
+
+                if (logLine.body) {
+                    requestBodyDiv.appendChild(document.createElement("br"));
+
+                    let hr = document.createElement("hr");
+                    requestBodyDiv.appendChild(hr);
+
+                    if (isRequest(logLine)) {
+                        hr.className = "default-hr hr-request";
+                    } else if (isErrorResponse(logLine)) {
+                        hr.className = "default-hr hr-error-response";
+                    } else if (isResponse(logLine)) {
+                        hr.className = "default-hr hr-response";
+                    }
+                }
+            }
+
+            if (logLine.body) {
+                let bodyP = document.createElement("p");
+                let bodySpan = document.createElement("span");
+                bodySpan.appendChild(document.createTextNode("Body:"));
+                bodyP.className = "default-item-space";
+                bodyP.appendChild(bodySpan);
+                setLogItemClassName(logLine, bodySpan);
+
+                let bodyPre = document.createElement("pre");
+                bodyPre.innerHTML = setBodyLinkable(logLine.body);
+                bodyPre.className = "default-item-space";
+
+                requestBodyDiv.appendChild(document.createElement("br"));
+                requestBodyDiv.appendChild(bodyP);
+                requestBodyDiv.appendChild(bodyPre);
+            }
+
+            requestBodyDiv.appendChild(document.createElement("br"));
+            requestRootTd.appendChild(requestBodyDiv);
+        } else {
+            let emptyBodySpan = document.createElement("span");
+            emptyBodySpan.appendChild(document.createTextNode("Empty body"));
+            requestRootTd.appendChild(emptyBodySpan);
+            setLogItemClassName(logLine, emptyBodySpan);
+        }
+
+        return requestRootTd;
+    }
+
+    function queryNumberTd(queryId) {
+        let queryNumTd = document.createElement("td");
+        let queryNumText = document.createTextNode("Num: " + queryId);
+
+        if (isDarkTheme) {
+            queryNumTd.setAttribute("class", "log-item log-item-dark-style");
+        } else {
+            queryNumTd.setAttribute("class", "log-item log-item-white-style");
+        }
+
+        queryNumTd.style.fontSize = currentContentFont + "pt";
+
+        queryNumTd.appendChild(queryNumText);
+        return queryNumTd;
+    }
+
+    function timeTd(time) {
+        let currentTime = getFormattedTime(new Date(time));
+        let timeTd = document.createElement("td");
+        let timeText = document.createTextNode(currentTime);
+
+        if (isDarkTheme) {
+            timeTd.setAttribute("class", "log-item log-item-dark-style");
+        } else {
+            timeTd.setAttribute("class", "log-item log-item-white-style");
+        }
+
+        timeTd.style.fontSize = currentContentFont + "pt";
+
+        timeTd.appendChild(timeText);
+        return timeTd;
     }
 
     function onGlobalKeyUp() {
@@ -301,12 +590,6 @@
 
     function onGlobalKeyDown(event) {
         globalKeyPressed = event.keyCode;
-    }
-
-    function onTagMouseLeave(item) {
-        item.style.cursor = "default";
-        item.style.fontWeight = 'normal';
-        item.style.fontSize = currentContentFont + "pt";
     }
 
     // region Ui events
@@ -320,10 +603,6 @@
             logContent.style.top = "81px";
             rightHeader.style.marginTop = "0px";
         }
-    }
-
-    function onShowFilter() {
-        filterDropdownContent.classList.toggle("show");
     }
 
     function onFollowClick(svgElement) {
@@ -353,25 +632,12 @@
         }
     }
 
-    function onSearchLogs(searchText) {
+    function onSearchLogs(search) {
         logsOffset = -1;
-        logsSearchText = searchText.value;
+        searchText = search.value;
 
         clearTimeoutHandle();
         loadLogs();
-    }
-
-    function executeSearchByTag(tag) {
-        logsOffset = -1;
-        logsTag = tag;
-
-        clearTimeoutHandle();
-        loadLogs();
-    }
-
-    function onDiscolorClick(isDiscolorActive) {
-        setDiscolorContent(isDiscolorActive);
-        saveDefaultsSetting();
     }
 
     function onClearAllClick() {
@@ -381,7 +647,7 @@
         logsOffset = -1;
 
         let body = 'clearAllLogs=' + encodeURIComponent('');
-        httpPost('logging', body, function () {
+        httpPost('network', body, function () {
             loadLogs();
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
@@ -409,8 +675,12 @@
         saveDefaultsSetting();
     }
 
-    function onSearchByTag(tag) {
-        executeSearchByTag(tag.value);
+    function onSearchByStatusCode(statusCodeInput) {
+        statusCode = statusCodeInput.value;
+        logsOffset = -1;
+
+        clearTimeoutHandle();
+        loadLogs();
     }
 
     function onCloseErrorContentClick() {
@@ -422,14 +692,12 @@
 
     function loadDefaultsSetting() {
         let body = 'getDefaultsSettings=' + encodeURIComponent('');
-        httpGet('logging', body, function (response) {
+        httpGet('network', body, function (response) {
             let logLevels = JSON.parse(response);
             currentContentFont = logLevels['logFont'];
             isDarkTheme = logLevels['theme'] === DARK_THEME;
-            isDiscolorActive = logLevels['isDiscolorLog'];
 
             changeTheme(isDarkTheme);
-            setDiscolorContent(isDiscolorActive);
             setContentFont(currentContentFont);
 
             if (currentContentFont !== DEFAULT_FONT_SIZE) {
@@ -473,28 +741,58 @@
         let setting = {};
         setting.theme = isDarkTheme === true ? DARK_THEME : LIGHT_THEME;
         setting.logFont = currentContentFont;
-        setting.isDiscolorLog = isDiscolorActive;
 
         let body = 'saveDefaultsSetting=' + encodeURIComponent('')
             + '&' + 'data=' + encodeURIComponent(JSON.stringify(setting));
 
-        httpPost('logging', body, function () {
+        httpPost('network', body, function () {
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
         });
     }
 
     function setContentFont(fontSize) {
-        for (let i = 0, n = logTable.rows.length; i < n; i++) {
-            logTable.rows[i].cells.item(1).style.fontSize = fontSize + "pt";
-            logTable.rows[i].cells.item(2).style.fontSize = fontSize + "pt";
-            logTable.rows[i].cells.item(3).style.fontSize = fontSize + "pt";
-            logTable.rows[i].cells.item(4).style.fontSize = fontSize + "pt";
+        let logItems = getElementsByClassName("log-item");
+        for (let i = 0; i < logItems.length; i++) {
+            logItems[i].style.fontSize = fontSize + "pt";
         }
     }
 
     function changeTheme(isDark) {
         isDarkTheme = isDark;
+
+        let logLine = getElementsByClassName("table-log-line");
+        for (let i = 0; i < logLine.length; i++) {
+            if (isDarkTheme) {
+                logLine[i].classList.remove("table-log-line-white-style");
+                logLine[i].classList.add("table-log-line-dark-style");
+            } else {
+                logLine[i].classList.remove("table-log-line-dark-style");
+                logLine[i].classList.add("table-log-line-white-style");
+            }
+        }
+
+        let logContentUrls = getElementsByClassName("log-header-url");
+        for (let i = 0; i < logContentUrls.length; i++) {
+            if (isDarkTheme) {
+                logContentUrls[i].classList.remove("log-header-url-white-style");
+                logContentUrls[i].classList.add("log-header-url-dark-style");
+            } else {
+                logContentUrls[i].classList.remove("log-header-url-dark-style");
+                logContentUrls[i].classList.add("log-header-url-white-style");
+            }
+        }
+
+        let logItems = getElementsByClassName("log-item");
+        for (let i = 0; i < logItems.length; i++) {
+            if (isDarkTheme) {
+                logItems[i].classList.remove("log-item-white-style");
+                logItems[i].classList.add("log-item-dark-style");
+            } else {
+                logItems[i].classList.remove("log-item-dark-style");
+                logItems[i].classList.add("log-item-white-style");
+            }
+        }
 
         if (isDarkTheme) {
             showElement(lightTheme);
@@ -509,18 +807,6 @@
 
             copyErrorContent.classList.remove("copy-error-content-white-style");
             copyErrorContent.classList.add("copy-error-content-dark-style");
-
-            let logItems = getElementsByClassName("log-item");
-            for (let i = 0; i < logItems.length; i++) {
-                logItems[i].classList.remove("log-item-white-style");
-                logItems[i].classList.add("log-item-dark-style");
-            }
-
-            let copyImages = getElementsByClassName("copy-img");
-            for (let i = 0; i < copyImages.length; i++) {
-                copyImages[i].classList.remove("copy-img-white-style");
-                copyImages[i].classList.add("copy-img-dark-style");
-            }
         } else {
             hideElement(lightTheme);
             showElement(darkTheme);
@@ -534,71 +820,6 @@
 
             copyErrorContent.classList.remove("copy-error-content-dark-style");
             copyErrorContent.classList.add("copy-error-content-white-style");
-
-            let logItems = getElementsByClassName("log-item");
-            for (let i = 0; i < logItems.length; i++) {
-                logItems[i].classList.remove("log-item-dark-style");
-                logItems[i].classList.add("log-item-white-style");
-            }
-
-            let copyImages = getElementsByClassName("copy-img");
-            for (let i = 0; i < copyImages.length; i++) {
-                copyImages[i].classList.remove("copy-img-dark-style");
-                copyImages[i].classList.add("copy-img-white-style");
-            }
-        }
-
-        discolorExecute(true);
-    }
-
-    function setDiscolorContent(isDiscolor) {
-        isDiscolorActive = isDiscolor;
-
-        discolorExecute(false);
-
-        if (isDiscolorActive) {
-            hideElement(discolorInactive);
-            showElement(discolorActive);
-        } else {
-            showElement(discolorInactive);
-            hideElement(discolorActive);
-        }
-    }
-
-    function discolorExecute(isIncludeVerboseLog) {
-        for (let i = 0, n = logTable.rows.length; i < n; i++) {
-            if (isDiscolorActive) {
-                if (logTable.rows[i].cells.item(2).innerText === 'INFO'
-                    || logTable.rows[i].cells.item(2).innerText === 'DEBUG'
-                    || logTable.rows[i].cells.item(2).innerText === 'WARN') {
-
-                    if (isDarkTheme) {
-                        logTable.rows[i].className = "darkVerbose";
-                    } else {
-                        logTable.rows[i].className = "verbose";
-                    }
-                }
-            } else {
-                switch (logTable.rows[i].cells.item(2).innerText) {
-                    case 'INFO':
-                        logTable.rows[i].className = "info";
-                        break;
-                    case 'WARN':
-                        logTable.rows[i].className = "warn";
-                        break;
-                    case 'DEBUG':
-                        logTable.rows[i].className = "debug";
-                        break;
-                }
-            }
-
-            if (isIncludeVerboseLog && logTable.rows[i].cells.item(2).innerText === 'VERBOSE') {
-                if (isDarkTheme) {
-                    logTable.rows[i].className = "darkVerbose";
-                } else {
-                    logTable.rows[i].className = "verbose";
-                }
-            }
         }
     }
 
@@ -643,203 +864,17 @@
         }
     }
 
-    function loadLogLevels() {
-        let body = 'getLogLevels=' + encodeURIComponent('');
-        httpGet('logging', body, function (response) {
-            let logLevels = JSON.parse(response);
-            clearContent(filterDropdownContent);
-
-            if (logsLevel == null) {
-                logLevelBtn.innerHTML =
-                    logLevels[0].charAt(0).toUpperCase() + logLevels[0].toLocaleLowerCase().slice(1);
-
-                logsLevel = logLevels[0];
-                loadLogs();
-            }
-
-            logLevels.forEach(function (log) {
-                let label = document.createElement("label");
-                label.className = "dropdown-content-item";
-                let logFormattedText = log.charAt(0).toUpperCase() + log.toLocaleLowerCase().slice(1);
-                let labelText = document.createTextNode(logFormattedText);
-
-                label.onclick = function () {
-                    logLevelBtn.innerHTML = logFormattedText;
-
-                    logsOffset = -1;
-                    logsLevel = log;
-
-                    clearTimeoutHandle();
-                    loadLogs();
-                };
-
-                label.appendChild(labelText);
-                filterDropdownContent.appendChild(label);
-            });
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
-    }
-
     function getFormattedTime(timestamp) {
         let logDate = new Date(timestamp);
-        return logDate.getHours() + ':' + logDate.getMinutes() + ':' + logDate.getSeconds() + ':' + logDate.getMilliseconds();
+        return zeroPad(logDate.getHours())
+            + ':' + zeroPad(logDate.getMinutes())
+            + ':' + zeroPad(logDate.getSeconds())
+            + '.' + zeroPad(logDate.getMilliseconds());
     }
 
-    function loadLogs() {
-        if (isConnectionLost) {
-            loadOfflineLogs();
-            return;
-        }
-
-        if (logRequestLock) {
-            return;
-        }
-        logRequestLock = true;
-
-        let body = 'getLogs=' + encodeURIComponent('')
-            + '&' + 'logsOffset=' + encodeURIComponent(logsOffset)
-            + '&' + 'logsLevel=' + encodeURIComponent(logsLevel);
-
-        if (logsTag != null) {
-            body += '&' + 'logsTag=' + encodeURIComponent(logsTag);
-        }
-
-        if (logsSearchText != null) {
-            body += '&' + 'logsSearch=' + encodeURIComponent(logsSearchText);
-        }
-
-        httpGet('logging', body, function (response) {
-            hideElement(loader);
-
-            if (logsOffset === -1) {
-                clearContent(logTable);
-            }
-
-            let parsedLogs = {};
-
-            if (response !== '') {
-                parsedLogs = JSON.parse(response);
-            }
-
-            if (parsedLogs.length !== 0) {
-                if (logsOffset === -1) {
-                    logsOffset = parsedLogs.length;
-                } else {
-                    logsOffset += parsedLogs.length;
-                }
-
-                parsedLogs.forEach(function (logLine) {
-                    let currentTime = getFormattedTime(new Date(logLine.time));
-
-                    let tr = document.createElement("tr");
-                    let copyImgTd = document.createElement("td");
-                    let tooltipSpan = document.createElement("span");
-                    let timeTd = document.createElement("td");
-                    let levelTd = document.createElement("td");
-                    let tagTd = document.createElement("td");
-                    let messageTd = document.createElement("td");
-                    let messagePre = document.createElement("pre");
-
-                    tooltipSpan.className = "tooltip-text";
-                    tooltipSpan.innerText = "Copied!";
-
-                    let copyImg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    copyImg.setAttribute("width", "20");
-                    copyImg.setAttribute("height", "20");
-                    copyImg.setAttribute("viewBox", "0 0 24 24");
-
-                    if (isDarkTheme) {
-                        copyImg.setAttribute("class", "copy-img copy-img-dark-style");
-                    } else {
-                        copyImg.setAttribute("class", "copy-img copy-img-white-style");
-                    }
-
-                    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    path.setAttributeNS(null, "d", "M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z");
-                    copyImg.appendChild(path);
-
-                    copyImg.onclick = function () {
-                        copyToClipboard(getFormattedTime(logLine.time) + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
-                        visibleElement(tooltipSpan);
-
-                        let tooltipTimeout = setTimeout(function () {
-                            clearInterval(tooltipTimeout);
-                            invisibleElement(tooltipSpan);
-                        }, 800);
-                    };
-
-                    copyImgTd.className = "log-item tooltip";
-                    timeTd.className = "log-item";
-                    levelTd.className = "log-item";
-                    tagTd.className = "log-item";
-                    messageTd.className = "log-item";
-
-                    if (isDarkTheme) {
-                        copyImgTd.classList.add("log-item-dark-style");
-                        timeTd.classList.add("log-item-dark-style");
-                        levelTd.classList.add("log-item-dark-style");
-                        tagTd.classList.add("log-item-dark-style");
-                        messageTd.classList.add("log-item-dark-style");
-                    } else {
-                        copyImgTd.classList.add("log-item-white-style");
-                        timeTd.classList.add("log-item-white-style");
-                        levelTd.classList.add("log-item-white-style");
-                        tagTd.classList.add("log-item-white-style");
-                        messageTd.classList.add("log-item-white-style");
-                    }
-
-                    let timeText = document.createTextNode(currentTime);
-                    let levelText = document.createTextNode(logLine.level);
-                    let tagText = document.createTextNode(logLine.tag);
-                    let messageText = document.createTextNode(logLine.message);
-
-                    tagTd.onmousemove = function () {
-                        onTagMouseMove(tagTd);
-                    };
-
-                    tagTd.onclick = function () {
-                        onTagClick(tagTd)
-                    };
-
-                    tagTd.onmouseleave = function () {
-                        onTagMouseLeave(tagTd)
-                    };
-
-                    copyImgTd.appendChild(copyImg);
-                    copyImgTd.appendChild(tooltipSpan);
-                    timeTd.appendChild(timeText);
-                    levelTd.appendChild(levelText);
-                    tagTd.appendChild(tagText);
-                    messagePre.appendChild(messageText);
-                    messageTd.appendChild(messagePre);
-
-                    tr.appendChild(copyImgTd);
-                    tr.appendChild(timeTd);
-                    tr.appendChild(levelTd);
-                    tr.appendChild(tagTd);
-                    tr.appendChild(messageTd);
-
-                    timeTd.style.fontSize = currentContentFont + "pt";
-                    levelTd.style.fontSize = currentContentFont + "pt";
-                    tagTd.style.fontSize = currentContentFont + "pt";
-                    messageTd.style.fontSize = currentContentFont + "pt";
-
-                    setLogLineColor(logLine.level, tr);
-
-                    logTable.appendChild(tr);
-                });
-
-                if (isFollowLogs) {
-                    scrollToBottom();
-                }
-            }
-
-            timeoutHandle = setTimeout(loadLogs, REFRESH_TIME);
-            logRequestLock = false;
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
+    function zeroPad(num) {
+        const zero = 2 - num.toString().length + 1;
+        return Array(+(zero > 0 && zero)).join("0") + num;
     }
 
     function onErrorTextClick() {
@@ -874,71 +909,26 @@
         }
     }
 
-    function loadOfflineLogs() {
-        let logsLevelTd, logsTagTd, logsSearchTextTd, i;
-        let tr = logTable.getElementsByTagName("tr");
-
-        for (i = 0; i < tr.length; i++) {
-            logsLevelTd = tr[i].getElementsByTagName("td")[2];
-            logsTagTd = tr[i].getElementsByTagName("td")[3];
-            logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
-
-            let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
-            let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
-            let searchTextCheck = logsSearchText == null || logsSearchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
-
-            if (levelCheck && tagCheck && searchTextCheck) {
-                showElement(tr[i]);
-            } else {
-                hideElement(tr[i]);
-            }
-        }
-    }
-
-    function setLogLineColor(logLevel, tr) {
-        if (isDiscolorActive) {
-            switch (logLevel) {
-                case 'ERROR':
-                    tr.className = "error";
-                    break;
-                case 'FATAL':
-                    tr.className = "fatal";
-                    break;
-                default:
-                    if (isDarkTheme) {
-                        tr.className = "darkVerbose";
-                    } else {
-                        tr.className = "verbose";
-                    }
-                    break;
-            }
-        } else {
-            switch (logLevel) {
-                case 'INFO':
-                    tr.className = "info";
-                    break;
-                case 'WARN':
-                    tr.className = "warn";
-                    break;
-                case 'DEBUG':
-                    tr.className = "debug";
-                    break;
-                case 'ERROR':
-                    tr.className = "error";
-                    break;
-                case 'FATAL':
-                    tr.className = "fatal";
-                    break;
-                case 'VERBOSE':
-                    if (isDarkTheme) {
-                        tr.className = "darkVerbose";
-                    } else {
-                        tr.className = "verbose";
-                    }
-                    break;
-            }
-        }
-    }
+    // function loadOfflineLogs() {
+    //     let logsLevelTd, logsTagTd, logsSearchTextTd, i;
+    //     let tr = logTable.getElementsByTagName("tr");
+    //
+    //     for (i = 0; i < tr.length; i++) {
+    //         logsLevelTd = tr[i].getElementsByTagName("td")[2];
+    //         logsTagTd = tr[i].getElementsByTagName("td")[3];
+    //         logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
+    //
+    //         let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
+    //         let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
+    //         let searchTextCheck = searchText == null || searchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
+    //
+    //         if (levelCheck && tagCheck && searchTextCheck) {
+    //             showElement(tr[i]);
+    //         } else {
+    //             hideElement(tr[i]);
+    //         }
+    //     }
+    // }
 
     function scrollToBottom() {
         logContent.scrollTo(0, logTable.scrollHeight);
@@ -967,6 +957,10 @@
 
     function hideElement(element) {
         element.style.display = "none";
+    }
+
+    function isVisibleElement(element) {
+        return element.style.display === "block"
     }
 
     function invisibleElement(element) {

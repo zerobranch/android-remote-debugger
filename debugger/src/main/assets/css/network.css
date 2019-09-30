@@ -100,37 +100,22 @@ h1, h2, h3, h4, h5, h6 {
     overflow-y: scroll;
 }
 
-/*tr.verbose {*/
-/*    color: #000000;*/
-/*}*/
+tr.table-log-line-white-style {
+    color: #717171;
+}
 
-/*tr.darkVerbose {*/
-/*    color: #bdbdbd;*/
-/*}*/
+tr.table-log-line-dark-style {
+    color: #a8a8a8;
+}
 
-/*tr.error {*/
-/*    color: red;*/
-/*}*/
+th, td {
+    padding: 0;
+    text-align: left;
+}
 
-/*tr.fatal {*/
-/*    color: #d32f2f;*/
-/*}*/
-
-/*tr.warn {*/
-/*    color: #fca823;*/
-/*}*/
-
-/*tr.debug {*/
-/*    color: #70A6DD;*/
-/*}*/
-
-/*tr.info {*/
-/*    color: #00c700;*/
-/*}*/
-
-/*tr {*/
-/*    vertical-align: top;*/
-/*}*/
+tr {
+    vertical-align: top;
+}
 
 .log-item-dark-style {
     background-color: #222222;
@@ -158,37 +143,32 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
 }
 
-/*#logTable td:first-child {*/
-/*    min-width: 10px;*/
-/*    text-align: center;*/
-/*    padding-top: 10px;*/
-/*}*/
+#logTable td:first-child {
+    min-width: 10px;
+    text-align: center;
+    padding-top: 10px;
+}
 
-/*#logTable td:last-child {*/
-/*    white-space: nowrap;*/
-/*    width: 100%;*/
-/*}*/
+#logTable td:last-child {
+    white-space: nowrap;
+    width: 100%;
+}
 
-/*td:nth-child(2) {*/
-/*    text-align: center;*/
-/*    min-width: 70px;*/
-/*}*/
+td:nth-child(2) {
+    text-align: center;
+    max-width: 150px;
+    white-space: normal;
+    overflow-x: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+}
 
-/*td:nth-child(3) {*/
-/*    text-align: center;*/
-/*    max-width: 200px;*/
-/*    white-space: normal;*/
-/*    overflow-x: auto;*/
-/*    padding-left: 10px;*/
-/*    padding-right: 10px;*/
-/*}*/
-
-/*#logTable th, td {*/
-/*    padding: 8px;*/
-/*    min-width: 110px;*/
-/*    font-size: 11pt;*/
-/*    font-family: monospace;*/
-/*}*/
+#logTable th, td {
+    padding: 8px;
+    min-width: 110px;
+    font-size: 11pt;
+    font-family: monospace;
+}
 
 /* Content */
 
@@ -230,6 +210,82 @@ h1, h2, h3, h4, h5, h6 {
 #logLevelBtn {
     float: left;
 }
+
+#isShowOnlyErrorsLabel {
+    margin-top: 3px;
+    margin-left: 15px;
+}
+
+#isShowOnlyErrorsWrapper {
+    float: left;
+    margin-left: 30px;
+    font-size: 15px;
+    margin-top: -4px;
+    font-family: 'Josefin Sans', sans-serif;
+    color: #c9c9c9;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+}
+
+#isShowOnlyErrors {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.check-box-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #afafaf;
+    -webkit-transition: .1s;
+    transition: .1s;
+}
+
+.check-box-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+#isShowOnlyErrors:checked + .check-box-slider {
+    background-color: #ffb600;
+}
+
+#isShowOnlyErrors:focus + .check-box-slider {
+    box-shadow: 0 0 1px #ffb600;
+}
+
+#isShowOnlyErrors:checked + .check-box-slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    transform: translateX(16px);
+}
+
+.check-box-slider.check-box-round {
+    border-radius: 34px;
+}
+
+.check-box-slider.check-box-round:before {
+    border-radius: 50%;
+}
+
+
+
 
 #scrollControlPanel {
     float: left;
@@ -284,10 +340,10 @@ h1, h2, h3, h4, h5, h6 {
     width: 40px;
 }
 
-#searchByTag {
-    width: 150px;
+#searchByStatusCode {
+    width: 120px;
     float: left;
-    margin-left: 30px;
+    margin-left: 10px;
     margin-top: -4px;
 }
 
@@ -452,41 +508,115 @@ body {
     left: 105%;
 }
 
+/* header panel */
 
 
 
+.default-hr {
+    border: 0;
+    height: 1px;
+}
 
-.table-row {
-    color: black;
+
+.hr-request {
+    background-image: linear-gradient(to right, rgba(0, 154, 234, 1), rgba(0, 154, 234, 1), rgba(0, 0, 0, 0));
+}
+
+.log-content-border-request {
+    border-top: rgb(0, 154, 234) solid 1px;
+    border-bottom: rgb(0, 154, 234) solid 1px;
+    border-left: rgb(0, 154, 234) solid 1px;
+    margin-top: 20px;
+}
+
+.log-type-secondary-request {
+    color: rgba(0, 154, 234, 0.6);
+}
+
+.primary-color-request {
+    color: rgb(0, 154, 234);
+}
+
+.hr-response {
+    background-image: linear-gradient(to right, rgba(212, 155, 110, 1), rgba(212, 155, 110, 1), rgba(0,0,0, 0));
+}
+
+.log-content-border-response {
+    border-top: rgb(212, 155, 110) solid 1px;
+    border-bottom: rgb(212, 155, 110) solid 1px;
+    border-left: rgb(212, 155, 110) solid 1px;
+    margin-top: 20px;
+}
+
+.log-type-secondary-response {
+    color: rgba(212, 155, 110, 0.6);
+}
+
+.primary-color-response {
+    color: rgb(212, 155, 110);
+}
+
+
+.hr-error-response {
+    background-image: linear-gradient(to right, rgba(192, 62, 73, 255), rgba(192, 62, 73, 255), rgba(0,0,0, 0));
+}
+
+.log-content-border-error-response {
+    border-top: rgb(192, 62, 73) solid 1px;
+    border-bottom: rgb(192, 62, 73) solid 1px;
+    border-left: rgb(192, 62, 73) solid 1px;
+    margin-top: 20px;
+}
+
+.log-type-secondary-error-response {
+    color: rgba(192, 62, 73, 0.6);
+}
+
+.primary-color-error-response {
+    color: rgb(192, 62, 73);
+}
+
+.default-item-space {
+    padding-left: 18px;
+}
+
+.detail-log-item {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-right: 60%;
     cursor: pointer;
 }
 
-.cell {
-    min-width: 100px;
-    border: 1px solid #999999;
-    display: table-cell;
-    padding: 3px 10px;
+.detail-log-item:hover {
+    text-decoration: underline;
 }
 
-.cell.path {
-   width: 100%;
+.log-header-url {
+    text-decoration: none;
 }
 
-.headers-content {
-    width: 60%;
-    text-align: left;
-    border: 1px solid #0e0e0e;
-    vertical-align: top;
+.log-header-url:hover {
+    text-decoration: underline;
+    color: #3875cd;
 }
 
-.base-content {
-    width: 40%;
-    text-align: left;
-    border: 1px solid #0e0e0e;
-    vertical-align: top;
+.log-header-url-white-style {
+    color: #717171;
 }
 
-.meta-table {
-    width: 100%;
+.log-header-url-dark-style {
+    color: #a8a8a8;
 }
 
+.log-body-url {
+    text-decoration: none;
+    color: #3875cd;
+}
+
+.log-body-url:hover {
+    text-decoration: underline;
+}
+
+.main-query-title {
+    margin-bottom: 7px;
+}

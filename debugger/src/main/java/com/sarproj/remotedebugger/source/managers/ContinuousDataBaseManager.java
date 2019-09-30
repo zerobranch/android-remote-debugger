@@ -4,8 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
-import com.sarproj.remotedebugger.source.models.HttpLogModel;
+import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
 import com.sarproj.remotedebugger.source.models.LogModel;
+import com.sarproj.remotedebugger.source.models.httplog.QueryType;
 import com.sarproj.remotedebugger.source.repository.HttpLogRepository;
 import com.sarproj.remotedebugger.source.repository.LogRepository;
 
@@ -21,7 +25,7 @@ public final class ContinuousDataBaseManager {
 
     private ContinuousDataBaseManager(Context context) {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
-        database = context.openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READWRITE, null);
+        database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
         database.setVersion(Integer.MAX_VALUE);
 
         httpLogRepository = new HttpLogRepository(database);
@@ -61,15 +65,15 @@ public final class ContinuousDataBaseManager {
         }
     }
 
-    public HttpLogModel addHttpLog(HttpLogModel model) {
+    public long addHttpLogRequest(HttpLogRequest logRequest) {
         synchronized (LOCK) {
-            return httpLogRepository.add(model);
+            return httpLogRepository.add(mapToLogModel(logRequest));
         }
     }
 
-    public void updateHttpLog(HttpLogModel model) {
+    public void addHttpLogResponse(HttpLogResponse logResponse) {
         synchronized (LOCK) {
-            httpLogRepository.update(model);
+            httpLogRepository.add(mapToLogModel(logResponse));
         }
     }
 
@@ -97,7 +101,46 @@ public final class ContinuousDataBaseManager {
         }
     }
 
-    public List<HttpLogModel> getHttpLogs(String logsLevel, String logsSearch) {
-        return null;
+    public List<HttpLogModel> getHttpLogs(int offset,
+                                          int limit,
+                                          StatusCodeFilter statusCode,
+                                          boolean isOnlyErrors,
+                                          String search) {
+        return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyErrors, search);
+    }
+
+    private HttpLogModel mapToLogModel(HttpLogResponse httpLogResponse) {
+        HttpLogModel httpLogModel = new HttpLogModel();
+        httpLogModel.queryId = httpLogResponse.queryId;
+        httpLogModel.method = httpLogResponse.method;
+        httpLogModel.time = httpLogResponse.time;
+        httpLogModel.code = httpLogResponse.code;
+        httpLogModel.message = httpLogResponse.message;
+        httpLogModel.duration = httpLogResponse.duration;
+        httpLogModel.bodySize = httpLogResponse.bodySize;
+        httpLogModel.port = httpLogResponse.port;
+        httpLogModel.ip = httpLogResponse.ip;
+        httpLogModel.url = httpLogResponse.url;
+        httpLogModel.errorMessage = httpLogResponse.errorMessage;
+        httpLogModel.body = httpLogResponse.body;
+        httpLogModel.headers = httpLogResponse.headers;
+        httpLogModel.queryType = QueryType.RESPONSE;
+        return httpLogModel;
+    }
+
+    private HttpLogModel mapToLogModel(HttpLogRequest httpLogRequest) {
+        HttpLogModel httpLogModel = new HttpLogModel();
+        httpLogModel.queryId = httpLogRequest.queryId;
+        httpLogModel.method = httpLogRequest.method;
+        httpLogModel.time = httpLogRequest.time;
+        httpLogModel.requestContentType = httpLogRequest.requestContentType;
+        httpLogModel.bodySize = httpLogRequest.bodySize;
+        httpLogModel.port = httpLogRequest.port;
+        httpLogModel.ip = httpLogRequest.ip;
+        httpLogModel.url = httpLogRequest.url;
+        httpLogModel.body = httpLogRequest.body;
+        httpLogModel.headers = httpLogRequest.headers;
+        httpLogModel.queryType = QueryType.REQUEST;
+        return httpLogModel;
     }
 }

@@ -65,7 +65,7 @@ public class SharedPrefsApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String data = getValue(params, HtmlParams.DATA);
+        final String data = getStringValue(params, HtmlParams.DATA);
         final List<String> keys = deserialize(data, new TypeToken<List<String>>(){}.getType());
         getSharedPrefsAccess().removeItems(keys);
 
@@ -77,7 +77,7 @@ public class SharedPrefsApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String data = getValue(params, HtmlParams.DATA);
+        final String data = getStringValue(params, HtmlParams.DATA);
         final SharedPrefsData prefsData = deserialize(data, SharedPrefsData.class);
         final SharedPrefsManager manager = getSharedPrefsAccess();
 
@@ -111,7 +111,7 @@ public class SharedPrefsApi extends Api {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
-        final String name = getValue(params, HtmlParams.NAME);
+        final String name = getStringValue(params, HtmlParams.NAME);
         getSharedPrefsAccess().dropSharedPreferences(name);
         return EMPTY;
     }
@@ -133,7 +133,7 @@ public class SharedPrefsApi extends Api {
         }
 
         final List<SharedPrefsData> sharedPrefsDataList = new ArrayList<>();
-        final String name = getValue(params, HtmlParams.NAME);
+        final String name = getStringValue(params, HtmlParams.NAME);
         SharedPrefsManager.connect(context, name);
         final Map<String, ?> allData = getSharedPrefsAccess().getAllData();
 
@@ -177,7 +177,7 @@ public class SharedPrefsApi extends Api {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        final String settingsJson = getValue(params, HtmlParams.DATA);
+        final String settingsJson = getStringValue(params, HtmlParams.DATA);
         final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
 
         if (settings.sharedPreferencesFont == null) {
