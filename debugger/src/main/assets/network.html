@@ -267,9 +267,9 @@
                     let tr = document.createElement("tr");
 
                     if (isDarkTheme) {
-                        tr.className = "darkLogItem";
+                        tr.className = "table-log-line table-log-line-dark-style";
                     } else {
-                        tr.className = "whiteLogItem";
+                        tr.className = "table-log-line table-log-line-white-style";
                     }
 
                     tr.appendChild(timeTd(logLine.time));
@@ -328,6 +328,8 @@
 
         requestRootTd.style.fontSize = currentContentFont + "pt";
 
+        requestHeaderP.className = "main-query-title";
+
         if (isDarkTheme) {
             requestRootTd.className = "log-item log-item-dark-style";
         } else {
@@ -361,7 +363,6 @@
         requestHeaderP.appendChild(requestCenterHeaderSpan);
         requestHeaderP.appendChild(requestRightHeaderSpan);
         requestInfoDiv.appendChild(requestHeaderP);
-        requestInfoDiv.appendChild(document.createElement("br"));
 
         let urlP = document.createElement("p");
         let urlSpan = document.createElement("span");
@@ -374,9 +375,9 @@
         urlP.appendChild(urlA);
 
         if (isDarkTheme) {
-            urlA.className = "default-url default-url-dark-style";
+            urlA.className = "default-url log-content-url default-url-dark-style";
         } else {
-            urlA.className = "default-url default-url-white-style";
+            urlA.className = "default-url log-content-url default-url-white-style";
         }
 
         requestInfoDiv.appendChild(urlP);
@@ -760,6 +761,39 @@
     function changeTheme(isDark) {
         isDarkTheme = isDark;
 
+        let logLine = getElementsByClassName("table-log-line");
+        for (let i = 0; i < logLine.length; i++) {
+            if (isDarkTheme) {
+                logLine[i].classList.remove("table-log-line-white-style");
+                logLine[i].classList.add("table-log-line-dark-style");
+            } else {
+                logLine[i].classList.remove("table-log-line-dark-style");
+                logLine[i].classList.add("table-log-line-white-style");
+            }
+        }
+
+        let logContentUrls = getElementsByClassName("log-content-url");
+        for (let i = 0; i < logContentUrls.length; i++) {
+            if (isDarkTheme) {
+                logContentUrls[i].classList.remove("default-url-white-style");
+                logContentUrls[i].classList.add("default-url-dark-style");
+            } else {
+                logContentUrls[i].classList.remove("default-url-dark-style");
+                logContentUrls[i].classList.add("default-url-white-style");
+            }
+        }
+
+        let logItems = getElementsByClassName("log-item");
+        for (let i = 0; i < logItems.length; i++) {
+            if (isDarkTheme) {
+                logItems[i].classList.remove("log-item-white-style");
+                logItems[i].classList.add("log-item-dark-style");
+            } else {
+                logItems[i].classList.remove("log-item-dark-style");
+                logItems[i].classList.add("log-item-white-style");
+            }
+        }
+
         if (isDarkTheme) {
             showElement(lightTheme);
             hideElement(darkTheme);
@@ -768,23 +802,12 @@
             errorContent.classList.remove("error-content-white-style");
             errorContent.classList.add("error-content-dark-style");
 
-            closeErrorContent.classList.remove("close-error-content-white-style");
-            closeErrorContent.classList.add("close-error-content-dark-style");
+            // todo тут почему то closeErrorContent не указан в переменных (и в логировании тоже)
+            // closeErrorContent.classList.remove("close-error-content-white-style");
+            // closeErrorContent.classList.add("close-error-content-dark-style");
 
             copyErrorContent.classList.remove("copy-error-content-white-style");
             copyErrorContent.classList.add("copy-error-content-dark-style");
-
-            let logItems = getElementsByClassName("log-item");
-            for (let i = 0; i < logItems.length; i++) {
-                logItems[i].classList.remove("log-item-white-style");
-                logItems[i].classList.add("log-item-dark-style");
-            }
-
-            let copyImages = getElementsByClassName("copy-img");
-            for (let i = 0; i < copyImages.length; i++) {
-                copyImages[i].classList.remove("copy-img-white-style");
-                copyImages[i].classList.add("copy-img-dark-style");
-            }
         } else {
             hideElement(lightTheme);
             showElement(darkTheme);
@@ -793,23 +816,12 @@
             errorContent.classList.remove("error-content-dark-style");
             errorContent.classList.add("error-content-white-style");
 
-            closeErrorContent.classList.remove("close-error-content-dark-style");
-            closeErrorContent.classList.add("close-error-content-white-style");
+            // todo тут почему то closeErrorContent не указан в переменных (и в логировании тоже)
+            // closeErrorContent.classList.remove("close-error-content-dark-style");
+            // closeErrorContent.classList.add("close-error-content-white-style");
 
             copyErrorContent.classList.remove("copy-error-content-dark-style");
             copyErrorContent.classList.add("copy-error-content-white-style");
-
-            let logItems = getElementsByClassName("log-item");
-            for (let i = 0; i < logItems.length; i++) {
-                logItems[i].classList.remove("log-item-dark-style");
-                logItems[i].classList.add("log-item-white-style");
-            }
-
-            let copyImages = getElementsByClassName("copy-img");
-            for (let i = 0; i < copyImages.length; i++) {
-                copyImages[i].classList.remove("copy-img-dark-style");
-                copyImages[i].classList.add("copy-img-white-style");
-            }
         }
     }
 
@@ -919,51 +931,6 @@
     //         }
     //     }
     // }
-
-    function setLogLineColor(logLevel, tr) {
-        if (isDiscolorActive) {
-            switch (logLevel) {
-                case 'ERROR':
-                    tr.className = "error";
-                    break;
-                case 'FATAL':
-                    tr.className = "fatal";
-                    break;
-                default:
-                    if (isDarkTheme) {
-                        tr.className = "darkVerbose";
-                    } else {
-                        tr.className = "verbose";
-                    }
-                    break;
-            }
-        } else {
-            switch (logLevel) {
-                case 'INFO':
-                    tr.className = "info";
-                    break;
-                case 'WARN':
-                    tr.className = "warn";
-                    break;
-                case 'DEBUG':
-                    tr.className = "debug";
-                    break;
-                case 'ERROR':
-                    tr.className = "error";
-                    break;
-                case 'FATAL':
-                    tr.className = "fatal";
-                    break;
-                case 'VERBOSE':
-                    if (isDarkTheme) {
-                        tr.className = "darkVerbose";
-                    } else {
-                        tr.className = "verbose";
-                    }
-                    break;
-            }
-        }
-    }
 
     function scrollToBottom() {
         logContent.scrollTo(0, logTable.scrollHeight);

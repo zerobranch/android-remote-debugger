@@ -100,11 +100,11 @@ h1, h2, h3, h4, h5, h6 {
     overflow-y: scroll;
 }
 
-tr.whiteLogItem {
+tr.table-log-line-white-style {
     color: #717171;
 }
 
-tr.darkLogItem {
+tr.table-log-line-dark-style {
     color: #a8a8a8;
 }
 
@@ -615,4 +615,8 @@ body {
 
 .body-url:hover {
     text-decoration: underline;
+}
+
+.main-query-title {
+    margin-bottom: 7px;
 }
