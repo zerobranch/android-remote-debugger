@@ -116,11 +116,6 @@
                 </svg>
             </div>
         </div>
-
-        <!--         todo это наверное лишнее -->
-        <div class="dropdown-content" id="filterDropdownContent">
-        </div>
-
     </div>
 </div>
 
@@ -153,8 +148,6 @@
     const DARK_THEME = "DARK";
     const LIGHT_THEME = "LIGHT";
     const CONNECTION_LOST_MESSAGE = "Connection lost!";
-    const CTRL_KEYCODE = 17;
-    const COMMAND_KEYCODE = 91;
 
     let logsOffset = -1;
     let statusCode = null;
@@ -164,11 +157,10 @@
     let logRequestLock = false;
     let timeoutHandle;
     let isFollowLogs = false;
-    let isDarkTheme = true; // todo удалить
+    let isDarkTheme = true;
 
     let currentContentFont = DEFAULT_FONT_SIZE;
     let isConnectionLost = false;
-    let globalKeyPressed = null;
 
     let logTable = getElementById("logTable");
     let changeContentFont = getElementById("changeContentFont");
@@ -177,7 +169,6 @@
     let logContent = getElementById("logContent");
     let connectionStatus = getElementById("connectionStatus");
     let loader = getElementById("loader");
-    let filterDropdownContent = getElementById("filterDropdownContent");
     let errorContent = getElementById('errorContent');
     let errorText = getElementById('errorText');
     let rightHeader = getElementById('rightHeader');
@@ -190,20 +181,10 @@
     window.onload = function () {
         loadLogs();
         loadDefaultsSetting();
-        // onPageResize();
-
-        window.addEventListener("keyup", onGlobalKeyUp);
-        window.addEventListener("keydown", onGlobalKeyDown);
+        onPageResize();
     };
 
-    window.onclick = function (e) {
-        if (!e.target.matches('.dropdown-btn')) {
-            if (filterDropdownContent.classList.contains('show')) {
-                filterDropdownContent.classList.remove('show');
-            }
-        }
-    };
-
+    // region Ui events
     function onErrorSwitchChange(item) {
         isOnlyError = item.checked;
         logsOffset = -1;
@@ -212,6 +193,114 @@
         loadLogs();
     }
 
+    function onErrorTextClick() {
+        copyToClipboard(errorText.innerHTML);
+        visibleElement(errorTextCopied);
+
+        let tooltipTimeout = setTimeout(function () {
+            clearInterval(tooltipTimeout);
+            invisibleElement(errorTextCopied);
+        }, 800);
+    }
+
+    function onPageResize() {
+        if (rightHeader.offsetTop > headerRightDefaultY + 18) {
+            header.style.height = "130px";
+            logContent.style.top = "131px";
+            rightHeader.style.marginTop = "18px";
+        } else {
+            header.style.height = "80px";
+            logContent.style.top = "81px";
+            rightHeader.style.marginTop = "0px";
+        }
+    }
+
+    function onFollowClick(svgElement) {
+        isFollowLogs = !isFollowLogs;
+
+        if (isFollowLogs) {
+            svgElement.style.fill = '#ffb600';
+            scrollToBottom();
+        } else {
+            svgElement.style.fill = '#c9c9c9';
+        }
+    }
+
+    function onGoTopClick() {
+        scrollToTop();
+    }
+
+    function onGoBottomClick() {
+        scrollToBottom();
+    }
+
+    function onChangeFont(item) {
+        if (isNumeric(item.value)) {
+            currentContentFont = item.value;
+            setContentFont(currentContentFont);
+            saveDefaultsSetting();
+        }
+    }
+
+    function onSearchLogs(search) {
+        logsOffset = -1;
+        searchText = search.value;
+
+        clearTimeoutHandle();
+        loadLogs();
+    }
+
+    function onClearAllClick() {
+        clearTimeoutHandle();
+
+        clearContent(logTable);
+        logsOffset = -1;
+
+        let body = 'clearAllLogs=' + encodeURIComponent('');
+        httpPost('network', body, function () {
+            loadLogs();
+        }, function (status, statusText, responseText) {
+            failedConnection(status, statusText, responseText);
+        });
+    }
+
+    function onDownloadLogs() {
+        let time, level, tag, text, i, fileName, totalText = "";
+        let tr = logTable.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            time = tr[i].getElementsByTagName("td")[1].innerText;
+            level = tr[i].getElementsByTagName("td")[2].innerText;
+            tag = tr[i].getElementsByTagName("td")[3].innerText;
+            text = tr[i].getElementsByTagName("td")[4].innerText;
+            totalText += time + ' \t' + level + '\t\t' + tag + '\t\t' + text;
+        }
+
+        fileName = getCurrentTime() + '.txt';
+        download(totalText, fileName, 'text/plain');
+    }
+
+    function onChangeThemeClick(isDark) {
+        changeTheme(isDark);
+        saveDefaultsSetting();
+    }
+
+    function onSearchByStatusCode(statusCodeInput) {
+        statusCode = statusCodeInput.value;
+        logsOffset = -1;
+
+        clearTimeoutHandle();
+        loadLogs();
+    }
+
+    function onCloseErrorContentClick() {
+        clearContent(errorText);
+        hideElement(errorContent);
+    }
+
+    // endregion
+
+    // region Log loading
     function loadLogs() {
         if (isConnectionLost) {
             // loadOfflineLogs();
@@ -254,11 +343,6 @@
                 } else {
                     logsOffset += parsedLogs.length;
                 }
-
-                console.log(parsedLogs);
-
-                // todo удалить console.log и все TODO
-                // todo setLogLineColor(logLine.level, tr);
 
                 let tbody = document.createElement("tbody");
                 logTable.appendChild(tbody);
@@ -311,11 +395,6 @@
         } else if (isResponse(logLine)) {
             item.className = "primary-color-response";
         }
-    }
-
-    function setBodyLinkable(inputText) {
-        let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-        return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
     }
 
     function bodyTd(logLine) {
@@ -583,111 +662,6 @@
         timeTd.appendChild(timeText);
         return timeTd;
     }
-
-    function onGlobalKeyUp() {
-        globalKeyPressed = null;
-    }
-
-    function onGlobalKeyDown(event) {
-        globalKeyPressed = event.keyCode;
-    }
-
-    // region Ui events
-    function onPageResize() {
-        if (rightHeader.offsetTop > headerRightDefaultY + 18) {
-            header.style.height = "130px";
-            logContent.style.top = "131px";
-            rightHeader.style.marginTop = "18px";
-        } else {
-            header.style.height = "80px";
-            logContent.style.top = "81px";
-            rightHeader.style.marginTop = "0px";
-        }
-    }
-
-    function onFollowClick(svgElement) {
-        isFollowLogs = !isFollowLogs;
-
-        if (isFollowLogs) {
-            svgElement.style.fill = '#ffb600';
-            scrollToBottom();
-        } else {
-            svgElement.style.fill = '#c9c9c9';
-        }
-    }
-
-    function onGoTopClick() {
-        scrollToTop();
-    }
-
-    function onGoBottomClick() {
-        scrollToBottom();
-    }
-
-    function onChangeFont(item) {
-        if (isNumeric(item.value)) {
-            currentContentFont = item.value;
-            setContentFont(currentContentFont);
-            saveDefaultsSetting();
-        }
-    }
-
-    function onSearchLogs(search) {
-        logsOffset = -1;
-        searchText = search.value;
-
-        clearTimeoutHandle();
-        loadLogs();
-    }
-
-    function onClearAllClick() {
-        clearTimeoutHandle();
-
-        clearContent(logTable);
-        logsOffset = -1;
-
-        let body = 'clearAllLogs=' + encodeURIComponent('');
-        httpPost('network', body, function () {
-            loadLogs();
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
-    }
-
-    function onDownloadLogs() {
-        let time, level, tag, text, i, fileName, totalText = "";
-        let tr = logTable.getElementsByTagName("tr");
-
-        for (i = 0; i < tr.length; i++) {
-            time = tr[i].getElementsByTagName("td")[1].innerText;
-            level = tr[i].getElementsByTagName("td")[2].innerText;
-            tag = tr[i].getElementsByTagName("td")[3].innerText;
-            text = tr[i].getElementsByTagName("td")[4].innerText;
-            totalText += time + ' \t' + level + '\t\t' + tag + '\t\t' + text;
-        }
-
-        fileName = getCurrentTime() + '.txt';
-        download(totalText, fileName, 'text/plain');
-    }
-
-    function onChangeThemeClick(isDark) {
-        changeTheme(isDark);
-        saveDefaultsSetting();
-    }
-
-    function onSearchByStatusCode(statusCodeInput) {
-        statusCode = statusCodeInput.value;
-        logsOffset = -1;
-
-        clearTimeoutHandle();
-        loadLogs();
-    }
-
-    function onCloseErrorContentClick() {
-        clearContent(errorText);
-        hideElement(errorContent);
-    }
-
     // endregion
 
     function loadDefaultsSetting() {
@@ -706,35 +680,6 @@
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
         });
-    }
-
-    function getCurrentTime() {
-        let currentDate = new Date();
-        return currentDate.getDate() + "."
-            + (currentDate.getMonth() + 1) + "."
-            + currentDate.getFullYear() + " @ "
-            + currentDate.getHours() + "."
-            + currentDate.getMinutes() + "."
-            + currentDate.getSeconds() + "."
-            + currentDate.getUTCMilliseconds() + ".";
-    }
-
-    function download(data, filename, type) {
-        let file = new Blob([data], {type: type});
-        if (window.navigator.msSaveOrOpenBlob) // IE10+
-            window.navigator.msSaveOrOpenBlob(file, filename);
-        else { // Others
-            let a = document.createElement("a"),
-                url = URL.createObjectURL(file);
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(function () {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 0);
-        }
     }
 
     function saveDefaultsSetting() {
@@ -864,6 +809,62 @@
         }
     }
 
+    // function loadOfflineLogs() {
+    //     let logsLevelTd, logsTagTd, logsSearchTextTd, i;
+    //     let tr = logTable.getElementsByTagName("tr");
+    //
+    //     for (i = 0; i < tr.length; i++) {
+    //         logsLevelTd = tr[i].getElementsByTagName("td")[2];
+    //         logsTagTd = tr[i].getElementsByTagName("td")[3];
+    //         logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
+    //
+    //         let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
+    //         let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
+    //         let searchTextCheck = searchText == null || searchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
+    //
+    //         if (levelCheck && tagCheck && searchTextCheck) {
+    //             showElement(tr[i]);
+    //         } else {
+    //             hideElement(tr[i]);
+    //         }
+    //     }
+    // }
+
+    // region Utils
+    function getCurrentTime() {
+        let currentDate = new Date();
+        return currentDate.getDate() + "."
+            + (currentDate.getMonth() + 1) + "."
+            + currentDate.getFullYear() + " @ "
+            + currentDate.getHours() + "."
+            + currentDate.getMinutes() + "."
+            + currentDate.getSeconds() + "."
+            + currentDate.getUTCMilliseconds() + ".";
+    }
+
+    function download(data, filename, type) {
+        let file = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else { // Others
+            let a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    }
+
+    function setBodyLinkable(inputText) {
+        let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+        return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
+    }
+
     function getFormattedTime(timestamp) {
         let logDate = new Date(timestamp);
         return zeroPad(logDate.getHours())
@@ -875,16 +876,6 @@
     function zeroPad(num) {
         const zero = 2 - num.toString().length + 1;
         return Array(+(zero > 0 && zero)).join("0") + num;
-    }
-
-    function onErrorTextClick() {
-        copyToClipboard(errorText.innerHTML);
-        visibleElement(errorTextCopied);
-
-        let tooltipTimeout = setTimeout(function () {
-            clearInterval(tooltipTimeout);
-            invisibleElement(errorTextCopied);
-        }, 800);
     }
 
     function copyToClipboard(text) {
@@ -909,27 +900,6 @@
         }
     }
 
-    // function loadOfflineLogs() {
-    //     let logsLevelTd, logsTagTd, logsSearchTextTd, i;
-    //     let tr = logTable.getElementsByTagName("tr");
-    //
-    //     for (i = 0; i < tr.length; i++) {
-    //         logsLevelTd = tr[i].getElementsByTagName("td")[2];
-    //         logsTagTd = tr[i].getElementsByTagName("td")[3];
-    //         logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
-    //
-    //         let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
-    //         let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
-    //         let searchTextCheck = searchText == null || searchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
-    //
-    //         if (levelCheck && tagCheck && searchTextCheck) {
-    //             showElement(tr[i]);
-    //         } else {
-    //             hideElement(tr[i]);
-    //         }
-    //     }
-    // }
-
     function scrollToBottom() {
         logContent.scrollTo(0, logTable.scrollHeight);
     }
@@ -938,7 +908,6 @@
         logContent.scrollTo(0, 0);
     }
 
-    // region Utils
     function clearContent(element) {
         element.innerHTML = '';
     }
