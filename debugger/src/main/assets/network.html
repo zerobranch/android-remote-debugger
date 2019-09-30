@@ -184,7 +184,7 @@
     let header = getElementById('header');
     let copyErrorContent = getElementById('copyErrorContent');
     let errorTextCopied = getElementById('errorTextCopied');
-    let searchByStatusCode = getElementById('searchByStatusCode');
+    let closeErrorContent = getElementById('closeErrorContent');
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
@@ -802,9 +802,8 @@
             errorContent.classList.remove("error-content-white-style");
             errorContent.classList.add("error-content-dark-style");
 
-            // todo тут почему то closeErrorContent не указан в переменных (и в логировании тоже)
-            // closeErrorContent.classList.remove("close-error-content-white-style");
-            // closeErrorContent.classList.add("close-error-content-dark-style");
+            closeErrorContent.classList.remove("close-error-content-white-style");
+            closeErrorContent.classList.add("close-error-content-dark-style");
 
             copyErrorContent.classList.remove("copy-error-content-white-style");
             copyErrorContent.classList.add("copy-error-content-dark-style");
@@ -816,9 +815,8 @@
             errorContent.classList.remove("error-content-dark-style");
             errorContent.classList.add("error-content-white-style");
 
-            // todo тут почему то closeErrorContent не указан в переменных (и в логировании тоже)
-            // closeErrorContent.classList.remove("close-error-content-dark-style");
-            // closeErrorContent.classList.add("close-error-content-white-style");
+            closeErrorContent.classList.remove("close-error-content-dark-style");
+            closeErrorContent.classList.add("close-error-content-white-style");
 
             copyErrorContent.classList.remove("copy-error-content-dark-style");
             copyErrorContent.classList.add("copy-error-content-white-style");
