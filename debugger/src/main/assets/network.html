@@ -403,7 +403,7 @@
                     }
 
                     tr.appendChild(timeTd(logLine));
-                    tr.appendChild(queryNumberTd(logLine));
+                    tr.appendChild(queryIdTd(logLine));
                     tr.appendChild(bodyTd(logLine));
 
                     tbody.appendChild(tr);
@@ -692,9 +692,9 @@
         return requestRootTd;
     }
 
-    function queryNumberTd(logLine) {
+    function queryIdTd(logLine) {
         let queryNumTd = document.createElement("td");
-        let queryNumText = document.createTextNode("Num: " + logLine.queryId);
+        let queryNumText = document.createTextNode("Id: " + logLine.queryId);
         let queryNumClass = "";
 
         if (isDarkTheme) {

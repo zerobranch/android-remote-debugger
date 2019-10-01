@@ -19,7 +19,7 @@ import fi.iki.elonen.NanoHTTPD;
 
 public final class NetworkApi extends Api {
     private static final int UNLIMITED_OFFSET = -1;
-    private static final int LIMIT_LOGS_PACKS = 1000;
+    private static final int LIMIT_LOGS_PACKS = 500;
 
     public NetworkApi(Context context) {
         super(context);

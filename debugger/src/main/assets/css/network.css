@@ -455,22 +455,22 @@ body {
 
 
 .hr-error-response {
-    background-image: linear-gradient(to right, rgba(192, 62, 73, 255), rgba(192, 62, 73, 255), rgba(0,0,0, 0));
+    background-image: linear-gradient(to right, rgba(207, 31, 38, 255), rgba(207, 31, 38, 255), rgba(0,0,0, 0));
 }
 
 .log-content-border-error-response {
-    border-top: rgb(192, 62, 73) solid 1px;
-    border-bottom: rgb(192, 62, 73) solid 1px;
-    border-left: rgb(192, 62, 73) solid 1px;
+    border-top: rgb(207, 31, 38) solid 1px;
+    border-bottom: rgb(207, 31, 38) solid 1px;
+    border-left: rgb(207, 31, 38) solid 1px;
     margin-top: 20px;
 }
 
 .log-type-secondary-error-response {
-    color: rgba(192, 62, 73, 0.6);
+    color: rgba(207, 31, 38, 0.6);
 }
 
 .primary-color-error-response {
-    color: rgb(192, 62, 73);
+    color: rgb(207, 31, 38);
 }
 
 .default-item-space {
