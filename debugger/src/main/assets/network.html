@@ -265,19 +265,65 @@
     }
 
     function onDownloadLogs() {
-        let time, level, tag, text, i, fileName, totalText = "";
-        let tr = logTable.getElementsByTagName("tr");
+        let time, queryId, body, i, fileName, totalText = "";
+        let tr = logTable.getElementsByClassName("table-log-line");
 
         for (i = 0; i < tr.length; i++) {
-            time = tr[i].getElementsByTagName("td")[1].innerText;
-            level = tr[i].getElementsByTagName("td")[2].innerText;
-            tag = tr[i].getElementsByTagName("td")[3].innerText;
-            text = tr[i].getElementsByTagName("td")[4].innerText;
-            totalText += time + ' \t' + level + '\t\t' + tag + '\t\t' + text;
+            time = tr[i].getElementsByTagName("td")[0].innerText;
+            queryId = tr[i].getElementsByTagName("td")[1].innerText;
+            body = convertBodyToPlainText(tr[i].getElementsByTagName("td")[2]);
+
+            totalText += time + ' \t' + queryId + ' \t' + body + "\n\n\n";
         }
 
         fileName = getCurrentTime() + '.txt';
         download(totalText, fileName, 'text/plain');
+    }
+
+    function convertBodyToPlainText(td) {
+        let body = "";
+        let queryType = "";
+        let queryTypeItem = td.getElementsByClassName("query-type-name")[0];
+
+        if (queryTypeItem) {
+            queryType = queryTypeItem.innerText;
+        }
+
+        let queryDescription = "";
+        let queryDescriptionItem = td.getElementsByClassName("query-description");
+        for (let i = 0; i < queryDescriptionItem.length; i++) {
+            if (queryDescriptionItem[i]) {
+                queryDescription += queryDescriptionItem[i].innerText + "\n";
+            }
+        }
+
+        let queryHeaders = "";
+        let queryHeadersItem = td.getElementsByClassName("query-headers");
+        for (let i = 0; i < queryHeadersItem.length; i++) {
+            if (queryHeadersItem[i]) {
+                queryHeaders += queryHeadersItem[i].innerText + "\n";
+            }
+        }
+
+        let queryBody;
+        let queryBodyItem = td.getElementsByClassName("query-body")[0];
+        if (queryBodyItem) {
+            queryBody = queryBodyItem.innerText;
+        }
+
+
+        body += queryType + "\n";
+        body += queryDescription + "\n";
+
+        if (queryHeaders.length !== 0) {
+            body += "Headers:\n" + queryHeaders + "\n";
+        }
+
+        if (queryBody) {
+            body += "Body:\n" + queryBody;
+        }
+
+        return body;
     }
 
     function onChangeThemeClick(isDark) {
@@ -407,7 +453,7 @@
 
         requestRootTd.style.fontSize = currentContentFont + "pt";
 
-        requestHeaderP.className = "main-query-title";
+        requestHeaderP.className = "main-query-title query-type-name";
 
         if (isDarkTheme) {
             requestRootTd.className = "log-item log-item-dark-style";
@@ -444,6 +490,8 @@
         requestInfoDiv.appendChild(requestHeaderP);
 
         let urlP = document.createElement("p");
+        urlP.className = "query-description";
+
         let urlSpan = document.createElement("span");
         let urlA = document.createElement("a");
         urlA.appendChild(document.createTextNode(logLine.url));
@@ -463,6 +511,8 @@
         setLogItemClassName(logLine, urlSpan);
 
         let methodP = document.createElement("p");
+        methodP.className = "query-description";
+
         let methodSpan = document.createElement("span");
         methodSpan.appendChild(document.createTextNode("Method: "));
         methodP.appendChild(methodSpan);
@@ -472,6 +522,8 @@
 
         if (logLine.ip) {
             let ipP = document.createElement("p");
+            ipP.className = "query-description";
+
             let ipSpan = document.createElement("span");
             ipSpan.appendChild(document.createTextNode("Remote Address: "));
             ipP.appendChild(ipSpan);
@@ -482,6 +534,8 @@
 
         if (isRequest(logLine) && logLine.requestContentType) {
             let contentTypeP = document.createElement("p");
+            contentTypeP.className = "query-description";
+
             let contentTypeSpan = document.createElement("span");
             contentTypeSpan.className = "primary-color-request";
             contentTypeSpan.appendChild(document.createTextNode("Content-Type: "));
@@ -492,6 +546,8 @@
 
         if (isResponse(logLine) && logLine.code) {
             let statusP = document.createElement("p");
+            statusP.className = "query-description";
+
             let statusSpan = document.createElement("span");
             statusSpan.appendChild(document.createTextNode("Status: "));
             statusP.appendChild(statusSpan);
@@ -507,6 +563,8 @@
 
         if (isResponse(logLine) && logLine.duration) {
             let durationP = document.createElement("p");
+            durationP.className = "query-description";
+
             let durationSpan = document.createElement("span");
             durationSpan.appendChild(document.createTextNode("Duration: "));
             durationP.appendChild(durationSpan);
@@ -517,6 +575,8 @@
 
         if (logLine.bodySize && logLine.bodySize !== 0 && logLine.bodySize !== -1) {
             let bodySizeP = document.createElement("p");
+            bodySizeP.className = "query-description";
+
             let bodySizeSpan = document.createElement("span");
             bodySizeSpan.appendChild(document.createTextNode("Body size: "));
             bodySizeP.appendChild(bodySizeSpan);
@@ -527,6 +587,8 @@
 
         if (isErrorResponse(logLine) && logLine.errorMessage) {
             let errorMessageP = document.createElement("p");
+            errorMessageP.className = "query-description";
+
             let errorMessageSpan = document.createElement("span");
             errorMessageSpan.className = "primary-color-error-response";
             errorMessageSpan.appendChild(document.createTextNode("Error message: " + logLine.errorMessage));
@@ -580,7 +642,7 @@
 
                 for (let header in logLine.headers) {
                     let headerP = document.createElement("p");
-                    headerP.className = "default-item-space";
+                    headerP.className = "default-item-space query-headers";
                     headerP.appendChild(document.createTextNode(header + ": " + logLine.headers[header]));
                     requestBodyDiv.appendChild(headerP);
                 }
@@ -611,7 +673,7 @@
 
                 let bodyPre = document.createElement("pre");
                 bodyPre.innerHTML = setBodyLinkable(logLine.body);
-                bodyPre.className = "default-item-space";
+                bodyPre.className = "default-item-space query-body";
 
                 requestBodyDiv.appendChild(document.createElement("br"));
                 requestBodyDiv.appendChild(bodyP);
