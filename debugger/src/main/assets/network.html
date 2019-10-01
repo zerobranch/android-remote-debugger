@@ -905,63 +905,9 @@
         let newLogsLines = [];
 
         logsLines.forEach(function (log) {
-            let searchTextCheck = searchText == null || searchText === ""
-                || (log.code && log.message && (log.code + " " + log.message).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.duration && (log.duration + " ms").toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.body && log.body.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.bodySize && (log.bodySize + " byte").toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.ip && log.port && (log.ip + ":" + log.port).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.method && log.method.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.queryId && ("id: " + log.queryId).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.requestContentType && log.requestContentType.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.url && log.url.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || (log.errorMessage && log.errorMessage.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-                || getFormattedTime(new Date(log.time)).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
-
-            if (!searchTextCheck && log.headers) {
-                for (let header in log.headers) {
-                    searchTextCheck |= (header + ": " + log.headers[header]).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
-                }
-            }
-
-            let statusCodeCheck = statusCode == null || statusCode === "";
-            if (!statusCodeCheck && statusCode != null && statusCode !== "") {
-                let minStatusCode, maxStatusCode;
-                let splitText = statusCode.split(/[ ,-]/);
-
-                for (let i = 0; i < splitText.length; i++) {
-                    if (!isNumeric(splitText[i])) {
-                        continue;
-                    }
-
-                    if (!minStatusCode) {
-                        minStatusCode = parseInt(splitText[i], 10);
-                    } else if (!maxStatusCode) {
-                        maxStatusCode = parseInt(splitText[i], 10);
-                    } else {
-                        break;
-                    }
-                }
-
-                if (minStatusCode && !maxStatusCode) {
-                    maxStatusCode = minStatusCode;
-                }
-
-                if (minStatusCode && maxStatusCode) {
-                    statusCodeCheck = (log.code && log.code >= minStatusCode && log.code <= maxStatusCode);
-                }
-            }
-
-            let onlyErrorCheck = !isOnlyError;
-            if (!onlyErrorCheck) {
-                if (log.code) {
-                    onlyErrorCheck = (log.code >= 400 && log.code <= 599);
-                }
-
-                if (log.errorMessage) {
-                    onlyErrorCheck = true;
-                }
-            }
+            let searchTextCheck = isSearchByText(log);
+            let statusCodeCheck = isSearchByStatusCode(log);
+            let onlyErrorCheck = isSearchByError(log);
 
             if (searchTextCheck) {
                 if (isOnlyError) {
@@ -977,6 +923,74 @@
         });
 
         buildLogsContent(newLogsLines, false);
+    }
+
+    function isSearchByText(log) {
+        let searchTextCheck = searchText == null || searchText === ""
+            || (log.code && log.message && (log.code + " " + log.message).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.duration && (log.duration + " ms").toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.body && log.body.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.bodySize && (log.bodySize + " byte").toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.ip && log.port && (log.ip + ":" + log.port).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.method && log.method.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.queryId && ("id: " + log.queryId).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.requestContentType && log.requestContentType.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.url && log.url.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.errorMessage && log.errorMessage.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || getFormattedTime(new Date(log.time)).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
+
+        if (!searchTextCheck && log.headers) {
+            for (let header in log.headers) {
+                searchTextCheck |= (header + ": " + log.headers[header]).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
+            }
+        }
+
+        return searchTextCheck;
+    }
+
+    function isSearchByStatusCode(log) {
+        let statusCodeCheck = statusCode == null || statusCode === "";
+        if (!statusCodeCheck && statusCode != null && statusCode !== "") {
+            let minStatusCode, maxStatusCode;
+            let splitText = statusCode.split(/[ ,-]/);
+
+            for (let i = 0; i < splitText.length; i++) {
+                if (!isNumeric(splitText[i])) {
+                    continue;
+                }
+
+                if (!minStatusCode) {
+                    minStatusCode = parseInt(splitText[i], 10);
+                } else if (!maxStatusCode) {
+                    maxStatusCode = parseInt(splitText[i], 10);
+                } else {
+                    break;
+                }
+            }
+
+            if (minStatusCode && !maxStatusCode) {
+                maxStatusCode = minStatusCode;
+            }
+
+            if (minStatusCode && maxStatusCode) {
+                statusCodeCheck = (log.code && log.code >= minStatusCode && log.code <= maxStatusCode);
+            }
+        }
+        return statusCodeCheck;
+    }
+
+    function isSearchByError(log) {
+        let onlyErrorCheck = !isOnlyError;
+        if (!onlyErrorCheck) {
+            if (log.code) {
+                onlyErrorCheck = (log.code >= 400 && log.code <= 599);
+            }
+
+            if (log.errorMessage) {
+                onlyErrorCheck = true;
+            }
+        }
+        return onlyErrorCheck;
     }
 
     // region Utils
