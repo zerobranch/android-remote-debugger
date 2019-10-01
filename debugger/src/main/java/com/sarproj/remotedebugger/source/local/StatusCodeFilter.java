@@ -11,9 +11,9 @@ public class StatusCodeFilter {
             return;
         }
 
-        String[] splitted = rawStatusCodeFilter.split("[ ,\\-]");
+        String[] splitData = rawStatusCodeFilter.split("[ ,\\-]");
 
-        for (String item: splitted) {
+        for (String item : splitData) {
             try {
                 if (minStatusCode == -1) {
                     minStatusCode = Integer.parseInt(item);

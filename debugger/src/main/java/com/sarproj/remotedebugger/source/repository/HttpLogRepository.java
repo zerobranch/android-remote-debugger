@@ -85,6 +85,7 @@ public class HttpLogRepository {
 
         if (isOnlyErrors) {
             conditionBuilder
+                    .append("(")
                     .append(NetLogTable.ERROR_MESSAGE)
                     .append(" is not null ")
                     .append(" or ")
@@ -93,7 +94,8 @@ public class HttpLogRepository {
                     .append(" >= 400 ")
                     .append(" and ")
                     .append(NetLogTable.CODE)
-                    .append(" <= 599)");
+                    .append(" <= 599)")
+                    .append(")");
         } else if (statusCodeFilter != null && statusCodeFilter.isExistCondition()) {
             conditionBuilder
                     .append("(")
