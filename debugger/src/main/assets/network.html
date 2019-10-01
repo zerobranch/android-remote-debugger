@@ -703,8 +703,12 @@
             queryNumClass = "log-item log-item-white-style";
         }
 
-        if (isErrorResponse(logLine)) {
+        if (isRequest(logLine)) {
+            queryNumClass += " primary-color-request";
+        } else if (isErrorResponse(logLine)) {
             queryNumClass += " primary-color-error-response";
+        } else if (isResponse(logLine)) {
+            queryNumClass += " primary-color-response";
         }
 
         queryNumTd.setAttribute("class", queryNumClass);
@@ -725,8 +729,12 @@
             timeClass = "log-item log-item-white-style";
         }
 
-        if (isErrorResponse(logLine)) {
+        if (isRequest(logLine)) {
+            timeClass += " primary-color-request";
+        } else if (isErrorResponse(logLine)) {
             timeClass += " primary-color-error-response";
+        } else if (isResponse(logLine)) {
+            timeClass += " primary-color-response";
         }
 
         timeTd.setAttribute("class", timeClass);
