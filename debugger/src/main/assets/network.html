@@ -402,8 +402,8 @@
                         tr.className = "table-log-line table-log-line-white-style";
                     }
 
-                    tr.appendChild(timeTd(logLine.time));
-                    tr.appendChild(queryNumberTd(logLine.queryId));
+                    tr.appendChild(timeTd(logLine));
+                    tr.appendChild(queryNumberTd(logLine));
                     tr.appendChild(bodyTd(logLine));
 
                     tbody.appendChild(tr);
@@ -692,35 +692,45 @@
         return requestRootTd;
     }
 
-    function queryNumberTd(queryId) {
+    function queryNumberTd(logLine) {
         let queryNumTd = document.createElement("td");
-        let queryNumText = document.createTextNode("Num: " + queryId);
+        let queryNumText = document.createTextNode("Num: " + logLine.queryId);
+        let queryNumClass = "";
 
         if (isDarkTheme) {
-            queryNumTd.setAttribute("class", "log-item log-item-dark-style");
+            queryNumClass = "log-item log-item-dark-style";
         } else {
-            queryNumTd.setAttribute("class", "log-item log-item-white-style");
+            queryNumClass = "log-item log-item-white-style";
         }
 
-        queryNumTd.style.fontSize = currentContentFont + "pt";
+        if (isErrorResponse(logLine)) {
+            queryNumClass += " primary-color-error-response";
+        }
 
+        queryNumTd.setAttribute("class", queryNumClass);
+        queryNumTd.style.fontSize = currentContentFont + "pt";
         queryNumTd.appendChild(queryNumText);
         return queryNumTd;
     }
 
-    function timeTd(time) {
-        let currentTime = getFormattedTime(new Date(time));
+    function timeTd(logLine) {
+        let currentTime = getFormattedTime(new Date(logLine.time));
         let timeTd = document.createElement("td");
         let timeText = document.createTextNode(currentTime);
+        let timeClass = "";
 
         if (isDarkTheme) {
-            timeTd.setAttribute("class", "log-item log-item-dark-style");
+            timeClass = "log-item log-item-dark-style";
         } else {
-            timeTd.setAttribute("class", "log-item log-item-white-style");
+            timeClass = "log-item log-item-white-style";
         }
 
-        timeTd.style.fontSize = currentContentFont + "pt";
+        if (isErrorResponse(logLine)) {
+            timeClass += " primary-color-error-response";
+        }
 
+        timeTd.setAttribute("class", timeClass);
+        timeTd.style.fontSize = currentContentFont + "pt";
         timeTd.appendChild(timeText);
         return timeTd;
     }
