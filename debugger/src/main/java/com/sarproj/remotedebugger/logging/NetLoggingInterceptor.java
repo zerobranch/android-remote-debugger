@@ -43,7 +43,6 @@ public class NetLoggingInterceptor implements Interceptor {
 
         logRequest.method = request.method();
         logRequest.url = request.url().toString();
-
         logRequest.port = String.valueOf(request.url().port());
 
         Headers headers = request.headers();
@@ -90,6 +89,7 @@ public class NetLoggingInterceptor implements Interceptor {
             logRequest.id = getDataBase().addHttpLogRequest(logRequest);
         }
 
+        logResponse.time = System.currentTimeMillis();
         logResponse.method = logRequest.method;
         logResponse.port = logRequest.port;
         logResponse.ip = logRequest.ip;
