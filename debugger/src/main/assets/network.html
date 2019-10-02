@@ -177,6 +177,7 @@
     let copyErrorContent = getElementById('copyErrorContent');
     let errorTextCopied = getElementById('errorTextCopied');
     let closeErrorContent = getElementById('closeErrorContent');
+    let searchByStatusCode = getElementById('searchByStatusCode');
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
@@ -189,6 +190,14 @@
     function onErrorSwitchChange(item) {
         isOnlyError = item.checked;
         logsOffset = -1;
+
+        if (isOnlyError) {
+            searchByStatusCode.disabled = true;
+            searchByStatusCode.classList.add("disable-input")
+        } else {
+            searchByStatusCode.disabled = false;
+            searchByStatusCode.classList.remove("disable-input");
+        }
 
         clearTimeoutHandle();
         loadLogs();
