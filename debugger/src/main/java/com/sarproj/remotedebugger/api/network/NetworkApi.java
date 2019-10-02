@@ -17,9 +17,10 @@ import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
 
+import static com.sarproj.remotedebugger.source.local.Constants.LIMIT_HTTP_LOGS_PACKS;
+
 public final class NetworkApi extends Api {
     private static final int UNLIMITED_OFFSET = -1;
-    private static final int LIMIT_LOGS_PACKS = 500;
 
     public NetworkApi(Context context) {
         super(context);
@@ -81,7 +82,8 @@ public final class NetworkApi extends Api {
         boolean isOnlyErrors = getBooleanValue(params, NetworkHtmlKey.IS_ONLY_ERRORS, false);
         String search = getStringValue(params, NetworkHtmlKey.SEARCH);
 
-        return serialize(getDataBase().getHttpLogs(offset, LIMIT_LOGS_PACKS, new StatusCodeFilter(statusCode), isOnlyErrors, search));
+        return serialize(getDataBase().getHttpLogs(offset, LIMIT_HTTP_LOGS_PACKS,
+                new StatusCodeFilter(statusCode), isOnlyErrors, search));
     }
 
     private ContinuousDataBaseManager getDataBase() {

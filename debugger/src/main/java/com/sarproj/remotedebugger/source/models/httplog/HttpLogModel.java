@@ -1,5 +1,7 @@
 package com.sarproj.remotedebugger.source.models.httplog;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class HttpLogModel {
@@ -21,4 +23,29 @@ public class HttpLogModel {
     public String errorMessage;
     public QueryType queryType;
     public List<String> headers;
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "HttpLogModel{" +
+                "id=" + id +
+                ", time='" + time + '\'' +
+                ", queryId='" + queryId + '\'' +
+                ", url='" + url + '\'' +
+                ", method='" + method + '\'' +
+                ", code=" + code +
+                ", fullStatus='" + fullStatus + '\'' +
+                ", message='" + message + '\'' +
+                ", port='" + port + '\'' +
+                ", ip='" + ip + '\'' +
+                ", fullIpAddress='" + fullIpAddress + '\'' +
+                ", requestContentType='" + requestContentType + '\'' +
+                ", duration='" + duration + '\'' +
+                ", bodySize='" + bodySize + '\'' +
+                ", body='" + body + '\'' +
+                ", errorMessage='" + errorMessage + '\'' +
+                ", queryType=" + queryType +
+                ", headers=" + headers +
+                '}';
+    }
 }

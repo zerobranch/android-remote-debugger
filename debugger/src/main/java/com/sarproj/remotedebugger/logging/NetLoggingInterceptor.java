@@ -1,6 +1,8 @@
 package com.sarproj.remotedebugger.logging;
 
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
+import com.sarproj.remotedebugger.source.mapper.HttpLogRequestMapper;
+import com.sarproj.remotedebugger.source.mapper.HttpLogResponseMapper;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
 
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,8 +29,10 @@ import okio.BufferedSource;
 import okio.GzipSource;
 
 public class NetLoggingInterceptor implements Interceptor {
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     private static AtomicInteger queryNumber = new AtomicInteger(0);
+    private final HttpLogRequestMapper requestMapper = new HttpLogRequestMapper();
+    private final HttpLogResponseMapper responseMapper = new HttpLogResponseMapper();
 
     @NotNull
     @Override
@@ -86,7 +91,7 @@ public class NetLoggingInterceptor implements Interceptor {
         } catch (Exception ignored) {
             // ignore
         } finally {
-            logRequest.id = getDataBase().addHttpLogRequest(logRequest);
+            logRequest.id = getDataBase().addHttpLog(requestMapper.map(logRequest));
         }
 
         logResponse.time = System.currentTimeMillis();
@@ -102,7 +107,7 @@ public class NetLoggingInterceptor implements Interceptor {
             response = chain.proceed(request);
         } catch (Exception e) {
             logResponse.errorMessage = e.getMessage();
-            getDataBase().addHttpLogResponse(logResponse);
+            getDataBase().addHttpLog(responseMapper.map(logResponse));
             throw e;
         }
 
@@ -153,7 +158,7 @@ public class NetLoggingInterceptor implements Interceptor {
             }
         }
 
-        getDataBase().addHttpLogResponse(logResponse);
+        getDataBase().addHttpLog(responseMapper.map(logResponse));
 
         return response;
     }

@@ -19,10 +19,11 @@ import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
 
+import static com.sarproj.remotedebugger.source.local.Constants.LIMIT_LOGS_PACKS;
+
 public final class LogApi extends Api {
     private static final int UNLIMITED_OFFSET = -1;
     private static final boolean DEFAULT_LOG_IS_DISCOLOR = false;
-    private static final int LIMIT_LOGS_PACKS = 1000;
 
     public LogApi(Context context) {
         super(context);
