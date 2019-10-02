@@ -546,7 +546,7 @@
             let ipSpan = document.createElement("span");
             ipSpan.appendChild(document.createTextNode("Remote Address: "));
             ipP.appendChild(ipSpan);
-            ipP.appendChild(document.createTextNode(logLine.ip + ":" + logLine.port));
+            ipP.appendChild(document.createTextNode(logLine.fullIpAddress));
             requestInfoDiv.appendChild(ipP);
             setLogItemClassName(logLine, ipSpan);
         }
@@ -570,7 +570,7 @@
             let statusSpan = document.createElement("span");
             statusSpan.appendChild(document.createTextNode("Status: "));
             statusP.appendChild(statusSpan);
-            statusP.appendChild(document.createTextNode(logLine.code + " " + logLine.message));
+            statusP.appendChild(document.createTextNode(logLine.fullStatus));
             requestInfoDiv.appendChild(statusP);
 
             if (isErrorResponse(logLine)) {
@@ -587,7 +587,7 @@
             let durationSpan = document.createElement("span");
             durationSpan.appendChild(document.createTextNode("Duration: "));
             durationP.appendChild(durationSpan);
-            durationP.appendChild(document.createTextNode(logLine.duration + " ms"));
+            durationP.appendChild(document.createTextNode(logLine.duration));
             requestInfoDiv.appendChild(durationP);
             setLogItemClassName(logLine, durationSpan);
         }
@@ -599,7 +599,7 @@
             let bodySizeSpan = document.createElement("span");
             bodySizeSpan.appendChild(document.createTextNode("Body size: "));
             bodySizeP.appendChild(bodySizeSpan);
-            bodySizeP.appendChild(document.createTextNode(logLine.bodySize + " byte"));
+            bodySizeP.appendChild(document.createTextNode(logLine.bodySize));
             requestInfoDiv.appendChild(bodySizeP);
             setLogItemClassName(logLine, bodySizeSpan);
         }
@@ -618,7 +618,7 @@
         requestInfoDiv.appendChild(document.createElement("br"));
         requestRootTd.appendChild(requestInfoDiv);
 
-        if (logLine.headers || logLine.body) {
+        if ((logLine.headers && logLine.headers.length !== 0) || logLine.body) {
             let requestBodyDiv = document.createElement("div");
             hideElement(requestBodyDiv);
 
@@ -647,7 +647,7 @@
             };
             requestRootTd.appendChild(detailSpan);
 
-            if (logLine.headers) {
+            if (logLine.headers && logLine.headers.length !== 0) {
                 let headersP = document.createElement("p");
                 let headersSpan = document.createElement("span");
                 headersSpan.appendChild(document.createTextNode("Headers:"));
@@ -659,10 +659,10 @@
                 requestBodyDiv.appendChild(document.createElement("br"));
                 requestBodyDiv.appendChild(headersP);
 
-                for (let header in logLine.headers) {
+                for (let i = 0; i < logLine.headers.length; i++) {
                     let headerP = document.createElement("p");
                     headerP.className = "default-item-space query-headers";
-                    headerP.appendChild(document.createTextNode(header + ": " + logLine.headers[header]));
+                    headerP.appendChild(document.createTextNode(logLine.headers[i]));
                     requestBodyDiv.appendChild(headerP);
                 }
 
@@ -713,7 +713,7 @@
 
     function queryIdTd(logLine) {
         let queryNumTd = document.createElement("td");
-        let queryNumText = document.createTextNode("id: " + logLine.queryId);
+        let queryNumText = document.createTextNode(logLine.queryId);
         let queryNumClass = "";
 
         if (isDarkTheme) {
@@ -936,21 +936,21 @@
 
     function isSearchByText(log) {
         let searchTextCheck = searchText == null || searchText === ""
-            || (log.code && log.message && (log.code + " " + log.message).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-            || (log.duration && (log.duration + " ms").toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.fullStatus && log.fullStatus.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.duration && log.duration.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.body && log.body.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-            || (log.bodySize && (log.bodySize + " byte").toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-            || (log.ip && log.port && (log.ip + ":" + log.port).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.bodySize && log.bodySize.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.fullIpAddress && log.fullIpAddress.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.method && log.method.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-            || (log.queryId && ("id: " + log.queryId).toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+            || (log.queryId && log.queryId.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.requestContentType && log.requestContentType.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.url && log.url.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.errorMessage && log.errorMessage.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || getFormattedTime(new Date(log.time)).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
 
         if (!searchTextCheck && log.headers) {
-            for (let header in log.headers) {
-                searchTextCheck |= (header + ": " + log.headers[header]).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
+            for (let i = 0; i < log.headers.length; i++) {
+                searchTextCheck |= (log.headers[i]).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
             }
         }
 

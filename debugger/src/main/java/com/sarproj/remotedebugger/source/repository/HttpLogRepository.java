@@ -13,9 +13,7 @@ import com.sarproj.remotedebugger.source.models.httplog.QueryType;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HttpLogRepository {
     private static final String REMOTE_NET_LOGS_TABLE_NAME = "net_log_data";
@@ -37,12 +35,14 @@ public class HttpLogRepository {
         values.put(NetLogTable.METHOD, sqlFormat(model.method));
         values.put(NetLogTable.QUERY_TYPE, sqlFormat(model.queryType.name()));
         values.put(NetLogTable.MESSAGE, sqlFormat(model.message));
+        values.put(NetLogTable.FULL_STATUS, sqlFormat(model.fullStatus));
+        values.put(NetLogTable.FULL_IP_ADDRESS, sqlFormat(model.fullIpAddress));
         values.put(NetLogTable.REQUEST_CONTENT_TYPE, sqlFormat(model.requestContentType));
         values.put(NetLogTable.IP, sqlFormat(model.ip));
         values.put(NetLogTable.URL, sqlFormat(model.url));
         values.put(NetLogTable.BODY, sqlFormat(model.body));
         values.put(NetLogTable.ERROR_MESSAGE, sqlFormat(model.errorMessage));
-        putMap(values, NetLogTable.HEADERS, model.headers);
+        values.put(NetLogTable.HEADERS, sqlFormat(gson.toJson(model.headers)));
 
         return database.insert(REMOTE_NET_LOGS_TABLE_NAME, null, values);
     }
@@ -58,6 +58,8 @@ public class HttpLogRepository {
                 NetLogTable.METHOD + " text," +
                 NetLogTable.CODE + " integer," +
                 NetLogTable.MESSAGE + " text," +
+                NetLogTable.FULL_STATUS + " text," +
+                NetLogTable.FULL_IP_ADDRESS + " text," +
                 NetLogTable.QUERY_TYPE + " text," +
                 NetLogTable.TIME + " integer," +
                 NetLogTable.DURATION + " text," +
@@ -117,10 +119,14 @@ public class HttpLogRepository {
                     NetLogTable.METHOD,
                     NetLogTable.CODE,
                     NetLogTable.MESSAGE,
+                    NetLogTable.FULL_STATUS,
+                    NetLogTable.FULL_IP_ADDRESS,
                     NetLogTable.REQUEST_CONTENT_TYPE,
                     NetLogTable.PORT,
                     NetLogTable.IP,
                     NetLogTable.URL,
+                    NetLogTable.BODY_SIZE,
+                    NetLogTable.DURATION,
                     NetLogTable.BODY,
                     NetLogTable.ERROR_MESSAGE,
                     NetLogTable.HEADERS
@@ -182,27 +188,20 @@ public class HttpLogRepository {
             httpLogModel.bodySize = cursor.getString(cursor.getColumnIndex(NetLogTable.BODY_SIZE));
             httpLogModel.port = cursor.getString(cursor.getColumnIndex(NetLogTable.PORT));
             httpLogModel.ip = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.IP)));
+            httpLogModel.fullIpAddress = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.FULL_IP_ADDRESS)));
+            httpLogModel.fullStatus = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.FULL_STATUS)));
             httpLogModel.url = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.URL)));
             httpLogModel.errorMessage = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.ERROR_MESSAGE)));
             httpLogModel.body = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.BODY)));
 
-            Type empMapType = new TypeToken<HashMap<String, String>>() {}.getType();
-            httpLogModel.headers = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.HEADERS))), empMapType);
+            Type listType = new TypeToken<List<String>>() {}.getType();
+            httpLogModel.headers = gson.fromJson(getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.HEADERS))), listType);
 
             logModels.add(httpLogModel);
         }
 
         cursor.close();
         return logModels;
-    }
-
-    private void putMap(ContentValues values, String field, Map<String, String> map) {
-        String val = null;
-        if (map != null) {
-            val = sqlFormat(gson.toJson(map));
-        }
-
-        values.put(field, val);
     }
 
     private String sqlFormat(String value) {
@@ -229,6 +228,8 @@ public class HttpLogRepository {
         String URL = "url";
         String CODE = "code";
         String MESSAGE = "message";
+        String FULL_STATUS = "full_status";
+        String FULL_IP_ADDRESS = "full_ip_address";
         String TIME = "time";
         String DURATION = "duration";
         String REQUEST_CONTENT_TYPE = "request_content_type";

@@ -5,15 +5,17 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
+import com.sarproj.remotedebugger.source.models.LogModel;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
-import com.sarproj.remotedebugger.source.models.LogModel;
 import com.sarproj.remotedebugger.source.models.httplog.QueryType;
 import com.sarproj.remotedebugger.source.repository.HttpLogRepository;
 import com.sarproj.remotedebugger.source.repository.LogRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class ContinuousDataBaseManager {
     private static final String DATABASE_NAME = "remote_debugger_data.db";
@@ -109,38 +111,53 @@ public final class ContinuousDataBaseManager {
         return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyErrors, search);
     }
 
-    private HttpLogModel mapToLogModel(HttpLogResponse httpLogResponse) {
+    private HttpLogModel mapToLogModel(HttpLogResponse response) {
         HttpLogModel httpLogModel = new HttpLogModel();
-        httpLogModel.queryId = httpLogResponse.queryId;
-        httpLogModel.method = httpLogResponse.method;
-        httpLogModel.time = httpLogResponse.time;
-        httpLogModel.code = httpLogResponse.code;
-        httpLogModel.message = httpLogResponse.message;
-        httpLogModel.duration = httpLogResponse.duration;
-        httpLogModel.bodySize = httpLogResponse.bodySize;
-        httpLogModel.port = httpLogResponse.port;
-        httpLogModel.ip = httpLogResponse.ip;
-        httpLogModel.url = httpLogResponse.url;
-        httpLogModel.errorMessage = httpLogResponse.errorMessage;
-        httpLogModel.body = httpLogResponse.body;
-        httpLogModel.headers = httpLogResponse.headers;
+        httpLogModel.queryId = "id: " + response.queryId;
+        httpLogModel.method = response.method;
+        httpLogModel.time = response.time;
+        httpLogModel.code = response.code;
+        httpLogModel.message = response.message;
+        httpLogModel.fullStatus = response.code + " " + response.message;
+        httpLogModel.duration = response.duration == null ? null : response.duration + " ms";
+        httpLogModel.bodySize = response.bodySize == null ? null : response.bodySize + " byte";
+        httpLogModel.port = response.port;
+        httpLogModel.ip = response.ip;
+        httpLogModel.fullIpAddress = response.ip == null ? null : response.ip + ":" + response.port;
+        httpLogModel.url = response.url;
+        httpLogModel.errorMessage = response.errorMessage;
+        httpLogModel.body = response.body;
         httpLogModel.queryType = QueryType.RESPONSE;
+
+        httpLogModel.headers = new ArrayList<>();
+        if (response.headers != null) {
+            for (Map.Entry<String, String> header : response.headers.entrySet()) {
+                httpLogModel.headers.add(header.getKey() + ": " + header.getValue());
+            }
+        }
         return httpLogModel;
     }
 
-    private HttpLogModel mapToLogModel(HttpLogRequest httpLogRequest) {
+    private HttpLogModel mapToLogModel(HttpLogRequest request) {
         HttpLogModel httpLogModel = new HttpLogModel();
-        httpLogModel.queryId = httpLogRequest.queryId;
-        httpLogModel.method = httpLogRequest.method;
-        httpLogModel.time = httpLogRequest.time;
-        httpLogModel.requestContentType = httpLogRequest.requestContentType;
-        httpLogModel.bodySize = httpLogRequest.bodySize;
-        httpLogModel.port = httpLogRequest.port;
-        httpLogModel.ip = httpLogRequest.ip;
-        httpLogModel.url = httpLogRequest.url;
-        httpLogModel.body = httpLogRequest.body;
-        httpLogModel.headers = httpLogRequest.headers;
+        httpLogModel.queryId = "id: " + request.queryId;
+        httpLogModel.method = request.method;
+        httpLogModel.time = request.time;
+        httpLogModel.requestContentType = request.requestContentType;
+        httpLogModel.bodySize = request.bodySize == null ? null : request.bodySize + " byte";
+        httpLogModel.port = request.port;
+        httpLogModel.ip = request.ip;
+        httpLogModel.fullIpAddress = request.ip == null ? null : request.ip + ":" + request.port;
+        httpLogModel.url = request.url;
+        httpLogModel.body = request.body;
         httpLogModel.queryType = QueryType.REQUEST;
+
+        httpLogModel.headers = new ArrayList<>();
+        if (request.headers != null) {
+            for (Map.Entry<String, String> header : request.headers.entrySet()) {
+                httpLogModel.headers.add(header.getKey() + ": " + header.getValue());
+            }
+        }
         return httpLogModel;
     }
 }
