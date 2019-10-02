@@ -4,7 +4,7 @@ import java.util.List;
 
 public class HttpLogModel {
     public long id;
-    public long time;
+    public String time;
     public String queryId;
     public String url;
     public String method;

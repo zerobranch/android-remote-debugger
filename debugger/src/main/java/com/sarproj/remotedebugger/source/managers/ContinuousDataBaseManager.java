@@ -13,8 +13,10 @@ import com.sarproj.remotedebugger.source.models.httplog.QueryType;
 import com.sarproj.remotedebugger.source.repository.HttpLogRepository;
 import com.sarproj.remotedebugger.source.repository.LogRepository;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class ContinuousDataBaseManager {
@@ -24,6 +26,7 @@ public final class ContinuousDataBaseManager {
     private static ContinuousDataBaseManager instance;
     private final HttpLogRepository httpLogRepository;
     private final LogRepository logRepository;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
 
     private ContinuousDataBaseManager(Context context) {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
@@ -115,7 +118,7 @@ public final class ContinuousDataBaseManager {
         HttpLogModel httpLogModel = new HttpLogModel();
         httpLogModel.queryId = "id: " + response.queryId;
         httpLogModel.method = response.method;
-        httpLogModel.time = response.time;
+        httpLogModel.time = dateFormat.format(response.time);
         httpLogModel.code = response.code;
         httpLogModel.message = response.message;
         httpLogModel.fullStatus = response.code + " " + response.message;
@@ -142,7 +145,7 @@ public final class ContinuousDataBaseManager {
         HttpLogModel httpLogModel = new HttpLogModel();
         httpLogModel.queryId = "id: " + request.queryId;
         httpLogModel.method = request.method;
-        httpLogModel.time = request.time;
+        httpLogModel.time = dateFormat.format(request.time);
         httpLogModel.requestContentType = request.requestContentType;
         httpLogModel.bodySize = request.bodySize == null ? null : request.bodySize + " byte";
         httpLogModel.port = request.port;

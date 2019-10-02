@@ -61,7 +61,7 @@ public class HttpLogRepository {
                 NetLogTable.FULL_STATUS + " text," +
                 NetLogTable.FULL_IP_ADDRESS + " text," +
                 NetLogTable.QUERY_TYPE + " text," +
-                NetLogTable.TIME + " integer," +
+                NetLogTable.TIME + " text," +
                 NetLogTable.DURATION + " text," +
                 NetLogTable.REQUEST_CONTENT_TYPE + " text," +
                 NetLogTable.BODY_SIZE + " text," +
@@ -117,6 +117,7 @@ public class HttpLogRepository {
             String[] tables = new String[]{
                     NetLogTable.QUERY_ID,
                     NetLogTable.METHOD,
+                    NetLogTable.TIME,
                     NetLogTable.CODE,
                     NetLogTable.MESSAGE,
                     NetLogTable.FULL_STATUS,
@@ -182,7 +183,7 @@ public class HttpLogRepository {
             httpLogModel.code = (code != 0) ? code : null;
 
             httpLogModel.message = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.MESSAGE)));
-            httpLogModel.time = cursor.getLong(cursor.getColumnIndex(NetLogTable.TIME));
+            httpLogModel.time = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.TIME)));
             httpLogModel.duration = cursor.getString(cursor.getColumnIndex(NetLogTable.DURATION));
             httpLogModel.requestContentType = getValidString(cursor.getString(cursor.getColumnIndex(NetLogTable.REQUEST_CONTENT_TYPE)));
             httpLogModel.bodySize = cursor.getString(cursor.getColumnIndex(NetLogTable.BODY_SIZE));

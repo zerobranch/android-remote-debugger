@@ -745,9 +745,8 @@
     }
 
     function timeTd(logLine) {
-        let currentTime = getFormattedTime(new Date(logLine.time));
         let timeTd = document.createElement("td");
-        let timeText = document.createTextNode(currentTime);
+        let timeText = document.createTextNode(logLine.time);
         let timeClass = "";
 
         if (isDarkTheme) {
@@ -954,7 +953,7 @@
             || (log.requestContentType && log.requestContentType.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.url && log.url.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
             || (log.errorMessage && log.errorMessage.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
-            || getFormattedTime(new Date(log.time)).toLowerCase().indexOf(searchText.toLowerCase()) >= 0;
+            || (log.time && log.time.toLowerCase().indexOf(searchText.toLowerCase()) >= 0);
 
         if (!searchTextCheck && log.headers) {
             for (let i = 0; i < log.headers.length; i++) {
@@ -1043,19 +1042,6 @@
     function setBodyLinkable(inputText) {
         let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
         return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
-    }
-
-    function getFormattedTime(timestamp) {
-        let logDate = new Date(timestamp);
-        return zeroPad(logDate.getHours())
-            + ':' + zeroPad(logDate.getMinutes())
-            + ':' + zeroPad(logDate.getSeconds())
-            + '.' + zeroPad(logDate.getMilliseconds());
-    }
-
-    function zeroPad(num) {
-        const zero = 2 - num.toString().length + 1;
-        return Array(+(zero > 0 && zero)).join("0") + num;
     }
 
     function copyToClipboard(text) {
