@@ -3,6 +3,7 @@ package com.sarproj.remotedebugger.logging;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.mapper.HttpLogRequestMapper;
 import com.sarproj.remotedebugger.source.mapper.HttpLogResponseMapper;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogRequest;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogResponse;
 
@@ -33,6 +34,14 @@ public class NetLoggingInterceptor implements Interceptor {
     private static AtomicInteger queryNumber = new AtomicInteger(0);
     private final HttpLogRequestMapper requestMapper = new HttpLogRequestMapper();
     private final HttpLogResponseMapper responseMapper = new HttpLogResponseMapper();
+    private HttpLogger httpLogger;
+
+    public NetLoggingInterceptor() {
+    }
+
+    public NetLoggingInterceptor(HttpLogger httpLogger) {
+        this.httpLogger = httpLogger;
+    }
 
     @NotNull
     @Override
@@ -91,7 +100,9 @@ public class NetLoggingInterceptor implements Interceptor {
         } catch (Exception ignored) {
             // ignore
         } finally {
-            logRequest.id = getDataBase().addHttpLog(requestMapper.map(logRequest));
+            HttpLogModel logModel = requestMapper.map(logRequest);
+            logRequest.id = getDataBase().addHttpLog(logModel);
+            onReceiveLog(logModel);
         }
 
         logResponse.time = System.currentTimeMillis();
@@ -107,7 +118,10 @@ public class NetLoggingInterceptor implements Interceptor {
             response = chain.proceed(request);
         } catch (Exception e) {
             logResponse.errorMessage = e.getMessage();
-            getDataBase().addHttpLog(responseMapper.map(logResponse));
+
+            HttpLogModel logModel = responseMapper.map(logResponse);
+            getDataBase().addHttpLog(logModel);
+            onReceiveLog(logModel);
             throw e;
         }
 
@@ -158,12 +172,23 @@ public class NetLoggingInterceptor implements Interceptor {
             }
         }
 
-        getDataBase().addHttpLog(responseMapper.map(logResponse));
-
+        HttpLogModel logModel = responseMapper.map(logResponse);
+        getDataBase().addHttpLog(logModel);
+        onReceiveLog(logModel);
         return response;
+    }
+
+    private void onReceiveLog(HttpLogModel logModel) {
+        if (httpLogger != null) {
+            httpLogger.log(logModel);
+        }
     }
 
     private ContinuousDataBaseManager getDataBase() {
         return ContinuousDataBaseManager.getInstance();
+    }
+
+    public interface HttpLogger {
+        void log(HttpLogModel httpLogModel);
     }
 }

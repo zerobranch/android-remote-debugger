@@ -2,7 +2,6 @@ package com.sarproj.example;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.sarproj.example.db.DBHelper;
 import com.sarproj.remotedebugger.RemoteDebugger;
@@ -11,13 +10,11 @@ import com.sarproj.remotedebugger.utils.FileUtils;
 
 import java.io.IOException;
 
-import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 public class MainActivity extends AppCompatActivity {
     DBHelper dbHelper;
@@ -259,7 +256,9 @@ public class MainActivity extends AppCompatActivity {
                         return chain.proceed(originalRequest);
                     })
 //                                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .addInterceptor(new NetLoggingInterceptor())
+                    .addInterceptor(new NetLoggingInterceptor(httpLogModel -> {
+                        System.out.println("--- " + httpLogModel.toString());
+                    }))
                     .build();
 
             RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "{\"planet\":\"earth\",\"star\":\"sun\",\"nextStar\":\"proxima\"}");
