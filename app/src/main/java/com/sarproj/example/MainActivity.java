@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.info).setOnClickListener(v -> {
             int i = 4;
             while (i > 0) {
-                RemoteDebugger.i("testTag", "[ " + i + " ] info информационная линия просмотра");
+                RemoteDebugger.i("testTag", "[ " + i + " ] \"info\" информационная линия просмотра");
                 i--;
             }
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.verbose).setOnClickListener(v -> {
             int i = 4;
             while (i > 0) {
-                RemoteDebugger.v("testTag", "[ " + i + " ] verbose самая минимальная линия");
+                RemoteDebugger.v("testTag", "[ " + i + " ] verbose 'самая' минимальная линия");
                 i--;
             }
 
@@ -113,14 +113,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.error).setOnLongClickListener(view -> {
-            try {
-                int a = 1 / 0;
-            } catch (Throwable th) {
-                RemoteDebugger.e("testTag", "asd", th);
-            }
-            return false;
-        });
+//        findViewById(R.id.error).setOnLongClickListener(view -> {
+//            try {
+//                int a = 1 / 0;
+//            } catch (Throwable th) {
+//                RemoteDebugger.e("testTag", "asd", th);
+//            }
+//            return false;
+//        });
 
         findViewById(R.id.error).setOnClickListener(v -> {
             int i = 4;
@@ -243,7 +243,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.network6).setOnClickListener(v -> {
-            send("http://www.blablabla.io/v2/5d7bcf0a350000a96f3cadea?type=everType&profile=sky"); // not url
+            send("http://www.blablabla.io/v2/5d7bcf0a350000a96f3cadea?type=everType&profile=sky");
+        });
+
+        findViewById(R.id.network7).setOnClickListener(v -> {
+            send("http://www.mocky.io/v2/5d94a7962f00002a008ff899");
         });
     }
 

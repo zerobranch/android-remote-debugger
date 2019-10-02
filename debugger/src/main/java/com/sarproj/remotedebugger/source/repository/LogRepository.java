@@ -21,9 +21,9 @@ public final class LogRepository {
     public void addLog(LogModel model) {
         ContentValues values = new ContentValues();
         values.put(LogTable.TIME, model.getNewTime());
-        values.put(LogTable.LEVEL, sqlFormat(model.level));
-        values.put(LogTable.TAG, sqlFormat(model.tag));
-        values.put(LogTable.MESSAGE, sqlFormat(model.message));
+        values.put(LogTable.LEVEL, model.level);
+        values.put(LogTable.TAG, model.tag);
+        values.put(LogTable.MESSAGE, model.message);
 
         database.insert(REMOTE_LOGS_TABLE_NAME, null, values);
     }
@@ -90,9 +90,9 @@ public final class LogRepository {
         while (cursor.moveToNext()) {
             final LogModel log = new LogModel();
             log.time = cursor.getLong(cursor.getColumnIndex(LogTable.TIME));
-            log.level = getValidString(cursor.getString(cursor.getColumnIndex(LogTable.LEVEL)));
-            log.tag = getValidString(cursor.getString(cursor.getColumnIndex(LogTable.TAG)));
-            log.message = getValidString(cursor.getString(cursor.getColumnIndex(LogTable.MESSAGE)));
+            log.level = cursor.getString(cursor.getColumnIndex(LogTable.LEVEL));
+            log.tag = cursor.getString(cursor.getColumnIndex(LogTable.TAG));
+            log.message = cursor.getString(cursor.getColumnIndex(LogTable.MESSAGE));
             logModels.add(log);
         }
 
@@ -112,20 +112,6 @@ public final class LogRepository {
                 LogTable.TAG + " text," +
                 LogTable.MESSAGE + " text);";
         db.execSQL(query);
-    }
-
-    private String sqlFormat(String value) {
-        if (value == null) {
-            return null;
-        }
-        return value.replaceAll("'", "&shadow_39&");
-    }
-
-    private String getValidString(String value) {
-        if (value == null) {
-            return null;
-        }
-        return value.replaceAll("&shadow_39&", "'");
     }
 
     private interface LogTable {
