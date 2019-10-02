@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class FileUtils {
-    private static final char SQLITE_HEADER[] = new char[]{'S', 'Q', 'L', 'i', 't', 'e'};
+    private static final char[] SQLITE_HEADER = new char[]{'S', 'Q', 'L', 'i', 't', 'e'};
     private static final String JOURNAL_FILE_SUFFIX = "-journal";
 
     public static File searchFile(File rootFolder, String fileName) {

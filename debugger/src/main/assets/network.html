@@ -161,7 +161,7 @@
 
     let currentContentFont = DEFAULT_FONT_SIZE;
     let isConnectionLost = false;
-    let logsLines = [];
+    let receivedLogs = [];
 
     let logTable = getElementById("logTable");
     let changeContentFont = getElementById("changeContentFont");
@@ -397,6 +397,10 @@
             if (parsedLogs.length !== 0) {
                 if (logsOffset === -1) {
                     logsOffset = parsedLogs.length;
+
+                    if (isInactiveSearch()) {
+                        receivedLogs = [];
+                    }
                 } else {
                     logsOffset += parsedLogs.length;
                 }
@@ -415,13 +419,13 @@
         });
     }
 
-    function buildLogsContent(logLine, isOnlineLogs) {
+    function buildLogsContent(logLines, isOnlineLogs) {
         let tbody = document.createElement("tbody");
         logTable.appendChild(tbody);
 
-        logLine.forEach(function (logLine) {
-            if (isOnlineLogs) {
-                logsLines.push(logLine);
+        logLines.forEach(function (logLine) {
+            if (isOnlineLogs && isInactiveSearch()) {
+                receivedLogs.push(logLine);
             }
 
             let tr = document.createElement("tr");
@@ -438,6 +442,10 @@
 
             tbody.appendChild(tr);
         });
+    }
+
+    function isInactiveSearch() {
+        return (!isOnlyError && (statusCode == null || statusCode.length === 0) && (searchText == null || searchText.length === 0));
     }
 
     function isRequest(logLine) {
@@ -913,7 +921,7 @@
 
         let newLogsLines = [];
 
-        logsLines.forEach(function (log) {
+        receivedLogs.forEach(function (log) {
             let searchTextCheck = isSearchByText(log);
             let statusCodeCheck = isSearchByStatusCode(log);
             let onlyErrorCheck = isSearchByError(log);
