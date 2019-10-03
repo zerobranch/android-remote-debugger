@@ -3,9 +3,13 @@ package com.sarproj.remotedebugger.api.base;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.utils.NumberUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +18,16 @@ import fi.iki.elonen.NanoHTTPD;
 
 public abstract class Api {
     protected static final String EMPTY = "";
-    protected Context context;
-    private Gson gson;
     protected static final int DEFAULT_FONT_SIZE = 12;
     protected static final Theme DEFAULT_THEME = Theme.DARK;
+    protected Context context;
+    private Gson gson;
+    private Gson prettyPrintJson;
 
     public Api(Context context) {
         this.context = context;
         gson = new Gson();
+        prettyPrintJson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     public abstract String execute(Map<String, List<String>> params) throws NanoHTTPD.ResponseException;
@@ -90,8 +96,22 @@ public abstract class Api {
                 "'" + parameter + "' parameter not found");
     }
 
+    protected String prettyJson(String item) {
+        return prettyPrintJson.toJson(new JsonParser().parse(item));
+    }
+
+    protected boolean isJson(String json) {
+        try {
+            new Gson().getAdapter(JsonElement.class).fromJson(json);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public void destroy() {
         context = null;
         gson = null;
+        prettyPrintJson = null;
     }
 }

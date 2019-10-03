@@ -10,6 +10,7 @@ import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
+import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.utils.FileUtils;
 
 import java.util.List;
@@ -82,8 +83,18 @@ public final class NetworkApi extends Api {
         boolean isOnlyErrors = getBooleanValue(params, NetworkHtmlKey.IS_ONLY_ERRORS, false);
         String search = getStringValue(params, NetworkHtmlKey.SEARCH);
 
-        return serialize(getDataBase().getHttpLogs(offset, LIMIT_HTTP_LOGS_PACKS,
-                new StatusCodeFilter(statusCode), isOnlyErrors, search));
+        List<HttpLogModel> logs = getDataBase().getHttpLogs(offset, LIMIT_HTTP_LOGS_PACKS,
+                new StatusCodeFilter(statusCode), isOnlyErrors, search);
+
+        // todo лишнее и добавить в билдер возможно отключения pretty
+        logs.get(0).body = "";
+        logs.get(1).body = "qwe";
+        for (HttpLogModel log : logs) {
+//            if (isJson(log.body)) {
+                log.body = prettyJson(log.body); // todo что будет для больших json и он для строки типа qwe делает "qwe"
+//            }
+        }
+        return serialize(logs);
     }
 
     private ContinuousDataBaseManager getDataBase() {
