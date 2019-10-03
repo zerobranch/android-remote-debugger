@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 .Builder(getApplication())
                 .enabled(true)
                 .enableInternalLogging()
+                .enableJsonPrettyPrint()
         );
 
 //        RemoteLog.d("My debug");
@@ -257,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                     })
 //                                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                     .addInterceptor(new NetLoggingInterceptor(httpLogModel -> {
-                        System.out.println("--- " + httpLogModel.toString());
+//                        System.out.println("--- " + httpLogModel.toString());
                     }))
                     .build();
 

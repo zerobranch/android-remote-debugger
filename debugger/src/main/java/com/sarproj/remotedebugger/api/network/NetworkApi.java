@@ -1,7 +1,9 @@
 package com.sarproj.remotedebugger.api.network;
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.google.gson.JsonSyntaxException;
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
@@ -87,14 +89,18 @@ public final class NetworkApi extends Api {
         List<HttpLogModel> logs = getDataBase().getHttpLogs(offset, LIMIT_HTTP_LOGS_PACKS,
                 new StatusCodeFilter(statusCode), isOnlyErrors, search);
 
-        // todo лишнее и добавить в билдер возможно отключения pretty
-        logs.get(0).body = "";
-        logs.get(1).body = "qwe";
-        for (HttpLogModel log : logs) {
-//            if (isJson(log.body)) {
-                log.body = prettyJson(log.body); // todo что будет для больших json и он для строки типа qwe делает "qwe"
-//            }
+        if (internalSettings.isEnabledJsonPrettyPrint()) {
+            for (HttpLogModel log : logs) {
+                if (TextUtils.isEmpty(log.body)) {
+                    continue;
+                }
+
+                try {
+                    log.body = prettyJson(log.body);
+                } catch (JsonSyntaxException ignored) { }
+            }
         }
+
         return serialize(logs);
     }
 

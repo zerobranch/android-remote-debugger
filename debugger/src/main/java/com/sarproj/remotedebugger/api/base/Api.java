@@ -4,13 +4,12 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.utils.InternalUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -99,17 +98,8 @@ public abstract class Api {
                 "'" + parameter + "' parameter not found");
     }
 
-    protected String prettyJson(String item) {
+    protected String prettyJson(String item) throws JsonSyntaxException {
         return prettyPrintJson.toJson(new JsonParser().parse(item));
-    }
-
-    protected boolean isJson(String json) {
-        try {
-            new Gson().getAdapter(JsonElement.class).fromJson(json);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
     }
 
     public void destroy() {
