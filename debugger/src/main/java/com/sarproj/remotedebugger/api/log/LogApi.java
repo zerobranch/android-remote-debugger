@@ -4,7 +4,8 @@ import android.content.Context;
 
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
-import com.sarproj.remotedebugger.settings.Settings;
+import com.sarproj.remotedebugger.settings.InternalSettings;
+import com.sarproj.remotedebugger.settings.SettingsPrefs;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
@@ -25,8 +26,8 @@ public final class LogApi extends Api {
     private static final int UNLIMITED_OFFSET = -1;
     private static final boolean DEFAULT_LOG_IS_DISCOLOR = false;
 
-    public LogApi(Context context) {
-        super(context);
+    public LogApi(Context context, InternalSettings internalSettings) {
+        super(context, internalSettings);
     }
 
     @Override
@@ -68,17 +69,17 @@ public final class LogApi extends Api {
             settings.theme = DEFAULT_THEME.name();
         }
 
-        Settings.Key.THEME.save(settings.theme);
-        Settings.Key.LOG_FONT.save(settings.logFont);
-        Settings.Key.LOG_IS_DISCOLOR.save(settings.isDiscolorLog);
+        SettingsPrefs.Key.THEME.save(settings.theme);
+        SettingsPrefs.Key.LOG_FONT.save(settings.logFont);
+        SettingsPrefs.Key.LOG_IS_DISCOLOR.save(settings.isDiscolorLog);
         return EMPTY;
     }
 
     private String getDefaultSettings() {
         final DefaultSettings settings = new DefaultSettings();
-        settings.logFont = Settings.Key.LOG_FONT.get(DEFAULT_FONT_SIZE);
-        settings.isDiscolorLog = Settings.Key.LOG_IS_DISCOLOR.get(DEFAULT_LOG_IS_DISCOLOR);
-        settings.theme = Settings.Key.THEME.get(DEFAULT_THEME.name());
+        settings.logFont = SettingsPrefs.Key.LOG_FONT.get(DEFAULT_FONT_SIZE);
+        settings.isDiscolorLog = SettingsPrefs.Key.LOG_IS_DISCOLOR.get(DEFAULT_LOG_IS_DISCOLOR);
+        settings.theme = SettingsPrefs.Key.THEME.get(DEFAULT_THEME.name());
         return serialize(settings);
     }
 

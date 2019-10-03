@@ -6,7 +6,8 @@ import com.google.gson.reflect.TypeToken;
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
-import com.sarproj.remotedebugger.settings.Settings;
+import com.sarproj.remotedebugger.settings.InternalSettings;
+import com.sarproj.remotedebugger.settings.SettingsPrefs;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.SharedPrefsManager;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
@@ -33,8 +34,8 @@ public class SharedPrefsApi extends Api {
     private final static String TYPE_BOOLEAN = "Boolean";
     private final static String TYPE_SET_STRING = "Set<String>";
 
-    public SharedPrefsApi(Context context) {
-        super(context);
+    public SharedPrefsApi(Context context, InternalSettings internalSettings) {
+        super(context, internalSettings);
     }
 
     @Override
@@ -167,8 +168,8 @@ public class SharedPrefsApi extends Api {
 
     private String getDefaultSettings() {
         final DefaultSettings settings = new DefaultSettings();
-        settings.theme = Settings.Key.THEME.get(DEFAULT_THEME.name());
-        settings.sharedPreferencesFont = Settings.Key.SHARED_PREFERENCES_FONT.get(DEFAULT_FONT_SIZE);
+        settings.theme = SettingsPrefs.Key.THEME.get(DEFAULT_THEME.name());
+        settings.sharedPreferencesFont = SettingsPrefs.Key.SHARED_PREFERENCES_FONT.get(DEFAULT_FONT_SIZE);
         return serialize(settings);
     }
 
@@ -188,8 +189,8 @@ public class SharedPrefsApi extends Api {
             settings.theme = DEFAULT_THEME.name();
         }
 
-        Settings.Key.THEME.save(settings.theme);
-        Settings.Key.SHARED_PREFERENCES_FONT.save(settings.sharedPreferencesFont);
+        SettingsPrefs.Key.THEME.save(settings.theme);
+        SettingsPrefs.Key.SHARED_PREFERENCES_FONT.save(settings.sharedPreferencesFont);
         return EMPTY;
     }
 

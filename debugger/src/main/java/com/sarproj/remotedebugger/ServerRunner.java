@@ -3,7 +3,8 @@ package com.sarproj.remotedebugger;
 import android.content.Context;
 import android.util.Log;
 
-import com.sarproj.remotedebugger.utils.HttpUtils;
+import com.sarproj.remotedebugger.settings.InternalSettings;
+import com.sarproj.remotedebugger.utils.InternalUtils;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -29,18 +30,18 @@ final class ServerRunner {
         return localInstance;
     }
 
-    void init(Context context, boolean enabledInternalLogging) {
+    void init(Context context, InternalSettings internalSettings) {
         if (isAlive()) {
             print(context.getString(R.string.debugger_already_running));
             return;
         }
 
-        this.enabledInternalLogging = enabledInternalLogging;
+        this.enabledInternalLogging = internalSettings.isEnabledInternalLogging();
 
-        String ip = HttpUtils.getIpAccess(context);
+        String ip = InternalUtils.getIpAccess(context);
 
         try {
-            androidWebServer = new AndroidWebServer(context, ip, DEFAULT_PORT);
+            androidWebServer = new AndroidWebServer(context, ip, DEFAULT_PORT, internalSettings);
             androidWebServer.start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
 
             print(context.getString(R.string.debugger_started, ip));

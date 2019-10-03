@@ -3,25 +3,25 @@ package com.sarproj.remotedebugger.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public final class Settings {
+public final class SettingsPrefs {
     private static final String SHARED_PREFERENCES_NAME = "remote_debugger_settings";
-    private static Settings instance;
+    private static SettingsPrefs instance;
     private final SharedPreferences preferences;
 
     public static void init(Context context) {
-        instance = new Settings(context.getApplicationContext());
+        instance = new SettingsPrefs(context.getApplicationContext());
     }
 
-    private Settings(Context context) {
+    private SettingsPrefs(Context context) {
         preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 
-    private static Settings getInstance() {
+    private static SettingsPrefs getInstance() {
         if (instance != null) {
             return instance;
         }
 
-        throw new IllegalArgumentException("Please, use " + Settings.class.getName() +
+        throw new IllegalArgumentException("Please, use " + SettingsPrefs.class.getName() +
                 ".init(Context) before using this method.");
     }
 

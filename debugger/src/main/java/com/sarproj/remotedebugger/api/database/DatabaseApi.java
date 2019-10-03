@@ -5,7 +5,8 @@ import android.content.Context;
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
-import com.sarproj.remotedebugger.settings.Settings;
+import com.sarproj.remotedebugger.settings.InternalSettings;
+import com.sarproj.remotedebugger.settings.SettingsPrefs;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.DatabaseManager;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
@@ -28,8 +29,8 @@ public class DatabaseApi extends Api {
     private static final int LAST_PAGE = -1;
     private static final int DEFAULT_PAGE_SIZE = 15;
 
-    public DatabaseApi(Context context) {
-        super(context);
+    public DatabaseApi(Context context, InternalSettings internalSettings) {
+        super(context, internalSettings);
     }
 
     @Override
@@ -197,8 +198,8 @@ public class DatabaseApi extends Api {
 
     private String getDefaultSettings() {
         final DefaultSettings settings = new DefaultSettings();
-        settings.theme = Settings.Key.THEME.get(DEFAULT_THEME.name());
-        settings.databaseFont = Settings.Key.DATABASE_FONT.get(DEFAULT_FONT_SIZE);
+        settings.theme = SettingsPrefs.Key.THEME.get(DEFAULT_THEME.name());
+        settings.databaseFont = SettingsPrefs.Key.DATABASE_FONT.get(DEFAULT_FONT_SIZE);
         return serialize(settings);
     }
 
@@ -218,8 +219,8 @@ public class DatabaseApi extends Api {
             settings.theme = DEFAULT_THEME.name();
         }
 
-        Settings.Key.THEME.save(settings.theme);
-        Settings.Key.DATABASE_FONT.save(settings.databaseFont);
+        SettingsPrefs.Key.THEME.save(settings.theme);
+        SettingsPrefs.Key.DATABASE_FONT.save(settings.databaseFont);
         return EMPTY;
     }
 

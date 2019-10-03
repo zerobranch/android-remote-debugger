@@ -3,9 +3,7 @@ package com.sarproj.remotedebugger.logging;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.models.LogModel;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import com.sarproj.remotedebugger.utils.InternalUtils;
 
 public final class RemoteLog {
     private static final String DEFAULT_TAG = RemoteLog.class.getSimpleName();
@@ -18,6 +16,8 @@ public final class RemoteLog {
             isEnabledDefaultLogging = true;
             this.logger = logger;
         } else {
+            // todo тут наверное что то странное (если активирован isEnabledDefaultLogging и указан logger то наверное долно чтобы и логер работал и логер по умолчанию)
+            // не знаю, но лучше сделать как то по лакониченей, чтобы была однозначность
             this.logger = new DefaultLogger();
         }
 
@@ -38,10 +38,10 @@ public final class RemoteLog {
             if (th == null) {
                 return;
             }
-            msg = getStacktrace(th);
+            msg = InternalUtils.getStackTrace(th);
         } else {
             if (th != null) {
-                msg += "\n" + getStacktrace(th);
+                msg += "\n" + InternalUtils.getStackTrace(th);
             }
         }
 
@@ -50,17 +50,5 @@ public final class RemoteLog {
         if (isEnabledDefaultLogging) {
             logger.log(logLevel.priority(), tag, msg, th);
         }
-    }
-
-    private String getStacktrace(Throwable th) {
-        if (th == null) {
-            return "";
-        }
-
-        StringWriter sw = new StringWriter(256);
-        PrintWriter pw = new PrintWriter(sw, false);
-        th.printStackTrace(pw);
-        pw.flush();
-        return sw.toString();
     }
 }

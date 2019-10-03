@@ -11,10 +11,10 @@ import com.sarproj.remotedebugger.api.network.NetworkApi;
 import com.sarproj.remotedebugger.api.sharedprefs.SharedPrefsApi;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.http.HttpResponse;
+import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.utils.FileUtils;
+import com.sarproj.remotedebugger.utils.InternalUtils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -28,10 +28,12 @@ final class AndroidWebServer extends NanoHTTPD {
     private Api sharedPrefsApi;
     private Api networkApi;
     private ErrorPage errorPage;
+    private InternalSettings internalSettings;
 
-    AndroidWebServer(Context context, String hostname, int port) {
+    AndroidWebServer(Context context, String hostname, int port, InternalSettings internalSettings) {
         super(hostname, port);
         this.context = context;
+        this.internalSettings = internalSettings;
         assetManager = context.getAssets();
     }
 
@@ -101,13 +103,13 @@ final class AndroidWebServer extends NanoHTTPD {
             }
         } catch (ResponseException ex) {
             return HttpResponse.newErrorResponse(ex.getStatus(),
-                    ex.getMessage() + "\n" + getStackTrace(ex));
+                    ex.getMessage() + "\n" + InternalUtils.getStackTrace(ex));
         } catch (Exception ex) {
             return HttpResponse.newErrorResponse(Response.Status.BAD_REQUEST,
-                    ex.getMessage() + "\n" + getStackTrace(ex));
+                    ex.getMessage() + "\n" + InternalUtils.getStackTrace(ex));
         } catch (Throwable th) {
             return HttpResponse.newErrorResponse(Response.Status.INTERNAL_ERROR,
-                    th.getMessage() + "\n" + getStackTrace(th));
+                    th.getMessage() + "\n" + InternalUtils.getStackTrace(th));
         }
     }
 
@@ -161,7 +163,7 @@ final class AndroidWebServer extends NanoHTTPD {
 
     private Api getLogApi() {
         if (logApi == null) {
-            logApi = new LogApi(context);
+            logApi = new LogApi(context, internalSettings);
         }
         return logApi;
     }
@@ -175,21 +177,21 @@ final class AndroidWebServer extends NanoHTTPD {
 
     private Api getDatabaseApi() {
         if (databaseApi == null) {
-            databaseApi = new DatabaseApi(context);
+            databaseApi = new DatabaseApi(context, internalSettings);
         }
         return databaseApi;
     }
 
     private Api getSharedPrefsApi() {
         if (sharedPrefsApi == null) {
-            sharedPrefsApi = new SharedPrefsApi(context);
+            sharedPrefsApi = new SharedPrefsApi(context, internalSettings);
         }
         return sharedPrefsApi;
     }
 
     private Api getNetworkApi() {
         if (networkApi == null) {
-            networkApi = new NetworkApi(context);
+            networkApi = new NetworkApi(context, internalSettings);
         }
         return networkApi;
     }
@@ -227,11 +229,5 @@ final class AndroidWebServer extends NanoHTTPD {
             errorPage.destroy();
             errorPage = null;
         }
-    }
-
-    private String getStackTrace(Throwable th) {
-        final StringWriter stringWriter = new StringWriter();
-        th.printStackTrace(new PrintWriter(stringWriter));
-        return stringWriter.toString();
     }
 }

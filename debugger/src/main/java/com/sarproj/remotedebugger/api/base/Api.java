@@ -6,8 +6,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
-import com.sarproj.remotedebugger.utils.NumberUtils;
+import com.sarproj.remotedebugger.utils.InternalUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -23,9 +24,11 @@ public abstract class Api {
     protected Context context;
     private Gson gson;
     private Gson prettyPrintJson;
+    protected InternalSettings internalSettings;
 
-    public Api(Context context) {
+    public Api(Context context, InternalSettings internalSettings) {
         this.context = context;
+        this.internalSettings = internalSettings;
         gson = new Gson();
         prettyPrintJson = new GsonBuilder().setPrettyPrinting().create();
     }
@@ -56,7 +59,7 @@ public abstract class Api {
         }
 
         String rawValue = params.get(key).get(0);
-        if (!NumberUtils.isInt(rawValue)) {
+        if (!InternalUtils.isInt(rawValue)) {
             return defaultValue;
         }
 
