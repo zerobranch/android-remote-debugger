@@ -6,7 +6,7 @@ import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.settings.SettingsPrefs;
-import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
@@ -101,8 +101,8 @@ public final class LogApi extends Api {
         return serialize(getDataBase().getLogByFilter(offset, LIMIT_LOGS_PACKS, primaryLevel, primaryTag, primarySearch));
     }
 
-    private ContinuousDataBaseManager getDataBase() {
-        return ContinuousDataBaseManager.getInstance();
+    private ContinuousDBManager getDataBase() {
+        return ContinuousDBManager.getInstance();
     }
 
     private String getLogLevels() {

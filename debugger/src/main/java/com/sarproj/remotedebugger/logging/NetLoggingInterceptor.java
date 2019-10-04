@@ -1,7 +1,7 @@
 package com.sarproj.remotedebugger.logging;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
-import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.mapper.HttpLogRequestMapper;
 import com.sarproj.remotedebugger.source.mapper.HttpLogResponseMapper;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
@@ -198,8 +198,8 @@ public class NetLoggingInterceptor implements Interceptor {
         return RemoteDebugger.isAlive();
     }
 
-    private ContinuousDataBaseManager getDataBase() {
-        return ContinuousDataBaseManager.getInstance();
+    private ContinuousDBManager getDataBase() {
+        return ContinuousDBManager.getInstance();
     }
 
     public interface HttpLogger {

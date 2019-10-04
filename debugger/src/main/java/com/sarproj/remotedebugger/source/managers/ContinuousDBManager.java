@@ -12,15 +12,15 @@ import com.sarproj.remotedebugger.source.repository.LogRepository;
 
 import java.util.List;
 
-public final class ContinuousDataBaseManager {
+public final class ContinuousDBManager {
     private static final String DATABASE_NAME = "remote_debugger_data.db";
     private final static Object LOCK = new Object();
     private final SQLiteDatabase database;
-    private static ContinuousDataBaseManager instance;
+    private static ContinuousDBManager instance;
     private final HttpLogRepository httpLogRepository;
     private final LogRepository logRepository;
 
-    private ContinuousDataBaseManager(Context context) {
+    private ContinuousDBManager(Context context) {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
         database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
         database.setVersion(Integer.MAX_VALUE);
@@ -32,7 +32,7 @@ public final class ContinuousDataBaseManager {
         logRepository.createLogsTable(database);
     }
 
-    public static ContinuousDataBaseManager getInstance() {
+    public static ContinuousDBManager getInstance() {
         synchronized (LOCK) {
             if (instance == null) {
                 throw new IllegalStateException("RemoteDebugger is not initialized. " +
@@ -45,7 +45,7 @@ public final class ContinuousDataBaseManager {
     public static void init(Context context) {
         synchronized (LOCK) {
             if (instance == null) {
-                instance = new ContinuousDataBaseManager(context);
+                instance = new ContinuousDBManager(context);
             }
         }
     }

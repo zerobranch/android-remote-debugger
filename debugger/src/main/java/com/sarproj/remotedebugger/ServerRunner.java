@@ -30,9 +30,10 @@ final class ServerRunner {
         return localInstance;
     }
 
-    void init(Context context, InternalSettings internalSettings) {
+    void init(Context context, InternalSettings internalSettings, ConnectionStatus connectionStatus) {
         if (isAlive()) {
             print(context.getString(R.string.debugger_already_running));
+            connectionStatus.onResult(true);
             return;
         }
 
@@ -45,8 +46,10 @@ final class ServerRunner {
             androidWebServer.start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
 
             print(context.getString(R.string.debugger_started, ip));
+            connectionStatus.onResult(true);
         } catch (Exception ex) {
             printErr(context.getString(R.string.error_start_server), ex);
+            connectionStatus.onResult(false);
         }
     }
 
@@ -72,5 +75,9 @@ final class ServerRunner {
     private void printErr(String text, Throwable th) {
         if (enabledInternalLogging)
             Log.e(TAG, text, th);
+    }
+
+    interface ConnectionStatus {
+        void onResult(boolean isRunning);
     }
 }

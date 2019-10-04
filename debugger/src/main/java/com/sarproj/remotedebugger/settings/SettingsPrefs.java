@@ -9,7 +9,7 @@ public final class SettingsPrefs {
     private final SharedPreferences preferences;
 
     public static void init(Context context) {
-        instance = new SettingsPrefs(context.getApplicationContext());
+        instance = new SettingsPrefs(context);
     }
 
     private SettingsPrefs(Context context) {

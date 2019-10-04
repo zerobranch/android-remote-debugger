@@ -5,14 +5,14 @@ import android.content.Context;
 import com.sarproj.remotedebugger.logging.Logger;
 import com.sarproj.remotedebugger.logging.RemoteLog;
 import com.sarproj.remotedebugger.settings.InternalSettings;
-import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.settings.SettingsPrefs;
-import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
+import com.sarproj.remotedebugger.source.local.LogLevel;
+import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 
 public final class RemoteDebugger {
     private static RemoteLog remoteLog;
 
-    public static void init(Builder builder) {
+    public synchronized static void init(final Builder builder) {
         if (isAlive()) {
             stop();
         }
@@ -26,20 +26,30 @@ public final class RemoteDebugger {
                 builder.enabledJsonPrettyPrint
         );
 
-        SettingsPrefs.init(builder.context.getApplicationContext());
-        ContinuousDataBaseManager.init(builder.context.getApplicationContext());
-        ServerRunner.getInstance().init(builder.context.getApplicationContext(), internalSettings);
-        remoteLog = new RemoteLog(builder.logger, ContinuousDataBaseManager.getInstance(), builder.enabledDefaultLogging);
+        final Context context = builder.context.getApplicationContext();
+
+        ServerRunner.getInstance().init(context, internalSettings, new ServerRunner.ConnectionStatus() {
+            @Override
+            public void onResult(boolean isRunning) {
+                if (!isRunning) { // todo протестить эту шнягу, когда сервер занят другим приложением
+                    return;
+                }
+
+                SettingsPrefs.init(context);
+                ContinuousDBManager.init(context);
+                remoteLog = new RemoteLog(builder.logger, ContinuousDBManager.getInstance(), builder.enabledDefaultLogging);
+            }
+        });
     }
 
-    public static void init(Context context) {
+    public synchronized static void init(Context context) {
         init(new Builder(context));
     }
 
     public synchronized static void stop() {
         ServerRunner.getInstance().stop();
         SettingsPrefs.destroy();
-        ContinuousDataBaseManager.destroy();
+        ContinuousDBManager.destroy();
         remoteLog = null;
     }
 

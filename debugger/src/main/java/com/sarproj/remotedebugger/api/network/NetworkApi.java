@@ -11,7 +11,7 @@ import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.settings.SettingsPrefs;
 import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
 import com.sarproj.remotedebugger.source.local.Theme;
-import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.utils.FileUtils;
@@ -104,7 +104,7 @@ public final class NetworkApi extends Api {
         return serialize(logs);
     }
 
-    private ContinuousDataBaseManager getDataBase() {
-        return ContinuousDataBaseManager.getInstance();
+    private ContinuousDBManager getDataBase() {
+        return ContinuousDBManager.getInstance();
     }
 }

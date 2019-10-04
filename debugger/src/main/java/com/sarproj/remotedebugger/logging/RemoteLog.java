@@ -3,7 +3,7 @@ package com.sarproj.remotedebugger.logging;
 import android.os.Build;
 
 import com.sarproj.remotedebugger.source.local.LogLevel;
-import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
+import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.models.LogModel;
 import com.sarproj.remotedebugger.utils.InternalUtils;
 
@@ -12,23 +12,24 @@ import org.jetbrains.annotations.NotNull;
 public final class RemoteLog {
     private static final String DEFAULT_TAG = RemoteLog.class.getSimpleName();
     private final boolean isEnabledDefaultLogging;
-    private final ContinuousDataBaseManager continuousDataBaseManager;
+    private final ContinuousDBManager continuousDBManager;
     private final Logger logger;
     private static final int MAX_LOG_LENGTH = 2000;
     private static final int MAX_TAG_LENGTH = 23;
 
-    public RemoteLog(Logger logger, ContinuousDataBaseManager continuousDataBaseManager, boolean isEnabledDefaultLogging) {
+    public RemoteLog(Logger logger, ContinuousDBManager continuousDBManager, boolean isEnabledDefaultLogging) {
         if (logger != null) {
             isEnabledDefaultLogging = true;
             this.logger = logger;
         } else {
             // todo тут наверное что то странное (если активирован isEnabledDefaultLogging и указан logger то наверное долно чтобы и логер работал и логер по умолчанию)
             // не знаю, но лучше сделать как то по лакониченей, чтобы была однозначность
+            // DefaultLogger сделать типа как в timber DEFAULT
             this.logger = new DefaultLogger();
         }
 
         this.isEnabledDefaultLogging = isEnabledDefaultLogging;
-        this.continuousDataBaseManager = continuousDataBaseManager;
+        this.continuousDBManager = continuousDBManager;
     }
 
     public void log(LogLevel logLevel, String tag, String msg, Throwable th) {
@@ -51,7 +52,7 @@ public final class RemoteLog {
             }
         }
 
-        continuousDataBaseManager.addLog(new LogModel(logLevel.name(), tag, msg));
+        continuousDBManager.addLog(new LogModel(logLevel.name(), tag, msg));
 
         if (isEnabledDefaultLogging) {
             if (logger instanceof DefaultLogger) {
