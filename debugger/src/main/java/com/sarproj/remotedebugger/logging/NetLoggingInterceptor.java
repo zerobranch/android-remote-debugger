@@ -1,5 +1,6 @@
 package com.sarproj.remotedebugger.logging;
 
+import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.source.managers.ContinuousDataBaseManager;
 import com.sarproj.remotedebugger.source.mapper.HttpLogRequestMapper;
 import com.sarproj.remotedebugger.source.mapper.HttpLogResponseMapper;
@@ -101,7 +102,10 @@ public class NetLoggingInterceptor implements Interceptor {
             // ignore
         } finally {
             HttpLogModel logModel = requestMapper.map(logRequest);
-            logRequest.id = getDataBase().addHttpLog(logModel);
+            if (isAliveDebugger()) {
+                logRequest.id = getDataBase().addHttpLog(logModel);
+            }
+
             onReceiveLog(logModel);
         }
 
@@ -120,7 +124,10 @@ public class NetLoggingInterceptor implements Interceptor {
             logResponse.errorMessage = e.getMessage();
 
             HttpLogModel logModel = responseMapper.map(logResponse);
-            getDataBase().addHttpLog(logModel);
+            if (isAliveDebugger()) {
+                getDataBase().addHttpLog(logModel);
+            }
+
             onReceiveLog(logModel);
             throw e;
         }
@@ -173,7 +180,10 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         HttpLogModel logModel = responseMapper.map(logResponse);
-        getDataBase().addHttpLog(logModel);
+        if (isAliveDebugger()) {
+            getDataBase().addHttpLog(logModel);
+        }
+
         onReceiveLog(logModel);
         return response;
     }
@@ -182,6 +192,10 @@ public class NetLoggingInterceptor implements Interceptor {
         if (httpLogger != null) {
             httpLogger.log(logModel);
         }
+    }
+
+    private boolean isAliveDebugger() {
+        return RemoteDebugger.isAlive();
     }
 
     private ContinuousDataBaseManager getDataBase() {

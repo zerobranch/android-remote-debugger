@@ -44,7 +44,7 @@ public final class RemoteDebugger {
     }
 
     public static boolean isAlive() {
-        return ServerRunner.getInstance().isAlive();
+        return ServerRunner.getInstance().isAlive() || remoteLog != null;
     }
 
     public static class Builder {
@@ -194,7 +194,7 @@ public final class RemoteDebugger {
             // TODO: при (remoteLog == null) сделать exception
             // TODO: протестировать при каких условиях isAlive == false, возможно тогда, когда запущен другой сервер и сделать свой exception
 
-            if (!isAlive() || remoteLog == null) {
+            if (!isAlive()) {
                 return;
             }
 

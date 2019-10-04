@@ -257,9 +257,9 @@ public class MainActivity extends AppCompatActivity {
                         return chain.proceed(originalRequest);
                     })
 //                                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                    .addInterceptor(new NetLoggingInterceptor(httpLogModel -> {
-//                        System.out.println("--- " + httpLogModel.toString());
-                    }))
+                    .addInterceptor(new NetLoggingInterceptor(/*httpLogModel -> {
+                        System.out.println("--- " + httpLogModel.toString());
+                    }*/))
                     .build();
 
             RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "{\"planet\":\"earth\",\"star\":\"sun\",\"nextStar\":\"proxima\"}");
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                         .execute();
                 response.body().string();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }).start();
     }
