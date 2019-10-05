@@ -43,8 +43,7 @@ final class AndroidWebServer extends NanoHTTPD {
         final Host host = Host.getHost(session.getUri());
 
         if (host == null) {
-            return getErrorPageResponse(Response.Status.NOT_FOUND,
-                    getString(R.string.page_not_found));
+            return getErrorPageResponse(Response.Status.NOT_FOUND, "Sorry we could not find that page");
         }
 
         if (Method.GET.equals(method)) {
@@ -56,7 +55,7 @@ final class AndroidWebServer extends NanoHTTPD {
             }
             return response;
         } else {
-            return getErrorPageResponse(Response.Status.FORBIDDEN, getString(R.string.forbidden));
+            return getErrorPageResponse(Response.Status.FORBIDDEN, "Forbidden. Sorry you do not have access");
         }
     }
 
@@ -124,7 +123,7 @@ final class AndroidWebServer extends NanoHTTPD {
                     FileUtils.getStreamFromAssets(assetManager, host.getPath()));
         } catch (Exception ex) {
             return getErrorPageResponse(Response.Status.INTERNAL_ERROR,
-                    getString(R.string.internal_error, ex.toString()));
+                    String.format("Server internal error: %s", ex.getMessage()));
         }
     }
 
@@ -134,7 +133,7 @@ final class AndroidWebServer extends NanoHTTPD {
                     FileUtils.getStreamFromAssets(assetManager, host.getPath()));
         } catch (Exception ex) {
             return getErrorPageResponse(Response.Status.INTERNAL_ERROR,
-                    getString(R.string.internal_error, ex.toString()));
+                    String.format("Server internal error: %s", ex.getMessage()));
         }
     }
 
@@ -149,16 +148,8 @@ final class AndroidWebServer extends NanoHTTPD {
             return null;
         } catch (Exception ex) {
             return getErrorPageResponse(Response.Status.INTERNAL_ERROR,
-                    getString(R.string.internal_error, ex.getMessage()));
+                    String.format("Server internal error: %s", ex.getMessage()));
         }
-    }
-
-    private String getString(int stringRes) {
-        return context.getString(stringRes);
-    }
-
-    private String getString(int stringRes, Object... formatArgs) {
-        return context.getString(stringRes, formatArgs);
     }
 
     private Api getLogApi() {
