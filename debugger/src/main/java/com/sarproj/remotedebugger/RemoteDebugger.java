@@ -31,7 +31,7 @@ public final class RemoteDebugger {
         ServerRunner.getInstance().init(context, internalSettings, new ServerRunner.ConnectionStatus() {
             @Override
             public void onResult(boolean isRunning) {
-                if (!isRunning) { // todo протестить эту шнягу, когда сервер занят другим приложением
+                if (!isRunning) { // todo протестить эту шнягу, когда сервер занят другим приложением и какие выводяться логи при этом
                     return;
                 }
 
