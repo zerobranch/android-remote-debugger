@@ -78,6 +78,6 @@ final class ServerRunner {
     }
 
     interface ConnectionStatus {
-        void onResult(boolean isRunning);
+        void onResult(boolean isSuccessRunning);
     }
 }

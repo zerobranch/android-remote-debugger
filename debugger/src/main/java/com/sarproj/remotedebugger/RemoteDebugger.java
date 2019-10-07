@@ -30,8 +30,8 @@ public final class RemoteDebugger {
 
         ServerRunner.getInstance().init(context, internalSettings, new ServerRunner.ConnectionStatus() {
             @Override
-            public void onResult(boolean isRunning) {
-                if (!isRunning) { // todo протестить эту шнягу, когда сервер занят другим приложением и какие выводяться логи при этом
+            public void onResult(boolean isSuccessRunning) {
+                if (!isSuccessRunning) {
                     return;
                 }
 
@@ -201,9 +201,6 @@ public final class RemoteDebugger {
         }
 
         private static void log(LogLevel logLevel, String tag, String msg, Throwable th) {
-            // TODO: при (remoteLog == null) сделать exception
-            // TODO: протестировать при каких условиях isAlive == false, возможно тогда, когда запущен другой сервер и сделать свой exception
-
             if (!isAlive()) {
                 return;
             }
