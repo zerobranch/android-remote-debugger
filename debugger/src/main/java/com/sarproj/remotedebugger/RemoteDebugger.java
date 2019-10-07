@@ -2,6 +2,7 @@ package com.sarproj.remotedebugger;
 
 import android.content.Context;
 
+import com.sarproj.remotedebugger.logging.DefaultLogger;
 import com.sarproj.remotedebugger.logging.Logger;
 import com.sarproj.remotedebugger.logging.RemoteLog;
 import com.sarproj.remotedebugger.settings.InternalSettings;
@@ -11,6 +12,10 @@ import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 
 public final class RemoteDebugger {
     private static RemoteLog remoteLog;
+
+    private RemoteDebugger() {
+        throw new AssertionError("No instances.");
+    }
 
     public synchronized static void init(final Builder builder) {
         if (isAliveWebServer()) {
@@ -36,7 +41,7 @@ public final class RemoteDebugger {
                     ContinuousDBManager.init(context);
                 }
 
-                remoteLog = new RemoteLog(builder.logger, builder.enabledDuplicateLogging);
+                remoteLog = new RemoteLog(builder.logger);
             }
         });
     }
@@ -59,7 +64,6 @@ public final class RemoteDebugger {
     public static class Builder {
         private final Context context;
         private boolean enabled = true;
-        private boolean enabledDuplicateLogging = false;
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private Logger logger;
@@ -79,12 +83,11 @@ public final class RemoteDebugger {
         }
 
         public Builder enableDuplicateLogging() {
-            enabledDuplicateLogging = true;
+            this.logger = new DefaultLogger();
             return this;
         }
 
         public Builder enableDuplicateLogging(Logger logger) {
-            enabledDuplicateLogging = true;
             this.logger = logger;
             return this;
         }
