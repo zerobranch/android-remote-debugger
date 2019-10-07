@@ -74,14 +74,9 @@ public final class ContinuousDBManager {
         }
     }
 
-    public void addLog(final LogModel model) {
+    public void addLog(LogModel model) {
         synchronized (LOCK) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    logRepository.addLog(model);
-                }
-            }).start();
+            logRepository.addLog(model);
         }
     }
 
