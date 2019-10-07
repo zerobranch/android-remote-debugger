@@ -31,6 +31,10 @@ final class ServerRunner {
     }
 
     void init(Context context, InternalSettings internalSettings, ConnectionStatus connectionStatus) {
+        init(context, internalSettings, connectionStatus, DEFAULT_PORT);
+    }
+
+    void init(Context context, InternalSettings internalSettings, ConnectionStatus connectionStatus, int port) {
         if (isAlive()) {
             print("Server is already running");
             connectionStatus.onResult(true);
@@ -42,7 +46,7 @@ final class ServerRunner {
         String ip = InternalUtils.getIpAccess(context);
 
         try {
-            androidWebServer = new AndroidWebServer(context, ip, DEFAULT_PORT, internalSettings);
+            androidWebServer = new AndroidWebServer(context, ip, port, internalSettings);
             androidWebServer.start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
 
             print(String.format("Android Remote Debugger is started. Web server ip: %s", ip));
