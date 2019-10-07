@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
                         .enableInternalLogging()
                         .enableJsonPrettyPrint()
                         .enableDuplicateLogging()
+                        .excludeUncaughtException()
                         .build()
         );
 
@@ -63,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.user).setOnClickListener(v -> {
 //                dbHelper.insertUser();
 //                RemoteDebugger.init(getApplicationContext(), true, true);
-            dbHelper.insertUser();
+//            dbHelper.insertUser();
+            int a = 1 / 0;
         });
 
         findViewById(R.id.debug).setOnClickListener(v -> {

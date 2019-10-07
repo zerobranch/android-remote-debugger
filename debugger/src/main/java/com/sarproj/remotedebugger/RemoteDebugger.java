@@ -31,6 +31,10 @@ public final class RemoteDebugger {
             return;
         }
 
+        if (remoteDebugger.builder.includedUncaughtException) {
+            setUncaughtExceptionHandler();
+        }
+
         InternalSettings internalSettings = new InternalSettings(
                 remoteDebugger.builder.enabledInternalLogging,
                 remoteDebugger.builder.enabledJsonPrettyPrint
@@ -51,6 +55,18 @@ public final class RemoteDebugger {
         });
     }
 
+    private static void setUncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            private Thread.UncaughtExceptionHandler originalHandler = Thread.getDefaultUncaughtExceptionHandler();
+
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                Log.f(e);
+                originalHandler.uncaughtException(t, e);
+            }
+        });
+    }
+
     public synchronized static void stop() {
         ServerRunner.getInstance().stop();
         SettingsPrefs.destroy();
@@ -66,6 +82,7 @@ public final class RemoteDebugger {
         private boolean enabled = true;
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
+        private boolean includedUncaughtException = true;
         private Logger logger;
 
         public Builder enabled(boolean enabled) {
@@ -90,6 +107,11 @@ public final class RemoteDebugger {
 
         public Builder enableJsonPrettyPrint() {
             enabledJsonPrettyPrint = true;
+            return this;
+        }
+
+        public Builder excludeUncaughtException() {
+            includedUncaughtException = false;
             return this;
         }
 
