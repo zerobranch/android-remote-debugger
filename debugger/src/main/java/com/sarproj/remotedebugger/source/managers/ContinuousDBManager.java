@@ -24,6 +24,7 @@ public final class ContinuousDBManager {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
         database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
         database.setVersion(Integer.MAX_VALUE);
+        database.enableWriteAheadLogging();
 
         httpLogRepository = new HttpLogRepository(database);
         httpLogRepository.createHttpLogsTable(database);
