@@ -13,7 +13,7 @@ public final class RemoteDebugger {
     private static RemoteLog remoteLog;
 
     public synchronized static void init(final Builder builder) {
-        if (isAlive()) {
+        if (isAliveWebServer()) {
             stop();
         }
 
@@ -31,13 +31,12 @@ public final class RemoteDebugger {
         ServerRunner.getInstance().init(context, internalSettings, new ServerRunner.ConnectionStatus() {
             @Override
             public void onResult(boolean isSuccessRunning) {
-                if (!isSuccessRunning) {
-                    return;
+                if (isSuccessRunning) {
+                    SettingsPrefs.init(context);
+                    ContinuousDBManager.init(context);
                 }
 
-                SettingsPrefs.init(context);
-                ContinuousDBManager.init(context);
-                remoteLog = new RemoteLog(builder.logger, ContinuousDBManager.getInstance(), builder.enabledDefaultLogging);
+                remoteLog = new RemoteLog(builder.logger, builder.enabledDuplicateLogging);
             }
         });
     }
@@ -53,14 +52,14 @@ public final class RemoteDebugger {
         remoteLog = null;
     }
 
-    public static boolean isAlive() {
-        return ServerRunner.getInstance().isAlive() || remoteLog != null;
+    public static boolean isAliveWebServer() {
+        return ServerRunner.getInstance().isAlive();
     }
 
     public static class Builder {
         private final Context context;
         private boolean enabled = true;
-        private boolean enabledDefaultLogging = false;
+        private boolean enabledDuplicateLogging = false;
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private Logger logger;
@@ -79,18 +78,19 @@ public final class RemoteDebugger {
             return this;
         }
 
-        public Builder enableDefaultLogging() {
-            enabledDefaultLogging = true;
+        public Builder enableDuplicateLogging() {
+            enabledDuplicateLogging = true;
+            return this;
+        }
+
+        public Builder enableDuplicateLogging(Logger logger) {
+            enabledDuplicateLogging = true;
+            this.logger = logger;
             return this;
         }
 
         public Builder enableJsonPrettyPrint() {
             enabledJsonPrettyPrint = true;
-            return this;
-        }
-
-        public Builder logger(Logger logger) {
-            this.logger = logger;
             return this;
         }
     }
@@ -201,11 +201,9 @@ public final class RemoteDebugger {
         }
 
         private static void log(LogLevel logLevel, String tag, String msg, Throwable th) {
-            if (!isAlive()) {
-                return;
+            if (remoteLog != null) {
+                remoteLog.log(logLevel, tag, msg, th);
             }
-
-            remoteLog.log(logLevel, tag, msg, th);
         }
     }
 }

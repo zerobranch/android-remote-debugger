@@ -195,7 +195,7 @@ public class NetLoggingInterceptor implements Interceptor {
     }
 
     private boolean isAliveDebugger() {
-        return RemoteDebugger.isAlive();
+        return RemoteDebugger.isAliveWebServer();
     }
 
     private ContinuousDBManager getDataBase() {

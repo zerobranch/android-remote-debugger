@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                 .enabled(true)
                 .enableInternalLogging()
                 .enableJsonPrettyPrint()
-                .enableDefaultLogging() // todo переименовать mirror log to console и протестить теги (todo протестить когда запущен другой сервер а мой нет)
+                .enableDuplicateLogging()
         );
 
 //        RemoteLog.d("My debug");
