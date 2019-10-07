@@ -227,10 +227,4 @@ public class DatabaseApi extends Api {
     private DatabaseManager getDBAccess() {
         return DatabaseManager.getInstance();
     }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        DatabaseManager.disconnect();
-    }
 }

@@ -198,12 +198,6 @@ public class SharedPrefsApi extends Api {
         return SharedPrefsManager.getInstance();
     }
 
-    @Override
-    public void destroy() {
-        super.destroy();
-        SharedPrefsManager.disconnect();
-    }
-
     private void throwIfNotLong(String data) {
         final BigDecimal inVal = new BigDecimal(data);
         final BigDecimal maxLong = new BigDecimal(Long.MAX_VALUE);

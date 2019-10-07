@@ -101,10 +101,4 @@ public abstract class Api {
     protected String prettyJson(String item) throws JsonSyntaxException {
         return prettyPrintJson.toJson(new JsonParser().parse(item));
     }
-
-    public void destroy() {
-        context = null;
-        gson = null;
-        prettyPrintJson = null;
-    }
 }
