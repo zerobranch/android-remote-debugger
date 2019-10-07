@@ -827,7 +827,7 @@
             let searchTextCheck = logsSearchText == null || logsSearchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
 
             if (levelCheck && tagCheck && searchTextCheck) {
-                showElement(tr[i]);
+                removeDisplayAttr(tr[i]);
             } else {
                 hideElement(tr[i]);
             }
@@ -906,6 +906,10 @@
 
     function hideElement(element) {
         element.style.display = "none";
+    }
+
+    function removeDisplayAttr(element) {
+        element.style.display = "";
     }
 
     function invisibleElement(element) {
