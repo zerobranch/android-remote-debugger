@@ -61,7 +61,7 @@ public final class RemoteDebugger {
 
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                Log.f(e);
+                Log.wtf(e);
                 originalHandler.uncaughtException(t, e);
             }
         });
@@ -201,19 +201,19 @@ public final class RemoteDebugger {
             log(LogLevel.ERROR, tag, msg, th);
         }
 
-        public static void f(Throwable th) {
+        public static void wtf(Throwable th) {
             log(LogLevel.FATAL, null, null, th);
         }
 
-        public static void f(String msg) {
+        public static void wtf(String msg) {
             log(LogLevel.FATAL, null, msg, null);
         }
 
-        public static void f(String tag, String msg) {
+        public static void wtf(String tag, String msg) {
             log(LogLevel.FATAL, tag, msg, null);
         }
 
-        public static void f(String tag, String msg, Throwable th) {
+        public static void wtf(String tag, String msg, Throwable th) {
             log(LogLevel.FATAL, tag, msg, th);
         }
 

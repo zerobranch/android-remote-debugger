@@ -178,13 +178,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fatal).setOnClickListener(v -> {
             int i = 4;
             while (i > 0) {
-                RemoteDebugger.Log.f("testTag", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
+                RemoteDebugger.Log.wtf("testTag", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
                 i--;
             }
 
             i = -4;
             while (i < 0) {
-                RemoteDebugger.Log.f("farcry", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
+                RemoteDebugger.Log.wtf("farcry", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
                 i++;
             }
         });
