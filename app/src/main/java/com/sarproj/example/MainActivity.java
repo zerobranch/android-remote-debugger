@@ -26,12 +26,13 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        RemoteDebugger.init(new RemoteDebugger
-                .Builder(getApplication())
-                .enabled(true)
-                .enableInternalLogging()
-                .enableJsonPrettyPrint()
-                .enableDuplicateLogging()
+        RemoteDebugger.init(getApplication(),
+                new RemoteDebugger.Builder()
+                        .enabled(true)
+                        .enableInternalLogging()
+                        .enableJsonPrettyPrint()
+                        .enableDuplicateLogging()
+                        .build()
         );
 
 //        RemoteLog.d("My debug");

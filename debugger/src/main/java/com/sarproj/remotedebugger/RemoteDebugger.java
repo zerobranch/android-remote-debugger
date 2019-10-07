@@ -12,42 +12,43 @@ import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 
 public final class RemoteDebugger {
     private static RemoteLog remoteLog;
+    private Builder builder;
 
-    private RemoteDebugger() {
-        throw new AssertionError("No instances.");
+    private RemoteDebugger(Builder builder) {
+        this.builder = builder;
     }
 
-    public synchronized static void init(final Builder builder) {
+    public synchronized static void init(final Context context, final RemoteDebugger remoteDebugger) {
         if (isAliveWebServer()) {
             stop();
         }
 
-        if (!builder.enabled) {
+        if (!remoteDebugger.builder.enabled) {
             return;
         }
 
         InternalSettings internalSettings = new InternalSettings(
-                builder.enabledInternalLogging,
-                builder.enabledJsonPrettyPrint
+                remoteDebugger.builder.enabledInternalLogging,
+                remoteDebugger.builder.enabledJsonPrettyPrint
         );
-
-        final Context context = builder.context.getApplicationContext();
 
         ServerRunner.getInstance().init(context, internalSettings, new ServerRunner.ConnectionStatus() {
             @Override
             public void onResult(boolean isSuccessRunning) {
                 if (isSuccessRunning) {
-                    SettingsPrefs.init(context);
-                    ContinuousDBManager.init(context);
+                    Context appContext = context.getApplicationContext();
+
+                    SettingsPrefs.init(appContext);
+                    ContinuousDBManager.init(appContext);
                 }
 
-                remoteLog = new RemoteLog(builder.logger);
+                remoteLog = new RemoteLog(remoteDebugger.builder.logger);
             }
         });
     }
 
     public synchronized static void init(Context context) {
-        init(new Builder(context));
+        init(context, new Builder().build());
     }
 
     public synchronized static void stop() {
@@ -62,15 +63,10 @@ public final class RemoteDebugger {
     }
 
     public static class Builder {
-        private final Context context;
         private boolean enabled = true;
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private Logger logger;
-
-        public Builder(Context context) {
-            this.context = context;
-        }
 
         public Builder enabled(boolean enabled) {
             this.enabled = enabled;
@@ -95,6 +91,10 @@ public final class RemoteDebugger {
         public Builder enableJsonPrettyPrint() {
             enabledJsonPrettyPrint = true;
             return this;
+        }
+
+        public RemoteDebugger build() {
+            return new RemoteDebugger(this);
         }
     }
 
