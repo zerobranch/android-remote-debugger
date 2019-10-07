@@ -18,6 +18,10 @@ public final class RemoteDebugger {
         this.builder = builder;
     }
 
+    public synchronized static void init(Context context) {
+        init(context, new Builder().build());
+    }
+
     public synchronized static void init(final Context context, final RemoteDebugger remoteDebugger) {
         if (isAliveWebServer()) {
             stop();
@@ -45,10 +49,6 @@ public final class RemoteDebugger {
                 remoteLog = new RemoteLog(remoteDebugger.builder.logger);
             }
         });
-    }
-
-    public synchronized static void init(Context context) {
-        init(context, new Builder().build());
     }
 
     public synchronized static void stop() {
