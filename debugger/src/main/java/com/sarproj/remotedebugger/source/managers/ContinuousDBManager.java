@@ -24,7 +24,6 @@ public final class ContinuousDBManager {
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
         database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
         database.setVersion(Integer.MAX_VALUE);
-        database.enableWriteAheadLogging();
 
         httpLogRepository = new HttpLogRepository(database);
         httpLogRepository.createHttpLogsTable(database);
@@ -75,9 +74,14 @@ public final class ContinuousDBManager {
         }
     }
 
-    public void addLog(LogModel model) {
+    public void addLog(final LogModel model) {
         synchronized (LOCK) {
-            logRepository.addLog(model);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    logRepository.addLog(model);
+                }
+            }).start();
         }
     }
 
