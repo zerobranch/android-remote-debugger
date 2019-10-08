@@ -12,6 +12,7 @@ import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 
 public final class RemoteDebugger {
     private static RemoteLog remoteLog;
+    private static boolean isDebugEnable;
     private Builder builder;
 
     private RemoteDebugger(Builder builder) {
@@ -26,6 +27,8 @@ public final class RemoteDebugger {
         if (isAliveWebServer()) {
             stop();
         }
+
+        isDebugEnable = remoteDebugger.builder.enabled;
 
         if (!remoteDebugger.builder.enabled) {
             return;
@@ -68,10 +71,15 @@ public final class RemoteDebugger {
     }
 
     public synchronized static void stop() {
-        ServerRunner.getInstance().stop();
-        SettingsPrefs.destroy();
-        ContinuousDBManager.destroy();
+        isDebugEnable = false;
         remoteLog = null;
+        ServerRunner.getInstance().stop();
+        ContinuousDBManager.destroy();
+        SettingsPrefs.destroy();
+    }
+
+    public static boolean isDebugEnable() {
+        return isDebugEnable;
     }
 
     public static boolean isAliveWebServer() {

@@ -76,7 +76,7 @@ public final class NetworkApi extends Api {
     }
 
     private String clearAllLogs() {
-        getDataBase().clearAllHttpLog();
+        getDataBase().clearAllHttpLogs();
         return EMPTY;
     }
 

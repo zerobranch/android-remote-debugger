@@ -84,7 +84,7 @@ public final class LogApi extends Api {
     }
 
     private String clearAllLogs() {
-        getDataBase().clearAllLog();
+        getDataBase().clearAllLogs();
         return EMPTY;
     }
 
@@ -98,7 +98,7 @@ public final class LogApi extends Api {
             primaryLevel = null;
         }
 
-        return serialize(getDataBase().getLogByFilter(offset, LIMIT_LOGS_PACKS, primaryLevel, primaryTag, primarySearch));
+        return serialize(getDataBase().getLogsByFilter(offset, LIMIT_LOGS_PACKS, primaryLevel, primaryTag, primarySearch));
     }
 
     private ContinuousDBManager getDataBase() {

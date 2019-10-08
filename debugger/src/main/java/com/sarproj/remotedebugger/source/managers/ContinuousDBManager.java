@@ -2,6 +2,8 @@ package com.sarproj.remotedebugger.source.managers;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.HandlerThread;
 
 import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
@@ -19,8 +21,14 @@ public final class ContinuousDBManager {
     private static ContinuousDBManager instance;
     private final HttpLogRepository httpLogRepository;
     private final LogRepository logRepository;
+    private final Handler loggingHandler;
+    private final HandlerThread loggingHandlerThread;
 
     private ContinuousDBManager(Context context) {
+        loggingHandlerThread = new HandlerThread("LoggingHandlerThread");
+        loggingHandlerThread.start();
+        loggingHandler = new Handler(loggingHandlerThread.getLooper());
+
         SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
         database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
         database.setVersion(Integer.MAX_VALUE);
@@ -33,13 +41,11 @@ public final class ContinuousDBManager {
     }
 
     public static ContinuousDBManager getInstance() {
-        synchronized (LOCK) {
-            if (instance == null) {
-                throw new IllegalStateException("RemoteDebugger is not initialized. " +
-                        "Please call " + RemoteDebugger.class.getName() + ".init()");
-            }
-            return instance;
+        if (instance == null) {
+            throw new IllegalStateException("RemoteDebugger is not initialized. " +
+                    "Please call " + RemoteDebugger.class.getName() + ".init()");
         }
+        return instance;
     }
 
     public static void init(Context context) {
@@ -51,14 +57,14 @@ public final class ContinuousDBManager {
     }
 
     public static void destroy() {
-        synchronized (LOCK) {
-            if (instance != null) {
-                if (instance.database != null && instance.database.isOpen()) {
-                    instance.database.close();
-                }
+        if (instance != null) {
+            instance.loggingHandlerThread.quit();
 
-                instance = null;
+            if (instance.database != null && instance.database.isOpen()) {
+                instance.database.close();
             }
+
+            instance = null;
         }
     }
 
@@ -68,27 +74,42 @@ public final class ContinuousDBManager {
         }
     }
 
-    public void clearAllHttpLog() {
+    public void clearAllHttpLogs() {
         synchronized (LOCK) {
-            httpLogRepository.clearAll();
+            loggingHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    httpLogRepository.clearAll();
+                }
+            });
         }
     }
 
-    public void addLog(LogModel model) {
+    public void addLog(final LogModel model) {
         synchronized (LOCK) {
-            logRepository.addLog(model);
+            loggingHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logRepository.addLog(model);
+                }
+            });
         }
     }
 
-    public List<LogModel> getLogByFilter(int offset, int limit, String level, String tag, String search) {
+    public List<LogModel> getLogsByFilter(int offset, int limit, String level, String tag, String search) {
         synchronized (LOCK) {
             return logRepository.getLogsByFilter(offset, limit, level, tag, search);
         }
     }
 
-    public void clearAllLog() {
+    public void clearAllLogs() {
         synchronized (LOCK) {
-            logRepository.clearAllLogs();
+            loggingHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    logRepository.clearAllLogs();
+                }
+            });
         }
     }
 
@@ -97,6 +118,8 @@ public final class ContinuousDBManager {
                                           StatusCodeFilter statusCode,
                                           boolean isOnlyErrors,
                                           String search) {
-        return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyErrors, search);
+        synchronized (LOCK) {
+            return httpLogRepository.getHttpLogs(offset, limit, statusCode, isOnlyErrors, search);
+        }
     }
 }

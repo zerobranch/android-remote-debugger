@@ -189,7 +189,7 @@ public class NetLoggingInterceptor implements Interceptor {
     }
 
     private void onReceiveLog(HttpLogModel logModel) {
-        if (httpLogger != null) {
+        if (httpLogger != null && RemoteDebugger.isDebugEnable()) {
             httpLogger.log(logModel);
         }
     }
