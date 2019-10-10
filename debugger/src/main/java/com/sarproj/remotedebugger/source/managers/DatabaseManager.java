@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class DatabaseManager {
     private static final String FIELD_TYPE_NULL = "null";
@@ -23,7 +25,6 @@ public final class DatabaseManager {
     private static final String FIELD_TYPE_TEXT = "text";
     private static final String DATA_BASE_DIR = "databases";
     private static final String SELECT_QUERY = "select";
-    private static final String PRIMARY_KEY = "primary key";
     private static final Object LOCK = new Object();
 
     private SQLiteDatabase db;
@@ -306,22 +307,19 @@ public final class DatabaseManager {
 
     private String getFieldType(String metadata) {
         if (metadata == null || metadata.isEmpty()) {
-            return FIELD_TYPE_TEXT;
+            return null;
         }
 
-        String type = metadata.split(" ")[0].toLowerCase();
+        metadata = metadata.toLowerCase();
 
-        if (type.contains(FIELD_TYPE_INTEGER)) {
-            return FIELD_TYPE_INTEGER;
-        } else if (type.contains(FIELD_TYPE_REAL)) {
-            return FIELD_TYPE_REAL;
-        } else if (type.contains(FIELD_TYPE_BLOB)) {
-            return FIELD_TYPE_BLOB;
-        } else if (type.contains(FIELD_TYPE_NULL)) {
-            return FIELD_TYPE_NULL;
+        String[] types = new String[]{FIELD_TYPE_INTEGER, FIELD_TYPE_REAL, FIELD_TYPE_BLOB, FIELD_TYPE_TEXT, FIELD_TYPE_NULL};
+
+        for (String type : types) {
+            if (metadata.contains(type)) {
+                return type;
+            }
         }
-
-        return FIELD_TYPE_TEXT;
+        return null;
     }
 
     private List<Table.Header> getImmutableHeaders(List<String> columnsName) {
@@ -334,28 +332,79 @@ public final class DatabaseManager {
         return headers;
     }
 
+    private List<String> findPrimaryKey(String columnsText) {
+        List<String> primaryKeys = new ArrayList<>();
+
+        if (!columnsText.toLowerCase().contains("primary key")) {
+            return primaryKeys;
+        }
+
+        Pattern pattern = Pattern.compile("(?i)(primary key\\s*\\().*?\\)");
+        Matcher matcher = pattern.matcher(columnsText);
+        if (matcher.find()) {
+            String primaryKeyPart = matcher.group(0).replaceAll("(?i)(primary key\\s*\\()", "").replaceAll("\\)", "");
+            String[] columnParams = primaryKeyPart.split(",");
+
+            for (String columnParam : columnParams) {
+                primaryKeys.add(columnParam.trim());
+            }
+        } else {
+            String[] columnParams = columnsText.split(",");
+            for (String columnParam : columnParams) {
+                if (columnParam.toLowerCase().contains("primary key")) {
+                    primaryKeys.add(columnParam.trim().split(" ")[0].trim());
+                }
+            }
+        }
+
+        return primaryKeys;
+    }
+
     private List<Table.Header> getHeaders(String sql) {
         List<Table.Header> columnsList = new ArrayList<>();
         int start = sql.indexOf("(");
-        int end = sql.indexOf(")");
-        String[] columns = sql.substring(start + 1, end).split(",");
+        int end = sql.lastIndexOf(")");
+
+        String columnsText = sql.substring(start + 1, end);
+        columnsText = columnsText
+                .trim()
+                .replaceAll("\"", "")
+                .replaceAll("`", "")
+                .replaceAll("'", "")
+                .replaceAll("\n", " ")
+                .replaceAll("\r", " ")
+                .replaceAll("\t", " ");
+
+        List<String> primaryKeys = findPrimaryKey(columnsText);
+
+        columnsText = columnsText.replaceAll("(?i)(primary key\\s*\\().*?\\)", ""); // remove primary key in the end
+
+        String[] columns = columnsText.split(",");
 
         for (String column : columns) {
-            column = column.trim().replaceAll("\"", "").replaceAll("`", "");
-            String columnName = column.split(" ")[0];
+            column = column.trim();
+            String columnName = column.split(" ")[0].trim();
 
-            if (column.length() == columnName.length()) {
+            if (columnName.isEmpty()) {
+                continue;
+            }
+
+            if (column.equals(columnName)) {
                 columnsList.add(getDefaultHeader(columnName, true));
                 continue;
             }
 
             String columnMetadata = column.substring(columnName.length() + 1);
-            columnMetadata = columnMetadata.toLowerCase();
+            String fieldType = getFieldType(columnMetadata);
+
+            if (fieldType == null) {
+                continue;
+            }
 
             Table.Header header = new Table.Header();
             header.name = columnName;
-            header.isMutable = !isPrimaryKey(columnMetadata);
-            header.type = getFieldType(columnMetadata);
+            header.isMutable = !primaryKeys.contains(columnName);
+            header.type = fieldType;
 
             columnsList.add(header);
         }
@@ -369,10 +418,6 @@ public final class DatabaseManager {
         header.isMutable = isMutable;
         header.type = FIELD_TYPE_TEXT;
         return header;
-    }
-
-    private boolean isPrimaryKey(String metadata) {
-        return metadata.toLowerCase().contains(PRIMARY_KEY);
     }
 
     private void transactionRun(Runnable runnable) {
