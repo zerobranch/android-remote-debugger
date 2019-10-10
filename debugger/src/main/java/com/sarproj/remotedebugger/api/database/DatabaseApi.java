@@ -114,7 +114,7 @@ public class DatabaseApi extends Api {
 
         final String tableName = getStringValue(params, HtmlParams.NAME);
         final UpdatingDatabase fields = deserialize(
-                getStringValue(params, HtmlParams.DATA),
+                getStringValue(params, HtmlParams.DATA), // todo найти каждое значение old value и new value - потом перевести в base64 а потом перевести в объект с gson а потом снова в строку перевести
                 UpdatingDatabase.class
         );
 
