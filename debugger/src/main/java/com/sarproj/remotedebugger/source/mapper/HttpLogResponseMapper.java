@@ -17,7 +17,7 @@ public class HttpLogResponseMapper {
         httpLogModel.time = Constants.defaultDateFormat.format(response.time);
         httpLogModel.code = response.code;
         httpLogModel.message = response.message;
-        httpLogModel.fullStatus = response.code + " " + response.message;
+        httpLogModel.fullStatus = response.code == -1 ? null : response.code + " " + response.message;
         httpLogModel.duration = response.duration == null ? null : response.duration + " ms";
         httpLogModel.bodySize = response.bodySize == null ? null : response.bodySize + " byte";
         httpLogModel.port = response.port;

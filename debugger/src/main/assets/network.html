@@ -571,7 +571,7 @@
             requestInfoDiv.appendChild(contentTypeP);
         }
 
-        if (isResponse(logLine) && logLine.code) {
+        if (isResponse(logLine) && logLine.fullStatus) {
             let statusP = document.createElement("p");
             statusP.className = "query-description";
 
