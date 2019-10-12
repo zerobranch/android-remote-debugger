@@ -647,10 +647,13 @@ td {
     height: 30px;
     font-size: 12pt;
     outline: none !important;
+    padding-top: 10px;
+    min-height: 30px;
     font-family: monospace;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 3px;
+    resize: vertical;
 }
 
 .detail-item-input-white-style {
