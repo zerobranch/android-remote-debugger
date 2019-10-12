@@ -1,5 +1,6 @@
 package com.sarproj.remotedebugger.source.managers;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -177,20 +178,28 @@ public final class DatabaseManager {
         }
     }
 
-    public void removeItems(final String tableName, List<String> headers, final List<List<String>> lines) {
+    public void removeItems(final String tableName, final List<String> headers, final List<List<String>> lines) {
         synchronized (LOCK) {
-            final StringBuilder whereClause = new StringBuilder();
-            for (String header : headers) {
-                whereClause.append(header).append("=?").append(" and ");
-            }
-
-            whereClause.delete(whereClause.length() - 4, whereClause.length());
-
             transactionRun(new Runnable() {
                 @Override
                 public void run() {
-                    for (List<String> line : lines) {
-                        db.delete(tableName, whereClause.toString(), line.toArray(new String[0]));
+                    StringBuilder whereClause = new StringBuilder();
+                    for (int i = 0; i < lines.size(); i++) {
+                        List<String> arguments = new ArrayList<>();
+
+                        for (int j = 0; j < lines.get(i).size(); j++) {
+                            String item = lines.get(i).get(j);
+
+                            if (!TextUtils.isEmpty(item)) {
+                                whereClause.append(headers.get(j)).append("=?").append(" and ");
+                                arguments.add(item);
+                            }
+                        }
+
+                        whereClause.delete(whereClause.length() - 4, whereClause.length());
+
+                        db.delete(tableName, whereClause.toString(), arguments.toArray(new String[0]));
+                        whereClause.setLength(0);
                     }
                 }
             });
@@ -224,8 +233,9 @@ public final class DatabaseManager {
                         "and 'newValues' must match the size of the array 'headers'");
             }
 
-            final StringBuilder queryForUpdate = new StringBuilder();
             final StringBuilder whereClause = new StringBuilder();
+            final ContentValues contentValues = new ContentValues();
+            final List<String> arguments = new ArrayList<>();
 
             for (int i = 0; i < headers.size(); i++) {
                 String oldVal = oldValues.get(i);
@@ -233,28 +243,22 @@ public final class DatabaseManager {
                 String header = headers.get(i);
 
                 if (!newVal.equals(oldVal)) {
-                    queryForUpdate.append(header)
-                            .append(" = ")
-                            .append((newVal.isEmpty()) ? null : "'".concat(newVal).concat("'"))
-                            .append(", ");
+                    contentValues.put(header, newVal);
                 }
 
-                if (!TextUtils.isEmpty(header)) {
-                    whereClause.append(header)
-                            .append(" = '")
-                            .append(oldVal)
-                            .append("' and ");
+                if (!TextUtils.isEmpty(header) && !TextUtils.isEmpty(oldVal)) {
+                    whereClause.append(header).append("=?").append(" and ");
+                    arguments.add(oldVal);
                 }
             }
 
-            if (queryForUpdate.length() == 0) {
+            if (contentValues.size() == 0) {
                 return;
             }
 
-            queryForUpdate.delete(queryForUpdate.length() - 2, queryForUpdate.length());
             whereClause.delete(whereClause.length() - 4, whereClause.length());
 
-            db.execSQL("UPDATE " + tableName + " SET " + queryForUpdate.toString() + " WHERE " + whereClause.toString());
+            db.update(tableName, contentValues, whereClause.toString(), arguments.toArray(new String[0]));
         }
     }
 

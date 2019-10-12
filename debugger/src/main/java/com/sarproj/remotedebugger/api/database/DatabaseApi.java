@@ -114,9 +114,14 @@ public class DatabaseApi extends Api {
 
         final String tableName = getStringValue(params, HtmlParams.NAME);
         final UpdatingDatabase fields = deserialize(
-                getStringValue(params, HtmlParams.DATA), // todo найти каждое значение old value и new value - потом перевести в base64 а потом перевести в объект с gson а потом снова в строку перевести
+                getStringValue(params, HtmlParams.DATA),
                 UpdatingDatabase.class
         );
+
+        for (int i = 0; i < fields.newValues.size(); i++) {
+            fields.oldValues.set(i, fromBase64(fields.oldValues.get(i)));
+            fields.newValues.set(i, fromBase64(fields.newValues.get(i)));
+        }
 
         getDBAccess().updateData(tableName, fields.headers, fields.oldValues, fields.newValues);
         return EMPTY;
@@ -136,6 +141,12 @@ public class DatabaseApi extends Api {
                 getStringValue(params, HtmlParams.DATA),
                 DeletingDatabase.class
         );
+
+        for (int i = 0; i < deletingDatabase.fields.size(); i++) {
+            for (int j = 0; j < deletingDatabase.fields.get(i).size(); j++) {
+                deletingDatabase.fields.get(i).set(j, fromBase64(deletingDatabase.fields.get(i).get(j)));
+            }
+        }
 
         getDBAccess().removeItems(tableName, deletingDatabase.headers, deletingDatabase.fields);
         return EMPTY;

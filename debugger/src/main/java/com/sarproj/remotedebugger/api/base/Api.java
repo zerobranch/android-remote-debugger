@@ -1,6 +1,7 @@
 package com.sarproj.remotedebugger.api.base;
 
 import android.content.Context;
+import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,6 +12,7 @@ import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.utils.InternalUtils;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -100,5 +102,9 @@ public abstract class Api {
 
     protected String prettyJson(String item) throws JsonSyntaxException {
         return prettyPrintJson.toJson(new JsonParser().parse(item));
+    }
+
+    protected String fromBase64(String value) {
+        return new String(Base64.decode(value, Base64.DEFAULT), StandardCharsets.UTF_8);
     }
 }

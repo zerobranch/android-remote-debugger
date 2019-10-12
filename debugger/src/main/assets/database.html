@@ -666,7 +666,7 @@
             let tr = trs[selectedTableRecordsPositions[i]].getElementsByTagName("td");
             fieldsJson += '[';
             for (let j = 0; j < tr.length; j++) {
-                fieldsJson += '"' + tr[j].innerText + '",';
+                fieldsJson += '"' + window.btoa(tr[j].innerText) + '",';
             }
 
             fieldsJson = removeLast(fieldsJson) + '],';
@@ -778,11 +778,11 @@
 
         for (let key of newValMap.keys()) {
             headersJson += '"' + key + '",';
-            newValJson += '"' + newValMap.get(key) + '",';
+            newValJson += '"' + window.btoa(newValMap.get(key)) + '",';
         }
 
         oldValMap.forEach(table => {
-            oldValJson += '"' + table.value + '",';
+            oldValJson += '"' + window.btoa(table.value) + '",';
         });
 
         newValJson = '"newValues":[' + removeLast(newValJson) + ']';
