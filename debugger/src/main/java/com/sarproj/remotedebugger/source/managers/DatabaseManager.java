@@ -271,19 +271,18 @@ public final class DatabaseManager {
             table.headers = getHeaders(metaInfo);
 
             final StringBuilder queryBuilder = new StringBuilder("SELECT * FROM " + tableName + " WHERE ");
+            final List<String> arguments = new ArrayList<>();
 
             for (Table.Header header : table.headers) {
                 queryBuilder.append(header.name)
-                        .append(" LIKE ")
-                        .append("'%")
-                        .append(text)
-                        .append("%'")
+                        .append(" LIKE ?")
                         .append(" or ");
+                arguments.add("%".concat(text).concat("%"));
             }
 
             queryBuilder.delete(queryBuilder.length() - 4, queryBuilder.length() - 1);
 
-            final Cursor cursor = db.rawQuery(queryBuilder.toString(), null);
+            final Cursor cursor = db.rawQuery(queryBuilder.toString(), arguments.toArray(new String[0]));
 
             while (cursor.moveToNext()) {
                 final List<String> row = new ArrayList<>();

@@ -84,6 +84,7 @@ public class HttpLogRepository {
                 .append("select * from " + REMOTE_NET_LOGS_TABLE_NAME);
 
         final StringBuilder conditionBuilder = new StringBuilder();
+        final List<String> arguments = new ArrayList<>();
 
         if (isOnlyErrors) {
             conditionBuilder
@@ -138,12 +139,8 @@ public class HttpLogRepository {
                     searchBuilder.append(" or ");
                 }
 
-                searchBuilder
-                        .append(tables[i])
-                        .append(" like ")
-                        .append("'%")
-                        .append(search)
-                        .append("%'");
+                searchBuilder.append(tables[i]).append(" like ?");
+                arguments.add("%".concat(search).concat("%"));
             }
 
             if (conditionBuilder.length() != 0) {
@@ -169,7 +166,7 @@ public class HttpLogRepository {
             query.append(" offset ").append(offset);
         }
 
-        final Cursor cursor = database.rawQuery(query.toString(), null);
+        final Cursor cursor = database.rawQuery(query.toString(), arguments.toArray(new String[0]));
         final List<HttpLogModel> logModels = new ArrayList<>();
 
         while (cursor.moveToNext()) {

@@ -29,6 +29,8 @@ public final class LogRepository {
     }
 
     public List<LogModel> getLogsByFilter(int offset, int limit, String level, String tag, String search) {
+        final List<String> arguments = new ArrayList<>();
+
         final StringBuilder query = new StringBuilder()
                 .append("select ")
                 .append(LogTable.TIME + ", ")
@@ -46,9 +48,8 @@ public final class LogRepository {
                     .append(LogTable.LEVEL)
                     .append(")")
                     .append(" like ")
-                    .append("lower ('")
-                    .append(level)
-                    .append("%')");
+                    .append("lower (?)");
+            arguments.add("%".concat(level).concat("%"));
         }
 
         if (!TextUtils.isEmpty(tag)) {
@@ -60,9 +61,8 @@ public final class LogRepository {
                     .append(LogTable.TAG)
                     .append(")")
                     .append(" like ")
-                    .append("lower ('")
-                    .append(tag)
-                    .append("%')");
+                    .append("lower (?)");
+            arguments.add(tag.concat("%"));
         }
 
         if (!TextUtils.isEmpty(search)) {
@@ -70,11 +70,24 @@ public final class LogRepository {
                 query.append(" and ");
             }
 
-            query.append(LogTable.MESSAGE)
-                    .append(" like ")
-                    .append("'%")
-                    .append(search)
-                    .append("%'");
+            query.append(" (");
+
+            String[] tables = new String[]{
+                    LogTable.LEVEL,
+                    LogTable.MESSAGE,
+                    LogTable.TAG,
+                    LogTable.TIME
+            };
+
+            for (int i = 0; i < tables.length; i++) {
+                if (i != 0) {
+                    query.append(" or ");
+                }
+
+                query.append(tables[i]).append(" like ?");
+                arguments.add("%".concat(search).concat("%"));
+            }
+            query.append(") ");
         }
 
         query.append(" order by ")
@@ -86,7 +99,7 @@ public final class LogRepository {
             query.append(" offset ").append(offset);
         }
 
-        final Cursor cursor = database.rawQuery(query.toString(), null);
+        final Cursor cursor = database.rawQuery(query.toString(), arguments.toArray(new String[0]));
         final List<LogModel> logModels = new ArrayList<>();
 
         while (cursor.moveToNext()) {
