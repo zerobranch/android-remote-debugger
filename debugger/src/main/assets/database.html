@@ -514,7 +514,11 @@
             + '&' + 'data=' + encodeURIComponent(query);
         httpGet('database', body, function (response) {
             hideLoader();
-            clearTableContent();
+            clearTableContent(false);
+
+            selectedTable = null;
+            tableList.selectedIndex = 0;
+
             hideCustomQueryModal();
             hideElement(infoContent);
 
@@ -1058,7 +1062,7 @@
             + '&' + 'name=' + encodeURIComponent(selectedTable);
 
         httpPost('database', body, function () {
-            clearTableContent();
+            clearTableContent(true);
 
             hideElement(confirmationModal);
             onRefresh();
@@ -1067,7 +1071,7 @@
         });
     }
 
-    function clearTableContent() {
+    function clearTableContent(isClearTableList) {
         clearContent(dbTableContent);
 
         hideElement(dropTable);
@@ -1078,7 +1082,9 @@
         setEnabled(search, false);
 
         selectedTable = null;
-        resetChooser(tableList, DEFAULT_TABLE_LIST_TITLE);
+        if (isClearTableList) {
+            resetChooser(tableList, DEFAULT_TABLE_LIST_TITLE);
+        }
 
         currentPage = FIRST_PAGE;
         pagesCount = 0;
