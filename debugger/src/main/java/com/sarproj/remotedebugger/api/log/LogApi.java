@@ -4,17 +4,15 @@ import android.content.Context;
 
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
+import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.settings.SettingsPrefs;
-import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.local.LogLevel;
-import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.local.Theme;
-import com.sarproj.remotedebugger.http.Host;
+import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
+import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.utils.FileUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +32,6 @@ public final class LogApi extends Api {
     public String execute(Map<String, List<String>> params) throws NanoHTTPD.ResponseException {
         if (params == null || params.isEmpty()) {
             return FileUtils.getTextFromAssets(context.getAssets(), Host.LOGGING.getPath());
-        } else if (params.containsKey(LogHtmlKey.GET_LOG_LEVELS)) {
-            return getLogLevels();
         } else if (params.containsKey(LogHtmlKey.GET_LOGS)) {
             return getLogs(params);
         } else if (params.containsKey(LogHtmlKey.CLEAR_ALL_LOGS)) {
@@ -103,9 +99,5 @@ public final class LogApi extends Api {
 
     private ContinuousDBManager getDataBase() {
         return ContinuousDBManager.getInstance();
-    }
-
-    private String getLogLevels() {
-        return serialize(new ArrayList<>(Arrays.asList(LogLevel.values())));
     }
 }

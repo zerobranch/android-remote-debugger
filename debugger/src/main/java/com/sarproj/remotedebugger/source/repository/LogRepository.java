@@ -42,11 +42,13 @@ public final class LogRepository {
         }
 
         if (!TextUtils.isEmpty(level)) {
-            query.append(LogTable.LEVEL)
-                    .append(" = ")
-                    .append("'")
+            query.append(" lower (")
+                    .append(LogTable.LEVEL)
+                    .append(")")
+                    .append(" like ")
+                    .append("lower ('")
                     .append(level)
-                    .append("'");
+                    .append("%')");
         }
 
         if (!TextUtils.isEmpty(tag)) {

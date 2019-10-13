@@ -1,7 +1,6 @@
 package com.sarproj.remotedebugger.api.log;
 
 interface LogHtmlKey {
-    String GET_LOG_LEVELS = "getLogLevels";
     String GET_LOGS = "getLogs";
     String LOGS_TAG = "logsTag";
     String LOGS_SEARCH = "logsSearch";

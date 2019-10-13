@@ -27,56 +27,12 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffb600;
 }
 
-/* header dropdown */
-.dropdown-btn {
-    cursor: pointer;
-    font-size: 20px;
-    border: none;
-    outline: none;
-    background-color: inherit;
-    font-family: 'Josefin Sans', sans-serif;
-    color: #c9c9c9;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 110px;
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-.dropdown-content-item {
-    float: none;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-    font-size: 12pt;
-    color: #515151;
-    font-family: 'Josefin Sans', sans-serif;
-    cursor: pointer;
-}
-
-.dropdown-content-item:hover {
-    background-color: #ddd;
-}
-
-.dropdown-content a:hover {
-    background-color: #ddd;
-}
-
 .show {
     display: block;
 }
 
 .hide {
     display: none;
-}
-
-.dropdown-btn:hover {
-    color: #ffab00;
 }
 
 /* header dropdown */
@@ -229,6 +185,18 @@ td:nth-child(3) {
 /* header panel */
 #logLevelBtn {
     float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 35px;
+    max-width: 150px;
+    outline: none !important;
+    background: #222222;
+    margin-top: -5px;
+    font-size: 13pt;
+    font-family: monospace;
+    color: #c0c0c0;
+    border: 1px solid #222;
 }
 
 #scrollControlPanel {

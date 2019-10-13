@@ -52,7 +52,16 @@
 
 <div id="header">
     <div id="controlPanel">
-        <button class="dropdown-btn" id="logLevelBtn" onclick="onShowFilter()">Verbose<i></i></button>
+        <label for="logLevelBtn"></label>
+        <select id="logLevelBtn" onchange="onLogLevelClick()">
+            <option selected value="verbose">Verbose</option>
+            <option value="debug">Debug</option>
+            <option value="info">Info</option>
+            <option value="warn">Warn</option>
+            <option value="error">Error</option>
+            <option value="fatal">Fatal</option>
+        </select>
+
         <input type="text" id="searchByTag" class="default-input" onkeyup="onSearchByTag(this)"
                placeholder="Filter by tag" title="Type in a text">
 
@@ -124,10 +133,6 @@
                 </svg>
             </div>
         </div>
-
-        <div class="dropdown-content" id="filterDropdownContent">
-        </div>
-
     </div>
 </div>
 
@@ -187,7 +192,6 @@
     let connectionStatus = getElementById("connectionStatus");
     let logLevelBtn = getElementById("logLevelBtn");
     let loader = getElementById("loader");
-    let filterDropdownContent = getElementById("filterDropdownContent");
     let errorContent = getElementById('errorContent');
     let errorText = getElementById('errorText');
     let rightHeader = getElementById('rightHeader');
@@ -199,20 +203,14 @@
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
-        loadLogLevels();
+        logsLevel = logLevelBtn.options[0].value;
+
+        loadLogs();
         loadDefaultsSetting();
         onPageResize();
 
         window.addEventListener("keyup", onGlobalKeyUp);
         window.addEventListener("keydown", onGlobalKeyDown);
-    };
-
-    window.onclick = function (e) {
-        if (!e.target.matches('.dropdown-btn')) {
-            if (filterDropdownContent.classList.contains('show')) {
-                filterDropdownContent.classList.remove('show');
-            }
-        }
     };
 
     function onTagClick(item) {
@@ -261,8 +259,14 @@
         }
     }
 
-    function onShowFilter() {
-        filterDropdownContent.classList.toggle("show");
+    function onLogLevelClick() {
+        let logItem = logLevelBtn.options[logLevelBtn.selectedIndex].value;
+
+        logsOffset = -1;
+        logsLevel = logItem;
+
+        clearTimeoutHandle();
+        loadLogs();
     }
 
     function onFollowClick(svgElement) {
@@ -580,44 +584,6 @@
         if (timeoutHandle) {
             clearTimeout(timeoutHandle);
         }
-    }
-
-    function loadLogLevels() {
-        let body = 'getLogLevels=' + encodeURIComponent('');
-        httpGet('logging', body, function (response) {
-            let logLevels = JSON.parse(response);
-            clearContent(filterDropdownContent);
-
-            if (logsLevel == null) {
-                logLevelBtn.innerHTML =
-                    logLevels[0].charAt(0).toUpperCase() + logLevels[0].toLocaleLowerCase().slice(1);
-
-                logsLevel = logLevels[0];
-                loadLogs();
-            }
-
-            logLevels.forEach(function (log) {
-                let label = document.createElement("label");
-                label.className = "dropdown-content-item";
-                let logFormattedText = log.charAt(0).toUpperCase() + log.toLocaleLowerCase().slice(1);
-                let labelText = document.createTextNode(logFormattedText);
-
-                label.onclick = function () {
-                    logLevelBtn.innerHTML = logFormattedText;
-
-                    logsOffset = -1;
-                    logsLevel = log;
-
-                    clearTimeoutHandle();
-                    loadLogs();
-                };
-
-                label.appendChild(labelText);
-                filterDropdownContent.appendChild(label);
-            });
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
     }
 
     function getFormattedTime(timestamp) {
