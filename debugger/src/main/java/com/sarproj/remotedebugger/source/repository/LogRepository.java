@@ -20,7 +20,7 @@ public final class LogRepository {
 
     public void addLog(LogModel model) {
         ContentValues values = new ContentValues();
-        values.put(LogTable.TIME, model.getNewTime());
+        values.put(LogTable.TIME, model.time);
         values.put(LogTable.LEVEL, model.level);
         values.put(LogTable.TAG, model.tag);
         values.put(LogTable.MESSAGE, model.message);
@@ -104,7 +104,7 @@ public final class LogRepository {
 
         while (cursor.moveToNext()) {
             final LogModel log = new LogModel();
-            log.time = cursor.getLong(cursor.getColumnIndex(LogTable.TIME));
+            log.time = cursor.getString(cursor.getColumnIndex(LogTable.TIME));
             log.level = cursor.getString(cursor.getColumnIndex(LogTable.LEVEL));
             log.tag = cursor.getString(cursor.getColumnIndex(LogTable.TAG));
             log.message = cursor.getString(cursor.getColumnIndex(LogTable.MESSAGE));
@@ -122,7 +122,7 @@ public final class LogRepository {
     public void createLogsTable(SQLiteDatabase db) {
         final String query = "create table " + REMOTE_LOGS_TABLE_NAME + " (" +
                 LogTable.ID + " integer primary key autoincrement, " +
-                LogTable.TIME + " integer," +
+                LogTable.TIME + " text," +
                 LogTable.LEVEL + " text," +
                 LogTable.TAG + " text," +
                 LogTable.MESSAGE + " text);";

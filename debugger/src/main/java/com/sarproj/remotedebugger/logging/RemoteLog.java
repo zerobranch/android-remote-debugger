@@ -46,7 +46,7 @@ public final class RemoteLog {
         }
 
         if (continuousDBManager != null) {
-            continuousDBManager.addLog(new LogModel(logLevel.name(), tag, msg));
+            continuousDBManager.addLog(new LogModel(logLevel.name(), tag, msg, System.currentTimeMillis()));
         }
 
         if (logger != null) {

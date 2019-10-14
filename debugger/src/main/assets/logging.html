@@ -586,11 +586,6 @@
         }
     }
 
-    function getFormattedTime(timestamp) {
-        let logDate = new Date(timestamp);
-        return logDate.getHours() + ':' + logDate.getMinutes() + ':' + logDate.getSeconds() + ':' + logDate.getMilliseconds();
-    }
-
     function loadLogs() {
         if (isConnectionLost) {
             loadOfflineLogs();
@@ -635,8 +630,6 @@
                 }
 
                 parsedLogs.forEach(function (logLine) {
-                    let currentTime = getFormattedTime(new Date(logLine.time));
-
                     let tr = document.createElement("tr");
                     let copyImgTd = document.createElement("td");
                     let tooltipSpan = document.createElement("span");
@@ -665,7 +658,7 @@
                     copyImg.appendChild(path);
 
                     copyImg.onclick = function () {
-                        copyToClipboard(getFormattedTime(logLine.time) + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
+                        copyToClipboard(logLine.time + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
                         visibleElement(tooltipSpan);
 
                         let tooltipTimeout = setTimeout(function () {
@@ -694,7 +687,7 @@
                         messageTd.classList.add("log-item-white-style");
                     }
 
-                    let timeText = document.createTextNode(currentTime);
+                    let timeText = document.createTextNode(logLine.time);
                     let levelText = document.createTextNode(logLine.level);
                     let tagText = document.createTextNode(logLine.tag);
                     let messageText = document.createTextNode(logLine.message);

@@ -65,11 +65,11 @@ tr.darkVerbose {
 }
 
 tr.error {
-    color: red;
+    color: #D5003B;
 }
 
 tr.fatal {
-    color: #d32f2f;
+    color: #ff0000;
 }
 
 tr.warn {

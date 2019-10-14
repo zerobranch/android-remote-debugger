@@ -1,7 +1,9 @@
 package com.sarproj.remotedebugger.source.models;
 
+import com.sarproj.remotedebugger.source.local.Constants;
+
 public class LogModel {
-    public long time;
+    public String time;
     public String level;
     public String tag;
     public String message;
@@ -9,14 +11,10 @@ public class LogModel {
     public LogModel() {
     }
 
-    public LogModel(String level, String tag, String message) {
+    public LogModel(String level, String tag, String message, long currentTime) {
         this.level = level;
         this.tag = tag;
         this.message = message;
-    }
-
-    public long getNewTime() {
-        time = System.currentTimeMillis();
-        return time;
+        this.time = Constants.defaultDateFormat.format(currentTime);
     }
 }
