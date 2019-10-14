@@ -181,6 +181,7 @@
     let currentContentFont = DEFAULT_FONT_SIZE;
     let isConnectionLost = false;
     let globalKeyPressed = null;
+    let receivedLogs = [];
 
     let logTable = getElementById("logTable");
     let changeContentFont = getElementById("changeContentFont");
@@ -625,108 +626,15 @@
             if (parsedLogs.length !== 0) {
                 if (logsOffset === -1) {
                     logsOffset = parsedLogs.length;
+
+                    if (isInactiveSearch()) {
+                        receivedLogs = [];
+                    }
                 } else {
                     logsOffset += parsedLogs.length;
                 }
 
-                parsedLogs.forEach(function (logLine) {
-                    let tr = document.createElement("tr");
-                    let copyImgTd = document.createElement("td");
-                    let tooltipSpan = document.createElement("span");
-                    let timeTd = document.createElement("td");
-                    let levelTd = document.createElement("td");
-                    let tagTd = document.createElement("td");
-                    let messageTd = document.createElement("td");
-                    let messagePre = document.createElement("pre");
-
-                    tooltipSpan.className = "tooltip-text";
-                    tooltipSpan.innerText = "Copied!";
-
-                    let copyImg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    copyImg.setAttribute("width", "20");
-                    copyImg.setAttribute("height", "20");
-                    copyImg.setAttribute("viewBox", "0 0 24 24");
-
-                    if (isDarkTheme) {
-                        copyImg.setAttribute("class", "copy-img copy-img-dark-style");
-                    } else {
-                        copyImg.setAttribute("class", "copy-img copy-img-white-style");
-                    }
-
-                    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    path.setAttributeNS(null, "d", "M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z");
-                    copyImg.appendChild(path);
-
-                    copyImg.onclick = function () {
-                        copyToClipboard(logLine.time + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
-                        visibleElement(tooltipSpan);
-
-                        let tooltipTimeout = setTimeout(function () {
-                            clearInterval(tooltipTimeout);
-                            invisibleElement(tooltipSpan);
-                        }, 800);
-                    };
-
-                    copyImgTd.className = "log-item tooltip";
-                    timeTd.className = "log-item";
-                    levelTd.className = "log-item";
-                    tagTd.className = "log-item";
-                    messageTd.className = "log-item";
-
-                    if (isDarkTheme) {
-                        copyImgTd.classList.add("log-item-dark-style");
-                        timeTd.classList.add("log-item-dark-style");
-                        levelTd.classList.add("log-item-dark-style");
-                        tagTd.classList.add("log-item-dark-style");
-                        messageTd.classList.add("log-item-dark-style");
-                    } else {
-                        copyImgTd.classList.add("log-item-white-style");
-                        timeTd.classList.add("log-item-white-style");
-                        levelTd.classList.add("log-item-white-style");
-                        tagTd.classList.add("log-item-white-style");
-                        messageTd.classList.add("log-item-white-style");
-                    }
-
-                    let timeText = document.createTextNode(logLine.time);
-                    let levelText = document.createTextNode(logLine.level);
-                    let tagText = document.createTextNode(logLine.tag);
-                    let messageText = document.createTextNode(logLine.message);
-
-                    tagTd.onmousemove = function () {
-                        onTagMouseMove(tagTd);
-                    };
-
-                    tagTd.onclick = function () {
-                        onTagClick(tagTd)
-                    };
-
-                    tagTd.onmouseleave = function () {
-                        onTagMouseLeave(tagTd)
-                    };
-
-                    copyImgTd.appendChild(copyImg);
-                    copyImgTd.appendChild(tooltipSpan);
-                    timeTd.appendChild(timeText);
-                    levelTd.appendChild(levelText);
-                    tagTd.appendChild(tagText);
-                    messagePre.appendChild(messageText);
-                    messageTd.appendChild(messagePre);
-
-                    tr.appendChild(copyImgTd);
-                    tr.appendChild(timeTd);
-                    tr.appendChild(levelTd);
-                    tr.appendChild(tagTd);
-                    tr.appendChild(messageTd);
-
-                    timeTd.style.fontSize = currentContentFont + "pt";
-                    levelTd.style.fontSize = currentContentFont + "pt";
-                    tagTd.style.fontSize = currentContentFont + "pt";
-                    messageTd.style.fontSize = currentContentFont + "pt";
-
-                    setLogLineColor(logLine.level, tr);
-
-                    logTable.appendChild(tr);
-                });
+                buildLogsContent(parsedLogs, true);
 
                 if (isFollowLogs) {
                     scrollToBottom();
@@ -738,6 +646,117 @@
         }, function (status, statusText, responseText) {
             failedConnection(status, statusText, responseText);
         });
+    }
+
+    function buildLogsContent(logLines, isOnlineLogs) {
+        logLines.forEach(function (logLine) {
+            if (isOnlineLogs && isInactiveSearch()) {
+                receivedLogs.push(logLine);
+            }
+
+            let tr = document.createElement("tr");
+            let copyImgTd = document.createElement("td");
+            let tooltipSpan = document.createElement("span");
+            let timeTd = document.createElement("td");
+            let levelTd = document.createElement("td");
+            let tagTd = document.createElement("td");
+            let messageTd = document.createElement("td");
+            let messagePre = document.createElement("pre");
+
+            tooltipSpan.className = "tooltip-text";
+            tooltipSpan.innerText = "Copied!";
+
+            let copyImg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            copyImg.setAttribute("width", "20");
+            copyImg.setAttribute("height", "20");
+            copyImg.setAttribute("viewBox", "0 0 24 24");
+
+            if (isDarkTheme) {
+                copyImg.setAttribute("class", "copy-img copy-img-dark-style");
+            } else {
+                copyImg.setAttribute("class", "copy-img copy-img-white-style");
+            }
+
+            let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttributeNS(null, "d", "M16,1L4,1c-1.1,0 -2,0.9 -2,2v14h2L4,3h12L16,1zM19,5L8,5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h11c1.1,0 2,-0.9 2,-2L21,7c0,-1.1 -0.9,-2 -2,-2zM19,21L8,21L8,7h11v14z");
+            copyImg.appendChild(path);
+
+            copyImg.onclick = function () {
+                copyToClipboard(logLine.time + "\t" + logLine.level + "\t" + logLine.tag + "\t" + logLine.message);
+                visibleElement(tooltipSpan);
+
+                let tooltipTimeout = setTimeout(function () {
+                    clearInterval(tooltipTimeout);
+                    invisibleElement(tooltipSpan);
+                }, 800);
+            };
+
+            copyImgTd.className = "log-item tooltip";
+            timeTd.className = "log-item";
+            levelTd.className = "log-item";
+            tagTd.className = "log-item";
+            messageTd.className = "log-item";
+
+            if (isDarkTheme) {
+                copyImgTd.classList.add("log-item-dark-style");
+                timeTd.classList.add("log-item-dark-style");
+                levelTd.classList.add("log-item-dark-style");
+                tagTd.classList.add("log-item-dark-style");
+                messageTd.classList.add("log-item-dark-style");
+            } else {
+                copyImgTd.classList.add("log-item-white-style");
+                timeTd.classList.add("log-item-white-style");
+                levelTd.classList.add("log-item-white-style");
+                tagTd.classList.add("log-item-white-style");
+                messageTd.classList.add("log-item-white-style");
+            }
+
+            let timeText = document.createTextNode(logLine.time);
+            let levelText = document.createTextNode(logLine.level);
+            let tagText = document.createTextNode(logLine.tag);
+            let messageText = document.createTextNode(logLine.message);
+
+            tagTd.onmousemove = function () {
+                onTagMouseMove(tagTd);
+            };
+
+            tagTd.onclick = function () {
+                onTagClick(tagTd)
+            };
+
+            tagTd.onmouseleave = function () {
+                onTagMouseLeave(tagTd)
+            };
+
+            copyImgTd.appendChild(copyImg);
+            copyImgTd.appendChild(tooltipSpan);
+            timeTd.appendChild(timeText);
+            levelTd.appendChild(levelText);
+            tagTd.appendChild(tagText);
+            messagePre.appendChild(messageText);
+            messageTd.appendChild(messagePre);
+
+            tr.appendChild(copyImgTd);
+            tr.appendChild(timeTd);
+            tr.appendChild(levelTd);
+            tr.appendChild(tagTd);
+            tr.appendChild(messageTd);
+
+            timeTd.style.fontSize = currentContentFont + "pt";
+            levelTd.style.fontSize = currentContentFont + "pt";
+            tagTd.style.fontSize = currentContentFont + "pt";
+            messageTd.style.fontSize = currentContentFont + "pt";
+
+            setLogLineColor(logLine.level, tr);
+
+            logTable.appendChild(tr);
+        });
+    }
+
+    function isInactiveSearch() {
+        return (logsLevel == null || logsLevel.toLowerCase() === "verbose"
+            && (logsTag == null || logsTag.length === 0)
+            && (logsSearchText == null || logsSearchText.length === 0));
     }
 
     function onErrorTextClick() {
@@ -773,24 +792,41 @@
     }
 
     function loadOfflineLogs() {
-        let logsLevelTd, logsTagTd, logsSearchTextTd, i;
-        let tr = logTable.getElementsByTagName("tr");
+        clearContent(logTable);
 
-        for (i = 0; i < tr.length; i++) {
-            logsLevelTd = tr[i].getElementsByTagName("td")[2];
-            logsTagTd = tr[i].getElementsByTagName("td")[3];
-            logsSearchTextTd = tr[i].getElementsByTagName("td")[4];
+        let newLogsLines = [];
 
-            let levelCheck = logsLevel == null || logsLevel === "VERBOSE" || logsLevelTd.innerHTML.toUpperCase().startsWith(logsLevel.toUpperCase());
-            let tagCheck = logsTag == null || logsTagTd.innerHTML.toUpperCase().startsWith(logsTag.toUpperCase());
-            let searchTextCheck = logsSearchText == null || logsSearchText === "" || logsSearchTextTd.innerHTML.toUpperCase().indexOf(logsSearchText.toUpperCase()) > 0;
+        receivedLogs.forEach(function (log) {
+            let searchTextCheck = isSearchByText(log);
+            let tagCheck = isSearchByTag(log);
+            let logLevelCheck = isSearchByLogLevel(log);
 
-            if (levelCheck && tagCheck && searchTextCheck) {
-                removeDisplayAttr(tr[i]);
-            } else {
-                hideElement(tr[i]);
+            if (searchTextCheck && tagCheck && logLevelCheck) {
+                newLogsLines.push(log);
             }
-        }
+        });
+
+        buildLogsContent(newLogsLines, false);
+    }
+
+    function isSearchByText(log) {
+        return logsSearchText == null || logsSearchText === ""
+            || (log.time && log.time.toLowerCase().indexOf(logsSearchText.toLowerCase()) >= 0)
+            || (log.level && log.level.toLowerCase().indexOf(logsSearchText.toLowerCase()) >= 0)
+            || (log.tag && log.tag.toLowerCase().indexOf(logsSearchText.toLowerCase()) >= 0)
+            || (log.message && log.message.toLowerCase().indexOf(logsSearchText.toLowerCase()) >= 0);
+    }
+
+    function isSearchByTag(log) {
+        return logsTag == null
+            || logsTag === ""
+            || (log.tag && log.tag.toLowerCase().indexOf(logsTag.toLowerCase()) >= 0);
+    }
+
+    function isSearchByLogLevel(log) {
+        return logsLevel == null
+            || logsLevel.toLowerCase() === "verbose"
+            || (log.level && log.level.toLowerCase().indexOf(logsLevel.toLowerCase()) >= 0);
     }
 
     function setLogLineColor(logLevel, tr) {
