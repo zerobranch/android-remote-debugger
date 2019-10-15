@@ -225,11 +225,11 @@
         if (globalKeyPressed === COMMAND_KEYCODE || globalKeyPressed === CTRL_KEYCODE) {
             item.style.cursor = "pointer";
             item.style.fontWeight = "900";
-            item.style.fontSize = currentContentFont + 1+ "pt";
+            item.style.textDecoration = "underline";
         } else {
             item.style.cursor = "default";
-            item.style.fontWeight = 'normal';
-            item.style.fontSize = currentContentFont + "pt";
+            item.style.fontWeight = "normal";
+            item.style.textDecoration = "none"
         }
     }
 
@@ -243,8 +243,8 @@
 
     function onTagMouseLeave(item) {
         item.style.cursor = "default";
-        item.style.fontWeight = 'normal';
-        item.style.fontSize = currentContentFont + "pt";
+        item.style.fontWeight = "normal";
+        item.style.textDecoration = "none"
     }
 
     // region Ui events
