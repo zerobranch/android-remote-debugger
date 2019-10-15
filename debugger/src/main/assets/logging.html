@@ -714,7 +714,6 @@
             let timeText = document.createTextNode(logLine.time);
             let levelText = document.createTextNode(logLine.level);
             let tagText = document.createTextNode(logLine.tag);
-            let messageText = document.createTextNode(logLine.message);
 
             tagTd.onmousemove = function () {
                 onTagMouseMove(tagTd);
@@ -733,7 +732,7 @@
             timeTd.appendChild(timeText);
             levelTd.appendChild(levelText);
             tagTd.appendChild(tagText);
-            messagePre.appendChild(messageText);
+            messagePre.innerHTML = setBodyLinkable(logLine.message);
             messageTd.appendChild(messagePre);
 
             tr.appendChild(copyImgTd);
@@ -917,6 +916,11 @@
 
     function isNumeric(str) {
         return /^\d+$/.test(str);
+    }
+
+    function setBodyLinkable(inputText) {
+        let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+        return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
     }
 
     // endregion

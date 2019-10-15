@@ -421,3 +421,12 @@ body {
 }
 
 /* header panel */
+
+.log-body-url {
+    text-decoration: none;
+    color: #3875cd;
+}
+
+.log-body-url:hover {
+    text-decoration: underline;
+}

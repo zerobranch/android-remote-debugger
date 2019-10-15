@@ -1,7 +1,9 @@
 package com.sarproj.remotedebugger.api.log;
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.google.gson.JsonSyntaxException;
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
@@ -11,6 +13,7 @@ import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.models.DefaultSettings;
+import com.sarproj.remotedebugger.source.models.LogModel;
 import com.sarproj.remotedebugger.utils.FileUtils;
 
 import java.util.List;
@@ -94,7 +97,27 @@ public final class LogApi extends Api {
             primaryLevel = null;
         }
 
-        return serialize(getDataBase().getLogsByFilter(offset, LIMIT_LOGS_PACKS, primaryLevel, primaryTag, primarySearch));
+        List<LogModel> logs = getDataBase().getLogsByFilter(
+                offset,
+                LIMIT_LOGS_PACKS,
+                primaryLevel,
+                primaryTag,
+                primarySearch
+        );
+
+        if (internalSettings.isEnabledJsonPrettyPrint()) {
+            for (LogModel log : logs) {
+                if (TextUtils.isEmpty(log.message)) {
+                    continue;
+                }
+
+                try {
+                    log.message = prettyJson(log.message);
+                } catch (JsonSyntaxException ignored) { }
+            }
+        }
+
+        return serialize(logs);
     }
 
     private ContinuousDBManager getDataBase() {
