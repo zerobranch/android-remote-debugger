@@ -1069,6 +1069,7 @@ td {
     line-height: 1.3em;
     overflow-y: scroll;
     max-height: 350px;
+    width: 80vw;
 }
 
 #dbListDropdown {

@@ -670,7 +670,7 @@
             let tr = trs[selectedTableRecordsPositions[i]].getElementsByTagName("td");
             fieldsJson += '[';
             for (let j = 0; j < tr.length; j++) {
-                fieldsJson += '"' + window.btoa(tr[j].innerText) + '",';
+                fieldsJson += '"' + window.btoa(unescape(encodeURIComponent(tr[j].innerText))) + '",';
             }
 
             fieldsJson = removeLast(fieldsJson) + '],';
@@ -782,11 +782,11 @@
 
         for (let key of newValMap.keys()) {
             headersJson += '"' + key + '",';
-            newValJson += '"' + window.btoa(newValMap.get(key)) + '",';
+            newValJson += '"' + window.btoa(unescape(encodeURIComponent(newValMap.get(key)))) + '",';
         }
 
         oldValMap.forEach(table => {
-            oldValJson += '"' + window.btoa(table.value) + '",';
+            oldValJson += '"' + window.btoa(unescape(encodeURIComponent(table.value))) + '",';
         });
 
         newValJson = '"newValues":[' + removeLast(newValJson) + ']';

@@ -348,6 +348,7 @@ td:nth-child(3) {
     line-height: 1.3em;
     overflow-y: scroll;
     max-height: 350px;
+    width: 80vw;
 }
 
 #closeErrorContent {
