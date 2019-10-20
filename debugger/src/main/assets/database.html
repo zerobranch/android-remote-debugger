@@ -230,8 +230,6 @@
 <script>
     // region Init constants
     const DEFAULT_FONT_SIZE = 12;
-    const DARK_THEME = "DARK";
-    const LIGHT_THEME = "LIGHT";
     const PAGINATION_SIZE = 10;
     const MAX_TABLE_LINE_IN_PAGE = 15;
     const FIRST_PAGE = 1;
@@ -241,6 +239,7 @@
     const CTRL_KEYCODE = 17;
     const COMMAND_KEYCODE = 91;
     const TABLE_HEADER_SIZE = 1;
+    const COOKIE_LIFE_TIME = 15768000;
     const CHOOSE_TABLE_TEXT = "Choose a table";
     const CHOOSE_DATABASE_TEXT = "Choose a database";
     const NUMBER_OF_RECORDS = "Number of records";
@@ -400,37 +399,32 @@
     }
 
     function loadDefaultsSetting() {
-        showLoader();
-        const body = 'getDefaultsSettings=' + encodeURIComponent('');
-        httpGet('database', body, function (response) {
-            hideLoader();
-            let settings = JSON.parse(response);
-            currentContentFont = settings['databaseFont'];
-            isDarkTheme = settings['theme'] === DARK_THEME;
-            changeTheme(isDarkTheme);
+        let savedFont = getCookie('font');
+        let savedIsDarkTheme = getCookie('isDarkTheme');
 
-            setContentFont(currentContentFont);
+        if (typeof savedFont === 'undefined') {
+            currentContentFont = DEFAULT_FONT_SIZE;
+        } else {
+            currentContentFont = parseInt(savedFont);
+        }
 
-            if (DEFAULT_FONT_SIZE !== currentContentFont) {
-                changeContentFont.value = currentContentFont;
-            }
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
+        if (typeof savedIsDarkTheme  === 'undefined') {
+            isDarkTheme = true;
+        } else {
+            isDarkTheme = savedIsDarkTheme === 'true';
+        }
+
+        changeTheme(isDarkTheme);
+        setContentFont(currentContentFont);
+
+        if (DEFAULT_FONT_SIZE !== currentContentFont) {
+            changeContentFont.value = currentContentFont;
+        }
     }
 
     function saveDefaultsSetting() {
-        let setting = {};
-        setting.theme = isDarkTheme === true ? DARK_THEME : LIGHT_THEME;
-        setting.databaseFont = currentContentFont;
-
-        let body = 'saveDefaultsSetting=' + encodeURIComponent('')
-            + '&' + 'data=' + encodeURIComponent(JSON.stringify(setting));
-
-        httpPost('database', body, function () {
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
+        setCookie('isDarkTheme', isDarkTheme, true);
+        setCookie('font', currentContentFont, false);
     }
 
     // region Ui events
@@ -1289,7 +1283,7 @@
 
             tableCell.classList.add(cellItem['type']);
             tableCell.classList.add("header-cell");
-            tableCell.style.fontSize = currentContentFont + "pt";
+            tableCell.style.fontSize = (currentContentFont + 2) + "pt";
 
             if (isDarkTheme) {
                 tableCell.classList.add("item-cell-dark-style");
@@ -1901,6 +1895,26 @@
                 }
             });
         });
+    }
+
+    function setCookie(name, value, isGlobal) {
+        let path;
+        if (isGlobal) {
+            path = 'path=/';
+        } else {
+            path = 'path=/database';
+        }
+
+        document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + "; "
+            + path + "; "
+            + "max-age=" + COOKIE_LIFE_TIME;
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
     }
     // endregion
 

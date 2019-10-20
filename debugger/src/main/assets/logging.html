@@ -162,11 +162,10 @@
 <script>
     const REFRESH_TIME = 1000;
     const DEFAULT_FONT_SIZE = 12;
-    const DARK_THEME = "DARK";
-    const LIGHT_THEME = "LIGHT";
     const CONNECTION_LOST_MESSAGE = "Connection lost!";
     const CTRL_KEYCODE = 17;
     const COMMAND_KEYCODE = 91;
+    const COOKIE_LIFE_TIME = 15768000;
 
     let logsOffset = -1;
     let logsLevel = null;
@@ -365,23 +364,41 @@
     // endregion
 
     function loadDefaultsSetting() {
-        let body = 'getDefaultsSettings=' + encodeURIComponent('');
-        httpGet('logging', body, function (response) {
-            let logLevels = JSON.parse(response);
-            currentContentFont = logLevels['logFont'];
-            isDarkTheme = logLevels['theme'] === DARK_THEME;
-            isDiscolorActive = logLevels['isDiscolorLog'];
+        let savedFont = getCookie('font');
+        let savedIsDarkTheme = getCookie('isDarkTheme');
+        let savedIsDiscolorActive = getCookie('isDiscolorActive');
 
-            changeTheme(isDarkTheme);
-            setDiscolorContent(isDiscolorActive);
-            setContentFont(currentContentFont);
+        if (typeof savedFont === 'undefined') {
+            currentContentFont = DEFAULT_FONT_SIZE;
+        } else {
+            currentContentFont = parseInt(savedFont);
+        }
 
-            if (currentContentFont !== DEFAULT_FONT_SIZE) {
-                changeContentFont.value = currentContentFont;
-            }
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
+        if (typeof savedIsDarkTheme  === 'undefined') {
+            isDarkTheme = true;
+        } else {
+            isDarkTheme = savedIsDarkTheme === 'true';
+        }
+
+        if (typeof savedIsDiscolorActive  === 'undefined') {
+            isDiscolorActive = false;
+        } else {
+            isDiscolorActive = savedIsDiscolorActive === 'true';
+        }
+
+        changeTheme(isDarkTheme);
+        setDiscolorContent(isDiscolorActive);
+        setContentFont(currentContentFont);
+
+        if (DEFAULT_FONT_SIZE !== currentContentFont) {
+            changeContentFont.value = currentContentFont;
+        }
+    }
+
+    function saveDefaultsSetting() {
+        setCookie('isDarkTheme', isDarkTheme, true);
+        setCookie('font', currentContentFont, false);
+        setCookie('isDiscolorActive', isDiscolorActive, false);
     }
 
     function getCurrentTime() {
@@ -411,21 +428,6 @@
                 window.URL.revokeObjectURL(url);
             }, 0);
         }
-    }
-
-    function saveDefaultsSetting() {
-        let setting = {};
-        setting.theme = isDarkTheme === true ? DARK_THEME : LIGHT_THEME;
-        setting.logFont = currentContentFont;
-        setting.isDiscolorLog = isDiscolorActive;
-
-        let body = 'saveDefaultsSetting=' + encodeURIComponent('')
-            + '&' + 'data=' + encodeURIComponent(JSON.stringify(setting));
-
-        httpPost('logging', body, function () {
-        }, function (status, statusText, responseText) {
-            failedConnection(status, statusText, responseText);
-        });
     }
 
     function setContentFont(fontSize) {
@@ -921,6 +923,26 @@
     function setBodyLinkable(inputText) {
         let replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
         return inputText.replace(replacePattern1, '<a href="$1" class="log-body-url" target="_blank">$1</a>');
+    }
+
+    function setCookie(name, value, isGlobal) {
+        let path;
+        if (isGlobal) {
+            path = 'path=/';
+        } else {
+            path = 'path=/logging';
+        }
+
+        document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + "; "
+            + path + "; "
+            + "max-age=" + COOKIE_LIFE_TIME;
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
     }
 
     // endregion
