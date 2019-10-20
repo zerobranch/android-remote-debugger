@@ -5,14 +5,10 @@ import android.text.TextUtils;
 
 import com.google.gson.JsonSyntaxException;
 import com.sarproj.remotedebugger.api.base.Api;
-import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.InternalSettings;
-import com.sarproj.remotedebugger.settings.SettingsPrefs;
 import com.sarproj.remotedebugger.source.local.StatusCodeFilter;
-import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
-import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.models.httplog.HttpLogModel;
 import com.sarproj.remotedebugger.utils.FileUtils;
 
@@ -38,41 +34,9 @@ public final class NetworkApi extends Api {
             return getLogs(params);
         } else if (params.containsKey(NetworkHtmlKey.CLEAR_ALL_LOGS)) {
             return clearAllLogs();
-        } else if (params.containsKey(NetworkHtmlKey.GET_DEFAULT_SETTINGS)) {
-            return getDefaultSettings();
-        } else if (containsValue(params, NetworkHtmlKey.SAVE_DEFAULTS_SETTING)) {
-            return saveDefaultSettings(params);
         }
 
         return EMPTY;
-    }
-
-    private String saveDefaultSettings(Map<String, List<String>> params) throws NanoHTTPD.ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
-            throwEmptyParameterException(HtmlParams.DATA);
-        }
-
-        final String settingsJson = getStringValue(params, HtmlParams.DATA);
-        final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
-
-        if (settings.logFont == null) {
-            settings.logFont = DEFAULT_FONT_SIZE;
-        }
-
-        if (Theme.notContains(settings.theme)) {
-            settings.theme = DEFAULT_THEME.name();
-        }
-
-        SettingsPrefs.Key.THEME.save(settings.theme);
-        SettingsPrefs.Key.NETWORK_FONT.save(settings.logFont);
-        return EMPTY;
-    }
-
-    private String getDefaultSettings() {
-        final DefaultSettings settings = new DefaultSettings();
-        settings.logFont = SettingsPrefs.Key.NETWORK_FONT.get(DEFAULT_FONT_SIZE);
-        settings.theme = SettingsPrefs.Key.THEME.get(DEFAULT_THEME.name());
-        return serialize(settings);
     }
 
     private String clearAllLogs() {

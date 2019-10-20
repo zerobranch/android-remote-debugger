@@ -7,10 +7,7 @@ import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.InternalSettings;
-import com.sarproj.remotedebugger.settings.SettingsPrefs;
-import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.source.managers.SharedPrefsManager;
-import com.sarproj.remotedebugger.source.models.DefaultSettings;
 import com.sarproj.remotedebugger.source.models.SharedPrefsData;
 import com.sarproj.remotedebugger.utils.FileUtils;
 
@@ -52,10 +49,6 @@ public class SharedPrefsApi extends Api {
             return update(params);
         } else if (params.containsKey(SharedPrefsKey.REMOVE)) {
             return remove(params);
-        } else if (params.containsKey(SharedPrefsKey.GET_DEFAULT_SETTINGS)) {
-            return getDefaultSettings();
-        } else if (containsValue(params, SharedPrefsKey.SAVE_DEFAULTS_SETTING)) {
-            return saveDefaultSettings(params);
         }
 
         return EMPTY;
@@ -164,34 +157,6 @@ public class SharedPrefsApi extends Api {
         }
 
         return serialize(sharedPrefsDataList);
-    }
-
-    private String getDefaultSettings() {
-        final DefaultSettings settings = new DefaultSettings();
-        settings.theme = SettingsPrefs.Key.THEME.get(DEFAULT_THEME.name());
-        settings.sharedPreferencesFont = SettingsPrefs.Key.SHARED_PREFERENCES_FONT.get(DEFAULT_FONT_SIZE);
-        return serialize(settings);
-    }
-
-    private String saveDefaultSettings(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
-            throwEmptyParameterException(HtmlParams.DATA);
-        }
-
-        final String settingsJson = getStringValue(params, HtmlParams.DATA);
-        final DefaultSettings settings = deserialize(settingsJson, DefaultSettings.class);
-
-        if (settings.sharedPreferencesFont == null) {
-            settings.sharedPreferencesFont = DEFAULT_FONT_SIZE;
-        }
-
-        if (Theme.notContains(settings.theme)) {
-            settings.theme = DEFAULT_THEME.name();
-        }
-
-        SettingsPrefs.Key.THEME.save(settings.theme);
-        SettingsPrefs.Key.SHARED_PREFERENCES_FONT.save(settings.sharedPreferencesFont);
-        return EMPTY;
     }
 
     private SharedPrefsManager getSharedPrefsAccess() {

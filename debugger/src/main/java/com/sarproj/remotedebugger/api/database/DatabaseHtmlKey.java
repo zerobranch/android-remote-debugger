@@ -10,6 +10,4 @@ interface DatabaseHtmlKey {
     String DROP_TABLE = "dropTable";
     String DROP_DATABASE = "dropDatabase";
     String SEARCH = "search";
-    String GET_DEFAULT_SETTINGS = "getDefaultsSettings";
-    String SAVE_DEFAULTS_SETTING = "saveDefaultsSetting";
 }

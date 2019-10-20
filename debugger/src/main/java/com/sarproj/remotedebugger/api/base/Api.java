@@ -8,7 +8,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.sarproj.remotedebugger.settings.InternalSettings;
-import com.sarproj.remotedebugger.source.local.Theme;
 import com.sarproj.remotedebugger.utils.InternalUtils;
 
 import java.lang.reflect.Type;
@@ -20,8 +19,6 @@ import fi.iki.elonen.NanoHTTPD;
 
 public abstract class Api {
     protected static final String EMPTY = "";
-    protected static final int DEFAULT_FONT_SIZE = 12;
-    protected static final Theme DEFAULT_THEME = Theme.DARK;
     protected Context context;
     private Gson gson;
     private Gson prettyPrintJson;

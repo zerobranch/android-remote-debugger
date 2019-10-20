@@ -3,6 +3,7 @@ package com.sarproj.remotedebugger.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+// todo remove it
 public final class SettingsPrefs {
     private static final String SHARED_PREFERENCES_NAME = "remote_debugger_settings";
     private static SettingsPrefs instance;
