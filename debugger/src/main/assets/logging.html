@@ -66,7 +66,7 @@
                placeholder="Filter by tag" title="Type in a text">
 
         <div id="scrollControlPanel">
-            <svg onclick="onFollowClick(this)" class="default-btn" height="28" viewBox="0 0 24 24" width="28"
+            <svg id="followButton" onclick="onFollowClick()" class="default-btn" height="28" viewBox="0 0 24 24" width="28"
                  xmlns="http://www.w3.org/2000/svg">
                 <path d="M0 0h24v24H0z" fill="none"></path>
                 <path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"></path>
@@ -200,6 +200,7 @@
     let errorTextCopied = getElementById('errorTextCopied');
     let searchByTag = getElementById('searchByTag');
     let closeErrorContent = getElementById('closeErrorContent');
+    let followButton = getElementById('followButton');
     let headerRightDefaultY = rightHeader.offsetTop;
 
     window.onload = function () {
@@ -269,14 +270,18 @@
         loadLogs();
     }
 
-    function onFollowClick(svgElement) {
+    function onFollowClick() {
         isFollowLogs = !isFollowLogs;
+        saveDefaultsSetting();
+        followLogs();
+    }
 
+    function followLogs() {
         if (isFollowLogs) {
-            svgElement.style.fill = '#ffb600';
+            followButton.style.fill = '#ffb600';
             scrollToBottom();
         } else {
-            svgElement.style.fill = '#c9c9c9';
+            followButton.style.fill = '#c9c9c9';
         }
     }
 
@@ -367,6 +372,7 @@
         let savedFont = getCookie('font');
         let savedIsDarkTheme = getCookie('isDarkTheme');
         let savedIsDiscolorActive = getCookie('isDiscolorActive');
+        let savedIsFollowLogs = getCookie('isFollowLogs');
 
         if (typeof savedFont === 'undefined') {
             currentContentFont = DEFAULT_FONT_SIZE;
@@ -374,21 +380,28 @@
             currentContentFont = parseInt(savedFont);
         }
 
-        if (typeof savedIsDarkTheme  === 'undefined') {
+        if (typeof savedIsDarkTheme === 'undefined') {
             isDarkTheme = true;
         } else {
             isDarkTheme = savedIsDarkTheme === 'true';
         }
 
-        if (typeof savedIsDiscolorActive  === 'undefined') {
+        if (typeof savedIsDiscolorActive === 'undefined') {
             isDiscolorActive = false;
         } else {
             isDiscolorActive = savedIsDiscolorActive === 'true';
         }
 
+        if (typeof savedIsFollowLogs === 'undefined') {
+            isFollowLogs = false;
+        } else {
+            isFollowLogs = savedIsFollowLogs === 'true';
+        }
+
         changeTheme(isDarkTheme);
         setDiscolorContent(isDiscolorActive);
         setContentFont(currentContentFont);
+        followLogs();
 
         if (DEFAULT_FONT_SIZE !== currentContentFont) {
             changeContentFont.value = currentContentFont;
@@ -399,6 +412,7 @@
         setCookie('isDarkTheme', isDarkTheme, true);
         setCookie('font', currentContentFont, false);
         setCookie('isDiscolorActive', isDiscolorActive, false);
+        setCookie('isFollowLogs', isFollowLogs, false);
     }
 
     function getCurrentTime() {
