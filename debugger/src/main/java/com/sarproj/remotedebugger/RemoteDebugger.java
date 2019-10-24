@@ -43,12 +43,13 @@ public final class RemoteDebugger {
                 remoteDebugger.builder.enabledJsonPrettyPrint
         );
 
-        ServerRunner.getInstance().init(context, internalSettings, new ServerRunner.ConnectionStatus() {
+        final Context appContext = context.getApplicationContext();
+
+        ServerRunner.getInstance().init(appContext, internalSettings, new ServerRunner.ConnectionStatus() {
             @Override
             public void onResult(boolean isSuccessRunning) {
                 if (isSuccessRunning) {
-                    Context appContext = context.getApplicationContext();
-
+                    AppNotification.init(appContext);
                     SettingsPrefs.init(appContext);
                     ContinuousDBManager.init(appContext);
                 }
@@ -76,6 +77,7 @@ public final class RemoteDebugger {
         ServerRunner.getInstance().stop();
         ContinuousDBManager.destroy();
         SettingsPrefs.destroy();
+        AppNotification.destroy();
     }
 
     public static boolean isDebugEnable() {
