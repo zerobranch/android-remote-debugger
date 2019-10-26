@@ -24,7 +24,7 @@ class AppNotification {
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(CHANNEL_NAME);
             channel.enableVibration(false);
         }
@@ -73,7 +73,7 @@ class AppNotification {
         builder.setSmallIcon(android.R.drawable.star_on)
                 .setContentTitle(title)
                 .setContentText(description)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setAutoCancel(true);
 
         if (isError) {
@@ -81,12 +81,12 @@ class AppNotification {
             repeatConnectionIntent.setAction(NotificationReceiver.ACTION_REPEAT_CONNECTION);
             PendingIntent repeatConnectionPendingIntent = PendingIntent.getBroadcast(context, 0, repeatConnectionIntent, 0);
 
-            Intent disableOtherIntent = new Intent(context, NotificationReceiver.class);
-            disableOtherIntent.setAction(NotificationReceiver.ACTION_DISABLE_OTHER);
-            PendingIntent disableOtherPendingIntent = PendingIntent.getBroadcast(context, 0, disableOtherIntent, 0);
+            Intent changePortIntent = new Intent(context, NotificationReceiver.class);
+            changePortIntent.setAction(NotificationReceiver.ACTION_CHANGE_PORT);
+            PendingIntent changePortPendingIntent = PendingIntent.getBroadcast(context, 0, changePortIntent, 0);
 
             builder.addAction(0, "Repeat", repeatConnectionPendingIntent);
-            builder.addAction(0, "Disable others", disableOtherPendingIntent);
+            builder.addAction(0, "Change port", changePortPendingIntent);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

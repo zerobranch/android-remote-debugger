@@ -10,6 +10,8 @@ import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 
 public final class RemoteDebugger {
+    private static final int DEFAULT_PORT = 8080;
+    private static final int MAX_PORT_VALUE = 8090;
     private static RemoteLog remoteLog;
     private static RemoteDebugger instance;
     private static boolean isDebugEnable;
@@ -27,6 +29,16 @@ public final class RemoteDebugger {
         init(instance);
     }
 
+    static void reconnectWithNewPort() {
+        if (instance == null) {
+            return;
+        }
+
+        int port = instance.builder.port;
+        instance.builder.port = port >= MAX_PORT_VALUE ? DEFAULT_PORT : port + 1;
+        init(instance);
+    }
+
     public synchronized static void init(Context context) {
         init(new Builder(context).build());
     }
@@ -39,31 +51,34 @@ public final class RemoteDebugger {
         instance = remoteDebugger;
         isDebugEnable = remoteDebugger.builder.enabled;
 
-        if (!remoteDebugger.builder.enabled) {
+        final Builder builder = remoteDebugger.builder;
+
+        if (!builder.enabled) {
             stop();
             return;
         }
 
-        if (remoteDebugger.builder.includedUncaughtException) {
+        if (builder.includedUncaughtException) {
             setUncaughtExceptionHandler();
         }
 
         InternalSettings internalSettings = new InternalSettings(
-                remoteDebugger.builder.enabledInternalLogging,
-                remoteDebugger.builder.enabledJsonPrettyPrint
+                builder.enabledInternalLogging,
+                builder.enabledJsonPrettyPrint
         );
 
-        final Context appContext = remoteDebugger.builder.context;
-
-        ServerRunner.getInstance().init(appContext, internalSettings, new ServerRunner.ConnectionStatus() {
+        ServerRunner.getInstance().init(builder.context, internalSettings, builder.port, new ServerRunner.ConnectionStatus() {
             @Override
-            public void onResult(boolean isSuccessRunning) {
-                if (!isSuccessRunning) {
-//                    AppNotification.notify();
+            public void onResult(boolean isSuccessRunning, String data) {
+                AppNotification.init(builder.context);
+
+                if (isSuccessRunning) {
+                    AppNotification.notify("Successfully connection: ".concat(data), null);
+                } else {
+                    AppNotification.notifyError("Failed connection. Port: ".concat(data), null);
                 }
 
-                ContinuousDBManager.init(appContext);
-                AppNotification.init(appContext);
+                ContinuousDBManager.init(builder.context);
                 remoteLog = new RemoteLog(remoteDebugger.builder.logger);
             }
         });
@@ -104,6 +119,7 @@ public final class RemoteDebugger {
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private boolean includedUncaughtException = true;
+        private int port = DEFAULT_PORT;
         private Logger logger;
 
         public Builder(Context context) {
@@ -137,6 +153,11 @@ public final class RemoteDebugger {
 
         public Builder excludeUncaughtException() {
             includedUncaughtException = false;
+            return this;
+        }
+
+        public Builder port(int port) {
+            this.port = port;
             return this;
         }
 

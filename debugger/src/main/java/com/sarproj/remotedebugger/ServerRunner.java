@@ -10,7 +10,6 @@ import fi.iki.elonen.NanoHTTPD;
 
 final class ServerRunner {
     private static final String TAG = "RemoteDebugger";
-    private static final int DEFAULT_PORT = 8080;
     private static volatile ServerRunner instance;
     private AndroidWebServer androidWebServer;
     private boolean enabledInternalLogging;
@@ -30,30 +29,25 @@ final class ServerRunner {
         return localInstance;
     }
 
-    void init(Context context, InternalSettings internalSettings, ConnectionStatus connectionStatus) {
-        init(context, internalSettings, connectionStatus, DEFAULT_PORT);
-    }
-
-    void init(Context context, InternalSettings internalSettings, ConnectionStatus connectionStatus, int port) {
+    void init(Context context, InternalSettings internalSettings, int port, ConnectionStatus connectionStatus) {
         if (isAlive()) {
             print("Server is already running");
-            connectionStatus.onResult(true);
+            connectionStatus.onResult(true, String.valueOf(port));
             return;
         }
 
         this.enabledInternalLogging = internalSettings.isEnabledInternalLogging();
-
         String ip = InternalUtils.getIpAccess(context);
 
         try {
             androidWebServer = new AndroidWebServer(context, ip, port, internalSettings);
             androidWebServer.start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
 
-            print(String.format("Android Remote Debugger is started. Web server ip: %s", ip));
-            connectionStatus.onResult(true);
+            print(String.format("Android Remote Debugger is started. Web server ip: %s:%s", ip, port));
+            connectionStatus.onResult(true, ip + ":" + port);
         } catch (Exception ex) {
             printErr("Could not start server", ex);
-            connectionStatus.onResult(false);
+            connectionStatus.onResult(false, String.valueOf(port));
         }
     }
 
@@ -82,6 +76,6 @@ final class ServerRunner {
     }
 
     interface ConnectionStatus {
-        void onResult(boolean isSuccessRunning);
+        void onResult(boolean isSuccessRunning, String data);
     }
 }
