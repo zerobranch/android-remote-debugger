@@ -2,7 +2,9 @@ package com.sarproj.remotedebugger;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -38,13 +40,19 @@ class AppNotification {
         instance = null;
     }
 
-    public static void notify(String title, String description) {
+    public static void notify(@Nullable String title, @Nullable String description) {
         if (instance == null) return;
 
-        instance.notification(title, description);
+        instance.notification(title, description, false);
     }
 
-    private void notification(@Nullable String title, @Nullable String description) {
+    public static void notifyError(@Nullable String title, @Nullable String description) {
+        if (instance == null) return;
+
+        instance.notification(title, description, true);
+    }
+
+    private void notification(@Nullable String title, @Nullable String description, boolean isError) {
         if (title == null && description == null) {
             return;
         }
@@ -67,6 +75,19 @@ class AppNotification {
                 .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
+
+        if (isError) {
+            Intent repeatConnectionIntent = new Intent(context, NotificationReceiver.class);
+            repeatConnectionIntent.setAction(NotificationReceiver.ACTION_REPEAT_CONNECTION);
+            PendingIntent repeatConnectionPendingIntent = PendingIntent.getBroadcast(context, 0, repeatConnectionIntent, 0);
+
+            Intent disableOtherIntent = new Intent(context, NotificationReceiver.class);
+            disableOtherIntent.setAction(NotificationReceiver.ACTION_DISABLE_OTHER);
+            PendingIntent disableOtherPendingIntent = PendingIntent.getBroadcast(context, 0, disableOtherIntent, 0);
+
+            builder.addAction(0, "Repeat", repeatConnectionPendingIntent);
+            builder.addAction(0, "Disable others", disableOtherPendingIntent);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             builder.setGroup(GROUP_KEY);

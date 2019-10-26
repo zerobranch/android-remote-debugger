@@ -102,9 +102,7 @@ public class NetLoggingInterceptor implements Interceptor {
             // ignore
         } finally {
             HttpLogModel logModel = requestMapper.map(logRequest);
-            if (isAliveDebugger()) {
-                logRequest.id = getDataBase().addHttpLog(logModel);
-            }
+            logRequest.id = getDataBase().addHttpLog(logModel);
 
             onReceiveLog(logModel);
         }
@@ -124,9 +122,7 @@ public class NetLoggingInterceptor implements Interceptor {
             logResponse.errorMessage = e.getMessage();
 
             HttpLogModel logModel = responseMapper.map(logResponse);
-            if (isAliveDebugger()) {
-                getDataBase().addHttpLog(logModel);
-            }
+            getDataBase().addHttpLog(logModel);
 
             onReceiveLog(logModel);
             throw e;
@@ -180,9 +176,7 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         HttpLogModel logModel = responseMapper.map(logResponse);
-        if (isAliveDebugger()) {
-            getDataBase().addHttpLog(logModel);
-        }
+        getDataBase().addHttpLog(logModel);
 
         onReceiveLog(logModel);
         return response;
@@ -192,10 +186,6 @@ public class NetLoggingInterceptor implements Interceptor {
         if (httpLogger != null && RemoteDebugger.isDebugEnable()) {
             httpLogger.log(logModel);
         }
-    }
-
-    private boolean isAliveDebugger() {
-        return RemoteDebugger.isAliveWebServer();
     }
 
     private ContinuousDBManager getDataBase() {

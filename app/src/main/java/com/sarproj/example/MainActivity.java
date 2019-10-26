@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        RemoteDebugger.init(getApplication(),
-                new RemoteDebugger.Builder()
+        RemoteDebugger.init(
+                new RemoteDebugger.Builder(this)
                         .enabled(true)
                         .enableInternalLogging()
                         .enableJsonPrettyPrint()
@@ -35,31 +35,6 @@ public class MainActivity extends AppCompatActivity {
                         .excludeUncaughtException()
                         .build()
         );
-
-//        RemoteLog.d("My debug");
-//        RemoteLog.d("My debug", "testTag");
-//        RemoteLog.d("My debug", "testTag", new RuntimeException("Null pointer"));
-//
-//        RemoteLog.v("My Verbose");
-//        RemoteLog.v("My Verbose", "testTag");
-//        RemoteLog.v("My Verbose", "testTag", new RuntimeException("Null pointer"));
-//
-//        RemoteLog.w("My warning");
-//        RemoteLog.w("My warning", "testTag");
-//        RemoteLog.w("My warning", "testTag", new RuntimeException("Null pointer"));
-//
-//        RemoteLog.i("My info");
-//        RemoteLog.i("My info", "testTag");
-//        RemoteLog.i("My info", "testTag", new RuntimeException("Null pointer"));
-//
-//        RemoteLog.e("My error");
-//        RemoteLog.e("My error", "testTag");
-//        RemoteLog.e("My error", "testTag", new RuntimeException("Null pointer"));
-//
-//        RemoteLog.f("My fatal");
-//        RemoteLog.f("My fatal", "testTag");
-//        RemoteLog.f("My fatal", "testTag", new RuntimeException("Null pointer"));
-
 
         findViewById(R.id.user).setOnClickListener(v -> {
 //                dbHelper.insertUser();
@@ -72,17 +47,17 @@ public class MainActivity extends AppCompatActivity {
             String val = FileUtils.getTextFromAssets(getAssets(), "test.json");
             RemoteDebugger.Log.d("test json", val);
 
-            int i = 4;
-            while (i > 0) {
-                RemoteDebugger.Log.d("testTag", "[ " + i + " ] debug это уровенть отладки");
-                i--;
-            }
-
-            i = -4;
-            while (i < 0) {
-                RemoteDebugger.Log.d("farcry", "[ " + i + " ] debug это уровенть отладки");
-                i++;
-            }
+//            int i = 4;
+//            while (i > 0) {
+//                RemoteDebugger.Log.d("testTag", "[ " + i + " ] debug это уровенть отладки");
+//                i--;
+//            }
+//
+//            i = -4;
+//            while (i < 0) {
+//                RemoteDebugger.Log.d("farcry", "[ " + i + " ] debug это уровенть отладки");
+//                i++;
+//            }
         });
 
         findViewById(R.id.info).setOnClickListener(v -> {
@@ -102,17 +77,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.verbose).setOnClickListener(v -> {
-            int i = 4;
-            while (i > 0) {
-                RemoteDebugger.Log.v("testTag", "[ " + i + " ] verbose 'самая' минимальная линия");
-                i--;
-            }
-
-            i = -4;
-            while (i < 0) {
-                RemoteDebugger.Log.v("farcry", "[ " + i + " ] verbose самая минимальная линия");
-                i++;
-            }
+            RemoteDebugger.Log.v("testTag", "] verbose 'самая' минимальная линия");
+//            int i = 4;
+//            while (i > 0) {
+//                i--;
+//            }
+//
+//            i = -4;
+//            while (i < 0) {
+//                RemoteDebugger.Log.v("farcry", "[ " + i + " ] verbose самая минимальная линия");
+//                i++;
+//            }
         });
 
 //        findViewById(R.id.error).setOnLongClickListener(view -> {

@@ -6,12 +6,12 @@ import com.sarproj.remotedebugger.logging.DefaultLogger;
 import com.sarproj.remotedebugger.logging.Logger;
 import com.sarproj.remotedebugger.logging.RemoteLog;
 import com.sarproj.remotedebugger.settings.InternalSettings;
-import com.sarproj.remotedebugger.settings.SettingsPrefs;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 
 public final class RemoteDebugger {
     private static RemoteLog remoteLog;
+    private static RemoteDebugger instance;
     private static boolean isDebugEnable;
     private Builder builder;
 
@@ -19,18 +19,28 @@ public final class RemoteDebugger {
         this.builder = builder;
     }
 
-    public synchronized static void init(Context context) {
-        init(context, new Builder().build());
-    }
-
-    public synchronized static void init(final Context context, final RemoteDebugger remoteDebugger) {
-        if (isAliveWebServer()) {
-            stop();
+    static void reconnect() {
+        if (instance == null) {
+            return;
         }
 
+        init(instance);
+    }
+
+    public synchronized static void init(Context context) {
+        init(new Builder(context).build());
+    }
+
+    public synchronized static void init(final RemoteDebugger remoteDebugger) {
+        if (isAliveWebServer()) {
+            return;
+        }
+
+        instance = remoteDebugger;
         isDebugEnable = remoteDebugger.builder.enabled;
 
         if (!remoteDebugger.builder.enabled) {
+            stop();
             return;
         }
 
@@ -43,17 +53,17 @@ public final class RemoteDebugger {
                 remoteDebugger.builder.enabledJsonPrettyPrint
         );
 
-        final Context appContext = context.getApplicationContext();
+        final Context appContext = remoteDebugger.builder.context;
 
         ServerRunner.getInstance().init(appContext, internalSettings, new ServerRunner.ConnectionStatus() {
             @Override
             public void onResult(boolean isSuccessRunning) {
-                if (isSuccessRunning) {
-                    AppNotification.init(appContext);
-                    SettingsPrefs.init(appContext);
-                    ContinuousDBManager.init(appContext);
+                if (!isSuccessRunning) {
+//                    AppNotification.notify();
                 }
 
+                ContinuousDBManager.init(appContext);
+                AppNotification.init(appContext);
                 remoteLog = new RemoteLog(remoteDebugger.builder.logger);
             }
         });
@@ -74,9 +84,9 @@ public final class RemoteDebugger {
     public synchronized static void stop() {
         isDebugEnable = false;
         remoteLog = null;
+        instance = null;
         ServerRunner.getInstance().stop();
         ContinuousDBManager.destroy();
-        SettingsPrefs.destroy();
         AppNotification.destroy();
     }
 
@@ -89,11 +99,16 @@ public final class RemoteDebugger {
     }
 
     public static class Builder {
+        private final Context context;
         private boolean enabled = true;
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private boolean includedUncaughtException = true;
         private Logger logger;
+
+        public Builder(Context context) {
+            this.context = context.getApplicationContext();
+        }
 
         public Builder enabled(boolean enabled) {
             this.enabled = enabled;

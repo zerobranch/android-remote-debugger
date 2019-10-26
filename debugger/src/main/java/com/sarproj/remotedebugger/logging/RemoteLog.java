@@ -2,7 +2,6 @@ package com.sarproj.remotedebugger.logging;
 
 import android.os.Build;
 
-import com.sarproj.remotedebugger.RemoteDebugger;
 import com.sarproj.remotedebugger.source.local.LogLevel;
 import com.sarproj.remotedebugger.source.managers.ContinuousDBManager;
 import com.sarproj.remotedebugger.source.models.LogModel;
@@ -19,10 +18,7 @@ public final class RemoteLog {
 
     public RemoteLog(Logger logger) {
         this.logger = logger;
-
-        if (RemoteDebugger.isAliveWebServer()) {
-            continuousDBManager = ContinuousDBManager.getInstance();
-        }
+        continuousDBManager = ContinuousDBManager.getInstance();
     }
 
     public void log(LogLevel logLevel, String tag, String msg, Throwable th) {
@@ -45,9 +41,7 @@ public final class RemoteLog {
             }
         }
 
-        if (continuousDBManager != null) {
-            continuousDBManager.addLog(new LogModel(logLevel.name(), tag, msg, System.currentTimeMillis()));
-        }
+        continuousDBManager.addLog(new LogModel(logLevel.name(), tag, msg, System.currentTimeMillis()));
 
         if (logger != null) {
             if (logger instanceof DefaultLogger) {
