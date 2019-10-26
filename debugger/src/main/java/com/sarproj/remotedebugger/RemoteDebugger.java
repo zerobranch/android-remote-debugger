@@ -21,24 +21,6 @@ public final class RemoteDebugger {
         this.builder = builder;
     }
 
-    static void reconnect() {
-        if (instance == null) {
-            return;
-        }
-
-        init(instance);
-    }
-
-    static void reconnectWithNewPort() {
-        if (instance == null) {
-            return;
-        }
-
-        int port = instance.builder.port;
-        instance.builder.port = port >= MAX_PORT_VALUE ? DEFAULT_PORT : port + 1;
-        init(instance);
-    }
-
     public synchronized static void init(Context context) {
         init(new Builder(context).build());
     }
@@ -84,18 +66,6 @@ public final class RemoteDebugger {
         });
     }
 
-    private static void setUncaughtExceptionHandler() {
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            private Thread.UncaughtExceptionHandler originalHandler = Thread.getDefaultUncaughtExceptionHandler();
-
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                Log.wtf(e);
-                originalHandler.uncaughtException(t, e);
-            }
-        });
-    }
-
     public synchronized static void stop() {
         isDebugEnable = false;
         remoteLog = null;
@@ -111,6 +81,36 @@ public final class RemoteDebugger {
 
     public static boolean isAliveWebServer() {
         return ServerRunner.getInstance().isAlive();
+    }
+
+    static void reconnect() {
+        if (instance == null) {
+            return;
+        }
+
+        init(instance);
+    }
+
+    static void reconnectWithNewPort() {
+        if (instance == null) {
+            return;
+        }
+
+        int port = instance.builder.port;
+        instance.builder.port = port >= MAX_PORT_VALUE ? DEFAULT_PORT : port + 1;
+        init(instance);
+    }
+
+    private static void setUncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            private Thread.UncaughtExceptionHandler originalHandler = Thread.getDefaultUncaughtExceptionHandler();
+
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                Log.wtf(e);
+                originalHandler.uncaughtException(t, e);
+            }
+        });
     }
 
     public static class Builder {
