@@ -31,10 +31,11 @@ final class ServerRunner {
 
     void init(Context context, InternalSettings internalSettings, int port, ConnectionStatus connectionStatus) {
         String ip = InternalUtils.getIpAccess(context);
+        String ipPort = ip + ":" + port;
 
         if (isAlive()) {
             print("Server is already running");
-            connectionStatus.onResult(true, ip + ":" + port);
+            connectionStatus.onResult(true, ipPort);
             return;
         }
 
@@ -44,11 +45,11 @@ final class ServerRunner {
             androidWebServer = new AndroidWebServer(context, ip, port, internalSettings);
             androidWebServer.start(NanoHTTPD.SOCKET_READ_TIMEOUT, true);
 
-            print(String.format("Android Remote Debugger is started. Web server ip: %s:%s", ip, port));
-            connectionStatus.onResult(true, ip + ":" + port);
+            print(String.format("Android Remote Debugger is started. Go to: http://%s", ipPort));
+            connectionStatus.onResult(true, ipPort);
         } catch (Exception ex) {
-            printErr("Could not start server", ex);
-            connectionStatus.onResult(false, ip + ":" + port);
+            printErr(String.format("Failed connection. %s is busy", ipPort), ex);
+            connectionStatus.onResult(false, ipPort);
         }
     }
 
@@ -77,6 +78,6 @@ final class ServerRunner {
     }
 
     interface ConnectionStatus {
-        void onResult(boolean isSuccessRunning, String data);
+        void onResult(boolean isSuccessRunning, String ipPort);
     }
 }

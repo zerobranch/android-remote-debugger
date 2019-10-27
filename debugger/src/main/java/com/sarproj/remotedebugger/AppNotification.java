@@ -72,6 +72,7 @@ class AppNotification {
 
         builder.setSmallIcon(android.R.drawable.star_on)
                 .setContentTitle(title)
+                .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(description))
                 .setAutoCancel(true);

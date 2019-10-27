@@ -51,13 +51,13 @@ public final class RemoteDebugger {
 
         ServerRunner.getInstance().init(builder.context, internalSettings, builder.port, new ServerRunner.ConnectionStatus() {
             @Override
-            public void onResult(boolean isSuccessRunning, String data) {
+            public void onResult(boolean isSuccessRunning, String ipPort) {
                 AppNotification.init(builder.context);
 
                 if (isSuccessRunning) {
-                    AppNotification.notify("Successfully", "Successfully connection: ".concat(data));
+                    AppNotification.notify("Successfully", String.format("http://%s", ipPort));
                 } else {
-                    AppNotification.notifyError("Failed connection.", "Address " + data + " is busy");
+                    AppNotification.notifyError("Failed connection", String.format("%s is busy", ipPort));
                 }
 
                 ContinuousDBManager.init(builder.context);
