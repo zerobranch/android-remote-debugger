@@ -30,14 +30,15 @@ final class ServerRunner {
     }
 
     void init(Context context, InternalSettings internalSettings, int port, ConnectionStatus connectionStatus) {
+        String ip = InternalUtils.getIpAccess(context);
+
         if (isAlive()) {
             print("Server is already running");
-            connectionStatus.onResult(true, String.valueOf(port));
+            connectionStatus.onResult(true, ip + ":" + port);
             return;
         }
 
         this.enabledInternalLogging = internalSettings.isEnabledInternalLogging();
-        String ip = InternalUtils.getIpAccess(context);
 
         try {
             androidWebServer = new AndroidWebServer(context, ip, port, internalSettings);
@@ -47,7 +48,7 @@ final class ServerRunner {
             connectionStatus.onResult(true, ip + ":" + port);
         } catch (Exception ex) {
             printErr("Could not start server", ex);
-            connectionStatus.onResult(false, String.valueOf(port));
+            connectionStatus.onResult(false, ip + ":" + port);
         }
     }
 

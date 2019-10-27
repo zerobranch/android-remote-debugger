@@ -55,9 +55,9 @@ public final class RemoteDebugger {
                 AppNotification.init(builder.context);
 
                 if (isSuccessRunning) {
-                    AppNotification.notify("Successfully connection: ".concat(data), null);
+                    AppNotification.notify("Successfully", "Successfully connection: ".concat(data));
                 } else {
-                    AppNotification.notifyError("Failed connection. Port: ".concat(data), null);
+                    AppNotification.notifyError("Failed connection.", "Address " + data + " is busy");
                 }
 
                 ContinuousDBManager.init(builder.context);
