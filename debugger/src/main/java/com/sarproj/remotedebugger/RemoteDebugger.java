@@ -1,5 +1,6 @@
 package com.sarproj.remotedebugger;
 
+import android.app.ActivityManager;
 import android.content.Context;
 
 import com.sarproj.remotedebugger.logging.DefaultLogger;
@@ -26,6 +27,14 @@ public final class RemoteDebugger {
     }
 
     public synchronized static void init(final RemoteDebugger remoteDebugger) {
+        System.out.println("------- init remote debugger");
+        if (remoteDebugger.builder.isOnlyMainProcess && !isDefaultProcess(remoteDebugger.builder.context)) {
+            System.out.println("------- disable other process");
+            return;
+        }
+
+        System.out.println("------- run in main process");
+
         if (isAliveWebServer()) {
             return;
         }
@@ -113,12 +122,27 @@ public final class RemoteDebugger {
         });
     }
 
+    private static boolean isDefaultProcess(Context context) {
+        String processName = "";
+        int pid = android.os.Process.myPid();
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
+            if (processInfo.pid == pid) {
+                processName = processInfo.processName;
+                break;
+            }
+        }
+        return processName.equals(context.getPackageName());
+    }
+
     public static class Builder {
         private final Context context;
         private boolean enabled = true;
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private boolean includedUncaughtException = true;
+        private boolean isOnlyMainProcess = false;
         private int port = DEFAULT_PORT;
         private Logger logger;
 
@@ -158,6 +182,11 @@ public final class RemoteDebugger {
 
         public Builder port(int port) {
             this.port = port;
+            return this;
+        }
+
+        public Builder onlyMainProcess(boolean isOnlyMainProcess) {
+            this.isOnlyMainProcess = isOnlyMainProcess;
             return this;
         }
 
