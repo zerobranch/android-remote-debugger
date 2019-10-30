@@ -27,13 +27,9 @@ public final class RemoteDebugger {
     }
 
     public synchronized static void init(final RemoteDebugger remoteDebugger) {
-        System.out.println("------- init remote debugger");
-        if (remoteDebugger.builder.isOnlyMainProcess && !isDefaultProcess(remoteDebugger.builder.context)) {
-            System.out.println("------- disable other process");
+        if (isNotDefaultProcess(remoteDebugger.builder.context)) {
             return;
         }
-
-        System.out.println("------- run in main process");
 
         if (isAliveWebServer()) {
             return;
@@ -122,18 +118,18 @@ public final class RemoteDebugger {
         });
     }
 
-    private static boolean isDefaultProcess(Context context) {
-        String processName = "";
-        int pid = android.os.Process.myPid();
+    private static boolean isNotDefaultProcess(Context context) {
+        String currentProcessName = "";
+        int currentPid = android.os.Process.myPid();
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
         for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
-            if (processInfo.pid == pid) {
-                processName = processInfo.processName;
+            if (processInfo.pid == currentPid) {
+                currentProcessName = processInfo.processName;
                 break;
             }
         }
-        return processName.equals(context.getPackageName());
+        return !currentProcessName.equals(context.getPackageName());
     }
 
     public static class Builder {
@@ -142,7 +138,6 @@ public final class RemoteDebugger {
         private boolean enabledInternalLogging = false;
         private boolean enabledJsonPrettyPrint = false;
         private boolean includedUncaughtException = true;
-        private boolean isOnlyMainProcess = false;
         private int port = DEFAULT_PORT;
         private Logger logger;
 
@@ -182,11 +177,6 @@ public final class RemoteDebugger {
 
         public Builder port(int port) {
             this.port = port;
-            return this;
-        }
-
-        public Builder onlyMainProcess(boolean isOnlyMainProcess) {
-            this.isOnlyMainProcess = isOnlyMainProcess;
             return this;
         }
 
