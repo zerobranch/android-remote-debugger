@@ -15,7 +15,7 @@ public final class RemoteDebugger {
     private static final int MAX_PORT_VALUE = 8090;
     private static RemoteLog remoteLog;
     private static RemoteDebugger instance;
-    private static boolean isDebugEnable;
+    private static boolean isEnable;
     private Builder builder;
 
     private RemoteDebugger(Builder builder) {
@@ -36,9 +36,9 @@ public final class RemoteDebugger {
         }
 
         instance = remoteDebugger;
-        isDebugEnable = remoteDebugger.builder.enabled;
+        isEnable = remoteDebugger.builder.enabled;
 
-        if (!isDebugEnable) {
+        if (!isEnable) {
             stop();
             return;
         }
@@ -72,7 +72,7 @@ public final class RemoteDebugger {
     }
 
     public synchronized static void stop() {
-        isDebugEnable = false;
+        isEnable = false;
         remoteLog = null;
         instance = null;
         ServerRunner.getInstance().stop();
@@ -80,8 +80,8 @@ public final class RemoteDebugger {
         AppNotification.destroy();
     }
 
-    public static boolean isDebugEnable() {
-        return isDebugEnable;
+    public static boolean isEnable() {
+        return isEnable;
     }
 
     public static boolean isAliveWebServer() {

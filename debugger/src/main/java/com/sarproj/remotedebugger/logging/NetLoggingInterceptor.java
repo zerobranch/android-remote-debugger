@@ -48,7 +48,7 @@ public class NetLoggingInterceptor implements Interceptor {
     @Override
     @SuppressWarnings("ConstantConditions")
     public Response intercept(@NotNull Chain chain) throws IOException {
-        if (!RemoteDebugger.isDebugEnable()) {
+        if (!RemoteDebugger.isEnable()) {
             return chain.proceed(chain.request());
         }
 
@@ -106,7 +106,7 @@ public class NetLoggingInterceptor implements Interceptor {
             // ignore
         } finally {
             HttpLogModel logModel = requestMapper.map(logRequest);
-            if (RemoteDebugger.isDebugEnable()) {
+            if (RemoteDebugger.isEnable()) {
                 logRequest.id = getDataBase().addHttpLog(logModel);
                 onReceiveLog(logModel);
             }
@@ -127,7 +127,7 @@ public class NetLoggingInterceptor implements Interceptor {
             logResponse.errorMessage = e.getMessage();
 
             HttpLogModel logModel = responseMapper.map(logResponse);
-            if (RemoteDebugger.isDebugEnable()) {
+            if (RemoteDebugger.isEnable()) {
                 getDataBase().addHttpLog(logModel);
                 onReceiveLog(logModel);
             }
@@ -183,7 +183,7 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         HttpLogModel logModel = responseMapper.map(logResponse);
-        if (RemoteDebugger.isDebugEnable()) {
+        if (RemoteDebugger.isEnable()) {
             getDataBase().addHttpLog(logModel);
             onReceiveLog(logModel);
         }
