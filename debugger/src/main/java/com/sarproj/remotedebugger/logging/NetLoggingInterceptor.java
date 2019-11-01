@@ -48,6 +48,10 @@ public class NetLoggingInterceptor implements Interceptor {
     @Override
     @SuppressWarnings("ConstantConditions")
     public Response intercept(@NotNull Chain chain) throws IOException {
+        if (!RemoteDebugger.isDebugEnable()) {
+            return chain.proceed(chain.request());
+        }
+
         HttpLogRequest logRequest = new HttpLogRequest();
         HttpLogResponse logResponse = new HttpLogResponse();
 

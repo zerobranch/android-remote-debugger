@@ -38,12 +38,12 @@ public final class RemoteDebugger {
         instance = remoteDebugger;
         isDebugEnable = remoteDebugger.builder.enabled;
 
-        final Builder builder = remoteDebugger.builder;
-
-        if (!builder.enabled) {
+        if (!isDebugEnable) {
             stop();
             return;
         }
+
+        final Builder builder = remoteDebugger.builder;
 
         if (builder.includedUncaughtException) {
             setUncaughtExceptionHandler();
