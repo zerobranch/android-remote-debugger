@@ -102,9 +102,10 @@ public class NetLoggingInterceptor implements Interceptor {
             // ignore
         } finally {
             HttpLogModel logModel = requestMapper.map(logRequest);
-            logRequest.id = getDataBase().addHttpLog(logModel);
-
-            onReceiveLog(logModel);
+            if (RemoteDebugger.isDebugEnable()) {
+                logRequest.id = getDataBase().addHttpLog(logModel);
+                onReceiveLog(logModel);
+            }
         }
 
         logResponse.time = System.currentTimeMillis();
@@ -122,9 +123,11 @@ public class NetLoggingInterceptor implements Interceptor {
             logResponse.errorMessage = e.getMessage();
 
             HttpLogModel logModel = responseMapper.map(logResponse);
-            getDataBase().addHttpLog(logModel);
+            if (RemoteDebugger.isDebugEnable()) {
+                getDataBase().addHttpLog(logModel);
+                onReceiveLog(logModel);
+            }
 
-            onReceiveLog(logModel);
             throw e;
         }
 
@@ -176,14 +179,16 @@ public class NetLoggingInterceptor implements Interceptor {
         }
 
         HttpLogModel logModel = responseMapper.map(logResponse);
-        getDataBase().addHttpLog(logModel);
+        if (RemoteDebugger.isDebugEnable()) {
+            getDataBase().addHttpLog(logModel);
+            onReceiveLog(logModel);
+        }
 
-        onReceiveLog(logModel);
         return response;
     }
 
     private void onReceiveLog(HttpLogModel logModel) {
-        if (httpLogger != null && RemoteDebugger.isDebugEnable()) {
+        if (httpLogger != null) {
             httpLogger.log(logModel);
         }
     }
