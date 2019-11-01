@@ -40,16 +40,22 @@ class AppNotification {
         instance = null;
     }
 
-    public static void notify(@Nullable String title, @Nullable String description) {
+    static void notify(@Nullable String title, @Nullable String description) {
         if (instance == null) return;
 
         instance.notification(title, description, false);
     }
 
-    public static void notifyError(@Nullable String title, @Nullable String description) {
+    static void notifyError(@Nullable String title, @Nullable String description) {
         if (instance == null) return;
 
         instance.notification(title, description, true);
+    }
+
+    static void cancelAll() {
+        if (instance == null) return;
+
+        instance.notificationManager.cancelAll();
     }
 
     private void notification(@Nullable String title, @Nullable String description, boolean isError) {
@@ -88,6 +94,11 @@ class AppNotification {
 
             builder.addAction(0, "Repeat", repeatConnectionPendingIntent);
             builder.addAction(0, "Change port", changePortPendingIntent);
+        } else {
+            Intent disconnectIntent = new Intent(context, NotificationReceiver.class);
+            disconnectIntent.setAction(NotificationReceiver.ACTION_DISCONNECT);
+            PendingIntent disconnectPendingIntent = PendingIntent.getBroadcast(context, 0, disconnectIntent, 0);
+            builder.addAction(0, "Disconnect", disconnectPendingIntent);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
