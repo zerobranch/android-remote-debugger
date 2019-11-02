@@ -748,7 +748,7 @@
             timeTd.appendChild(timeText);
             levelTd.appendChild(levelText);
             tagTd.appendChild(tagText);
-            messagePre.innerHTML = setBodyLinkable(logLine.message);
+            messagePre.innerHTML = setBodyLinkable(getSimpleText(logLine.message));
             messageTd.appendChild(messagePre);
 
             tr.appendChild(copyImgTd);
@@ -959,6 +959,9 @@
         return matches ? decodeURIComponent(matches[1]) : undefined;
     }
 
+    function getSimpleText(text) {
+        return text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
     // endregion
 
 </script>

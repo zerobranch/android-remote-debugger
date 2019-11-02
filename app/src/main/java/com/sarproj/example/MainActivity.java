@@ -137,17 +137,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.warn).setOnClickListener(v -> {
-            int i = 4;
-            while (i > 0) {
-                RemoteDebugger.Log.w("testTag", "[ " + i + " ] warn это навернео уровень предупреждения");
-                i--;
-            }
-
-            i = -4;
-            while (i < 0) {
-                RemoteDebugger.Log.w("farcry", "[ " + i + " ] warn это навернео уровень предупреждения");
-                i++;
-            }
+//            int i = 4;
+//            while (i > 0) {
+                RemoteDebugger.Log.w("tag test asd", "<!DOCTYPE html> <html> <body> <h1>sdfghj</h1> <b>brbrbr</b> </body> </html>");
+//                i--;
+//            }
+//
+//            i = -4;
+//            while (i < 0) {
+//                RemoteDebugger.Log.w("farcry", "[ " + i + " ] warn это навернео уровень предупреждения");
+//                i++;
+//            }
         });
 
         findViewById(R.id.fatal).setOnClickListener(v -> {
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Response response = client.newCall(request)
                         .execute();
-                response.body().string();
+                System.out.println(response.body().string());
             } catch (IOException e) {
 //                e.printStackTrace();
             }

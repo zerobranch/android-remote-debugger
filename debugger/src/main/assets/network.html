@@ -703,7 +703,7 @@
                 setLogItemClassName(logLine, bodySpan);
 
                 let bodyPre = document.createElement("pre");
-                bodyPre.innerHTML = setBodyLinkable(logLine.body.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+                bodyPre.innerHTML = setBodyLinkable(getSimpleText(logLine.body));
                 bodyPre.className = "default-item-space query-body";
 
                 requestBodyDiv.appendChild(document.createElement("br"));
@@ -1140,6 +1140,9 @@
         return matches ? decodeURIComponent(matches[1]) : undefined;
     }
 
+    function getSimpleText(text) {
+        return text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
     // endregion
 
 </script>
