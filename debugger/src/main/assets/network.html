@@ -703,7 +703,7 @@
                 setLogItemClassName(logLine, bodySpan);
 
                 let bodyPre = document.createElement("pre");
-                bodyPre.innerHTML = setBodyLinkable(logLine.body);
+                bodyPre.innerHTML = setBodyLinkable(logLine.body.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
                 bodyPre.className = "default-item-space query-body";
 
                 requestBodyDiv.appendChild(document.createElement("br"));

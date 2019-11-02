@@ -201,7 +201,8 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.network1).setOnClickListener(v -> {
 //            RemoteDebugger.Log.d("tags", "asd");
-            send("http://www.mocky.io/v2/5d7bcf0a350000a96f3cadea?type=everType&profile=sky"); // link and query
+            send("http://www.mocky.io/v2/5dbdbc9e330000678f16a26c"); // link and query
+//            send("http://www.mocky.io/v2/5d7bcf0a350000a96f3cadea?type=everType&profile=sky"); // link and query
         });
 
         findViewById(R.id.network2).setOnClickListener(v -> {
