@@ -1283,7 +1283,7 @@
 
             tableCell.classList.add(cellItem['type']);
             tableCell.classList.add("header-cell");
-            tableCell.style.fontSize = (currentContentFont + 2) + "pt";
+            tableCell.style.fontSize = (parseInt(currentContentFont) + 2) + "pt";
 
             if (isDarkTheme) {
                 tableCell.classList.add("item-cell-dark-style");

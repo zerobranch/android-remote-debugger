@@ -942,7 +942,7 @@
         let tableCell = document.createElement('th');
         tableCell.innerText = name;
         tableCell.classList.add("header-cell");
-        tableCell.style.fontSize = currentContentFont + "pt";
+        tableCell.style.fontSize = (parseInt(currentContentFont) + 2) + "pt";
 
         if (isDarkTheme) {
             tableCell.classList.add("item-cell-dark-style");
