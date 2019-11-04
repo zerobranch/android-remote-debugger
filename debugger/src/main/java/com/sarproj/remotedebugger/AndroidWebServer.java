@@ -5,7 +5,6 @@ import android.content.res.AssetManager;
 
 import com.sarproj.remotedebugger.api.base.Api;
 import com.sarproj.remotedebugger.api.database.DatabaseApi;
-import com.sarproj.remotedebugger.api.error.ErrorPage;
 import com.sarproj.remotedebugger.api.log.LogApi;
 import com.sarproj.remotedebugger.api.network.NetworkApi;
 import com.sarproj.remotedebugger.api.sharedprefs.SharedPrefsApi;
@@ -27,7 +26,6 @@ final class AndroidWebServer extends NanoHTTPD {
     private Api databaseApi;
     private Api sharedPrefsApi;
     private Api networkApi;
-    private ErrorPage errorPage;
     private InternalSettings internalSettings;
 
     AndroidWebServer(Context context, String hostname, int port, InternalSettings internalSettings) {
@@ -80,20 +78,19 @@ final class AndroidWebServer extends NanoHTTPD {
                         Response.Status.NO_CONTENT.getDescription());
             }
         } catch (ResponseException ex) {
-            return HttpResponse.newErrorResponse(ex.getStatus(),
+            return getErrorPageResponse(ex.getStatus(),
                     ex.getMessage() + "\n" + InternalUtils.getStackTrace(ex));
         } catch (Exception ex) {
-            return HttpResponse.newErrorResponse(Response.Status.BAD_REQUEST,
+            return getErrorPageResponse(Response.Status.BAD_REQUEST,
                     ex.getMessage() + "\n" + InternalUtils.getStackTrace(ex));
         } catch (Throwable th) {
-            return HttpResponse.newErrorResponse(Response.Status.INTERNAL_ERROR,
+            return getErrorPageResponse(Response.Status.INTERNAL_ERROR,
                     th.getMessage() + "\n" + InternalUtils.getStackTrace(th));
         }
     }
 
     private Response getErrorPageResponse(Response.Status status, String description) {
-        return HttpResponse.newFixedLengthResponse(
-                getErrorPage().get(status.getRequestStatus(), description));
+        return HttpResponse.newErrorResponse(status, description);
     }
 
     private Response getCssResponse(Host host) {
@@ -136,13 +133,6 @@ final class AndroidWebServer extends NanoHTTPD {
             logApi = new LogApi(context, internalSettings);
         }
         return logApi;
-    }
-
-    private ErrorPage getErrorPage() {
-        if (errorPage == null) {
-            errorPage = new ErrorPage(context);
-        }
-        return errorPage;
     }
 
     private Api getDatabaseApi() {
