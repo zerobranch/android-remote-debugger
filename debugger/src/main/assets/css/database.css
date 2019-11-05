@@ -966,7 +966,6 @@ td {
     transform: translate(-50%, -50%);
     font-size: 30px;
     margin-top: 10%;
-    cursor: pointer;
     font-family: 'Josefin Sans', sans-serif;
     display: none;
 }

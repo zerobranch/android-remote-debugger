@@ -130,7 +130,7 @@
 
 <div id="baseContent" class="base-content-dark-style">
     <div id="auxiliaryContainer">
-        <div id="infoContent" class="info-content-dark-style" onclick="onInfoContentClick()"></div>
+        <div id="infoContent" class="info-content-dark-style"></div>
         <div id="notificationContent" class="notification-content-dark-style">No data</div>
         <div id="loader"></div>
     </div>
@@ -611,24 +611,6 @@
         } else if (selectedTable != null) {
             getTable(selectedTable, currentPage);
         }
-    }
-
-    function onInfoContentClick() {
-        let switcher = false;
-        let backgroundInterval = setInterval(function () {
-            if (!switcher) {
-                tableControlPanel.style.border = "1px solid #ff0000";
-            } else {
-                tableControlPanel.style.border = "1px solid #bb8600";
-            }
-            switcher = !switcher;
-        }, 180);
-
-        let backgroundTimeout = setTimeout(function () {
-            clearInterval(backgroundInterval);
-            clearTimeout(backgroundTimeout);
-            tableControlPanel.style.border = "1px solid #bb8600";
-        }, 3000)
     }
 
     function onTableLineClick(position) {
