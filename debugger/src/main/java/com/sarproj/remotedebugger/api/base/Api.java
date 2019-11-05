@@ -19,10 +19,10 @@ import fi.iki.elonen.NanoHTTPD;
 
 public abstract class Api {
     protected static final String EMPTY = "";
+    protected InternalSettings internalSettings;
     protected Context context;
     private Gson gson;
     private Gson prettyPrintJson;
-    protected InternalSettings internalSettings;
 
     public Api(Context context, InternalSettings internalSettings) {
         this.context = context;

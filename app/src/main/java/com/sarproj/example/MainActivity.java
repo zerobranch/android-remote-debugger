@@ -1,6 +1,9 @@
 package com.sarproj.example;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.sarproj.example.db.DBHelper;
@@ -9,6 +12,8 @@ import com.sarproj.remotedebugger.logging.NetLoggingInterceptor;
 import com.sarproj.remotedebugger.utils.FileUtils;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -167,7 +172,29 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.flavor).setOnClickListener(v -> {
 //                dbHelper.insertFlavor();
 //                RemoteDebugger.stop();
-            dbHelper.insertFlavor();
+//            dbHelper.insertFlavor();
+
+            Set<String> integers = new HashSet<>();
+            integers.add("100");
+            integers.add("1001");
+            integers.add("10032");
+            integers.add("910024");
+
+            SharedPreferences sharedPref = getSharedPreferences("QWE_PREF_1", Context.MODE_PRIVATE);
+            sharedPref.edit().putInt("key_2", 123).apply();
+            sharedPref.edit().putBoolean("key_3", false).apply();
+            sharedPref.edit().putFloat("key_4", 4.2f).apply();
+            sharedPref.edit().putLong("key_5", 123L).apply();
+            sharedPref.edit().putStringSet("key_5", integers).apply();
+
+            SharedPreferences sharedPref1 = getSharedPreferences("QWE_PREF_2", Context.MODE_PRIVATE);
+            sharedPref1.edit().putString("key_21", "value_21").apply();
+
+            SharedPreferences sharedPref2 = getSharedPreferences("QWE_PREF_3", Context.MODE_PRIVATE);
+            sharedPref2.edit().putString("key_31", "value_31").apply();
+
+            SharedPreferences sharedPref3 = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            sharedPref3.edit().putString("key_31", "value_31").apply();
         });
 
 //        findViewById(R.id.flavor).setOnLongClickListener(new View.OnLongClickListener() {
@@ -175,10 +202,10 @@ public class MainActivity extends AppCompatActivity {
 //            @Override
 //            public boolean onLongClick(View v) {
 //                Set<String> integers = new HashSet<>();
-//                integers.addLog("100");
-//                integers.addLog("1001");
-//                integers.addLog("10032");
-//                integers.addLog("910024");
+//                integers.add("100");
+//                integers.add("1001");
+//                integers.add("10032");
+//                integers.add("910024");
 //
 //                SharedPreferences sharedPref = getSharedPreferences("QWE_PREF_1", Context.MODE_PRIVATE);
 //                sharedPref.edit().putInt("key_2", 123).apply();
