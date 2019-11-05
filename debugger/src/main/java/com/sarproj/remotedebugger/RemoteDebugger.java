@@ -31,15 +31,15 @@ public final class RemoteDebugger {
             return;
         }
 
-        if (isAliveWebServer()) {
-            return;
-        }
-
         instance = remoteDebugger;
         isEnable = remoteDebugger.builder.enabled;
 
         if (!isEnable) {
             stop();
+            return;
+        }
+
+        if (isAliveWebServer()) {
             return;
         }
 
