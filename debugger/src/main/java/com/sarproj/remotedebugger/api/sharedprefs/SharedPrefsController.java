@@ -3,7 +3,7 @@ package com.sarproj.remotedebugger.api.sharedprefs;
 import android.content.Context;
 
 import com.google.gson.reflect.TypeToken;
-import com.sarproj.remotedebugger.api.base.Api;
+import com.sarproj.remotedebugger.api.base.Controller;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.InternalSettings;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 import fi.iki.elonen.NanoHTTPD.ResponseException;
 
-public class SharedPrefsApi extends Api {
+public class SharedPrefsController extends Controller {
     private final static String TYPE_INTEGER = "Integer";
     private final static String TYPE_FLOAT = "Float";
     private final static String TYPE_LONG = "Long";
@@ -31,7 +31,7 @@ public class SharedPrefsApi extends Api {
     private final static String TYPE_BOOLEAN = "Boolean";
     private final static String TYPE_SET_STRING = "Set<String>";
 
-    public SharedPrefsApi(Context context, InternalSettings internalSettings) {
+    public SharedPrefsController(Context context, InternalSettings internalSettings) {
         super(context, internalSettings);
     }
 

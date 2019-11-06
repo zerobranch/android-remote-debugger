@@ -3,11 +3,12 @@ package com.sarproj.remotedebugger;
 import android.content.Context;
 import android.content.res.AssetManager;
 
-import com.sarproj.remotedebugger.api.base.Api;
-import com.sarproj.remotedebugger.api.database.DatabaseApi;
-import com.sarproj.remotedebugger.api.log.LogApi;
-import com.sarproj.remotedebugger.api.network.NetworkApi;
-import com.sarproj.remotedebugger.api.sharedprefs.SharedPrefsApi;
+import com.sarproj.remotedebugger.api.base.Controller;
+import com.sarproj.remotedebugger.api.database.DatabaseController;
+import com.sarproj.remotedebugger.api.home.HomeController;
+import com.sarproj.remotedebugger.api.log.LogController;
+import com.sarproj.remotedebugger.api.network.NetworkController;
+import com.sarproj.remotedebugger.api.sharedprefs.SharedPrefsController;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.http.HttpResponse;
 import com.sarproj.remotedebugger.settings.InternalSettings;
@@ -22,10 +23,11 @@ import fi.iki.elonen.NanoHTTPD;
 final class AndroidWebServer extends NanoHTTPD {
     private final Context context;
     private final AssetManager assetManager;
-    private Api logApi;
-    private Api databaseApi;
-    private Api sharedPrefsApi;
-    private Api networkApi;
+    private Controller homeController;
+    private Controller logController;
+    private Controller databaseController;
+    private Controller sharedPrefsController;
+    private Controller networkController;
     private InternalSettings internalSettings;
 
     AndroidWebServer(Context context, String hostname, int port, InternalSettings internalSettings) {
@@ -60,15 +62,15 @@ final class AndroidWebServer extends NanoHTTPD {
     private Response getResponse(Host host, Map<String, List<String>> params) {
         try {
             if (host == Host.INDEX) {
-                return getSimpleResponse(Host.INDEX);
+                return HttpResponse.newFixedLengthResponse(getHomeController().execute(params));
             } else if (host == Host.LOGGING) {
-                return HttpResponse.newFixedLengthResponse(getLogApi().execute(params));
+                return HttpResponse.newFixedLengthResponse(getLogController().execute(params));
             } else if (host == Host.DATABASE) {
-                return HttpResponse.newFixedLengthResponse(getDatabaseApi().execute(params));
+                return HttpResponse.newFixedLengthResponse(getDatabaseController().execute(params));
             } else if (host == Host.SHARED_REFERENCES) {
-                return HttpResponse.newFixedLengthResponse(getSharedPrefsApi().execute(params));
+                return HttpResponse.newFixedLengthResponse(getSharedPrefsController().execute(params));
             } else if (host == Host.NETWORK) {
-                return HttpResponse.newFixedLengthResponse(getNetworkApi().execute(params));
+                return HttpResponse.newFixedLengthResponse(getNetworkController().execute(params));
             } else if (host.isCss()) {
                 return getCssResponse(host);
             } else if (host.isPng()) {
@@ -113,11 +115,6 @@ final class AndroidWebServer extends NanoHTTPD {
         }
     }
 
-    private Response getSimpleResponse(Host host) {
-        return HttpResponse.newFixedLengthResponse(
-                FileUtils.getTextFromAssets(assetManager, host.getPath()));
-    }
-
     private Response parseParams(IHTTPSession session) {
         try {
             session.parseBody(null);
@@ -128,31 +125,38 @@ final class AndroidWebServer extends NanoHTTPD {
         }
     }
 
-    private Api getLogApi() {
-        if (logApi == null) {
-            logApi = new LogApi(context, internalSettings);
+    private Controller getLogController() {
+        if (logController == null) {
+            logController = new LogController(context, internalSettings);
         }
-        return logApi;
+        return logController;
     }
 
-    private Api getDatabaseApi() {
-        if (databaseApi == null) {
-            databaseApi = new DatabaseApi(context, internalSettings);
+    private Controller getDatabaseController() {
+        if (databaseController == null) {
+            databaseController = new DatabaseController(context, internalSettings);
         }
-        return databaseApi;
+        return databaseController;
     }
 
-    private Api getSharedPrefsApi() {
-        if (sharedPrefsApi == null) {
-            sharedPrefsApi = new SharedPrefsApi(context, internalSettings);
+    private Controller getHomeController() {
+        if (homeController == null) {
+            homeController = new HomeController(context, internalSettings);
         }
-        return sharedPrefsApi;
+        return homeController;
     }
 
-    private Api getNetworkApi() {
-        if (networkApi == null) {
-            networkApi = new NetworkApi(context, internalSettings);
+    private Controller getSharedPrefsController() {
+        if (sharedPrefsController == null) {
+            sharedPrefsController = new SharedPrefsController(context, internalSettings);
         }
-        return networkApi;
+        return sharedPrefsController;
+    }
+
+    private Controller getNetworkController() {
+        if (networkController == null) {
+            networkController = new NetworkController(context, internalSettings);
+        }
+        return networkController;
     }
 }

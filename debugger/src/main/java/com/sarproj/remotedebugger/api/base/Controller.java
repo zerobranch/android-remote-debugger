@@ -17,14 +17,14 @@ import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public abstract class Api {
+public abstract class Controller {
     protected static final String EMPTY = "";
     protected InternalSettings internalSettings;
     protected Context context;
     private Gson gson;
     private Gson prettyPrintJson;
 
-    public Api(Context context, InternalSettings internalSettings) {
+    public Controller(Context context, InternalSettings internalSettings) {
         this.context = context;
         this.internalSettings = internalSettings;
         gson = new Gson();

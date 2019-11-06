@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.google.gson.JsonSyntaxException;
-import com.sarproj.remotedebugger.api.base.Api;
+import com.sarproj.remotedebugger.api.base.Controller;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.InternalSettings;
 import com.sarproj.remotedebugger.source.local.LogLevel;
@@ -19,10 +19,10 @@ import fi.iki.elonen.NanoHTTPD;
 
 import static com.sarproj.remotedebugger.source.local.Constants.LIMIT_LOGS_PACKS;
 
-public final class LogApi extends Api {
+public final class LogController extends Controller {
     private static final int UNLIMITED_OFFSET = -1;
 
-    public LogApi(Context context, InternalSettings internalSettings) {
+    public LogController(Context context, InternalSettings internalSettings) {
         super(context, internalSettings);
     }
 

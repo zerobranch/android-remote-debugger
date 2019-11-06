@@ -1,6 +1,6 @@
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -60,7 +60,7 @@ body {
     color: #c9c9c9;
     margin-right:25px;
     margin-top:20px;
-    letter-spacing: 0.3px;
+    letter-spacing: 0;
     font-size: 14pt;
     text-decoration: none;
     padding: 10px;
@@ -75,7 +75,7 @@ body {
 }
 
 #headerButton:active {
-   opacity: 0.8;
+    opacity: 0.8;
 }
 
 #selectionMenu {
@@ -83,7 +83,10 @@ body {
 }
 
 .root-section {
-    margin: auto;
     display: table;
-    margin-top: 10px;
+    margin: 10px auto auto;
+}
+
+#appPackage {
+    color: #ffab00;
 }

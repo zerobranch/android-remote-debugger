@@ -2,7 +2,7 @@ package com.sarproj.remotedebugger.api.database;
 
 import android.content.Context;
 
-import com.sarproj.remotedebugger.api.base.Api;
+import com.sarproj.remotedebugger.api.base.Controller;
 import com.sarproj.remotedebugger.api.base.HtmlParams;
 import com.sarproj.remotedebugger.http.Host;
 import com.sarproj.remotedebugger.settings.InternalSettings;
@@ -21,12 +21,12 @@ import java.util.Map;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.ResponseException;
 
-public class DatabaseApi extends Api {
+public class DatabaseController extends Controller {
     private static final int FIRST_PAGE = 1;
     private static final int LAST_PAGE = -1;
     private static final int DEFAULT_PAGE_SIZE = 15;
 
-    public DatabaseApi(Context context, InternalSettings internalSettings) {
+    public DatabaseController(Context context, InternalSettings internalSettings) {
         super(context, internalSettings);
     }
 

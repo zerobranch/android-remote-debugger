@@ -6,12 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="css/index.css">
     <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet">
+
+    <script language="JavaScript">
+        function httpGet(url, params, successCallback, errorCallback) {
+            url = url + "?" + params;
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        successCallback(xhr.responseText);
+                    } else if (errorCallback != null) {
+                        errorCallback(xhr.status, xhr.statusText, xhr.responseText);
+                    }
+                }
+            };
+
+            xhr.open('get', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(null);
+        }
+    </script>
 </head>
 <body>
 <a href="https://github.com/arman-sar/" target="_blank" id="headerButton">Other projects</a>
 <div class="header-content">
-    <div id="headerTitle">Welcome to the Android Remote Debugger</div>
-    <div id="headerSecondTitle">To get started, select the section</div>
+    <div id="headerTitle">Welcome to Android Remote Debugger</div>
+    <div id="headerSecondTitle">package:&nbsp;<span id="appPackage"></span></div>
 </div>
 
 <div id="selectionMenu">
@@ -25,4 +46,25 @@
     </div>
 </div>
 </body>
+
+<script>
+    let appPackage = getElementById('appPackage');
+
+    window.onload = function () {
+        loadSettings()
+    };
+
+    function loadSettings() {
+        let body = 'getSettings=' + encodeURIComponent('');
+        httpGet('/', body, function (response) {
+            let settings = JSON.parse(response);
+            let packageText = document.createTextNode(settings['appPackage']);
+            appPackage.appendChild(packageText);
+        }, function (status, statusText, responseText) {});
+    }
+
+    function getElementById(id) {
+        return document.getElementById(id);
+    }
+</script>
 </html>
