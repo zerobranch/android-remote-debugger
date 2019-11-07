@@ -76,7 +76,7 @@ class AppNotification {
             builder = new NotificationCompat.Builder(context);
         }
 
-        builder.setSmallIcon(android.R.drawable.star_on)
+        builder.setSmallIcon(R.drawable.ic_bug)
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -105,7 +105,7 @@ class AppNotification {
             builder.setGroup(GROUP_KEY);
 
             NotificationCompat.Builder groupBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(android.R.drawable.star_on)
+                    .setSmallIcon(R.drawable.ic_bug)
                     .setGroup(GROUP_KEY)
                     .setAutoCancel(true)
                     .setVibrate(new long[]{0L})
