@@ -19,13 +19,13 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         switch (action) {
             case ACTION_REPEAT_CONNECTION:
-                RemoteDebugger.reconnect();
+                RemoteDebugger.reconnect(context);
                 break;
             case ACTION_CHANGE_PORT:
-                RemoteDebugger.reconnectWithNewPort();
+                RemoteDebugger.reconnectWithNewPort(context);
                 break;
             case ACTION_DISCONNECT:
-                AppNotification.cancelAll();
+                AppNotification.cancelAll(context);
                 RemoteDebugger.stop();
                 break;
         }

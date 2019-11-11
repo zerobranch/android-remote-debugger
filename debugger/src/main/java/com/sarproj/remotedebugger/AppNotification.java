@@ -21,7 +21,7 @@ class AppNotification {
 
     private AppNotification(Context context) {
         this.context = context;
-        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager = getNotificationManager(context);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
@@ -52,8 +52,11 @@ class AppNotification {
         instance.notification(title, description, true);
     }
 
-    static void cancelAll() {
-        if (instance == null) return;
+    static void cancelAll(Context context) {
+        if (instance == null) {
+            getNotificationManager(context).cancelAll();
+            return;
+        }
 
         instance.notificationManager.cancelAll();
     }
@@ -116,5 +119,9 @@ class AppNotification {
         } else {
             notificationManager.notify(NOTIFICATION_ID, builder.build());
         }
+    }
+
+    private static NotificationManager getNotificationManager(Context context) {
+        return ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
     }
 }

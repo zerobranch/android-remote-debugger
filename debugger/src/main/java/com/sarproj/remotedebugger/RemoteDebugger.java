@@ -89,7 +89,12 @@ public final class RemoteDebugger {
     }
 
     static void reconnect() {
+        reconnect(null);
+    }
+
+    static void reconnect(Context context) {
         if (instance == null) {
+            AppNotification.cancelAll(context);
             return;
         }
 
@@ -97,7 +102,12 @@ public final class RemoteDebugger {
     }
 
     static void reconnectWithNewPort() {
+        reconnectWithNewPort(null);
+    }
+
+    static void reconnectWithNewPort(Context context) {
         if (instance == null) {
+            AppNotification.cancelAll(context);
             return;
         }
 
