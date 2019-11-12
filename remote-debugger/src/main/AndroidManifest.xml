@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sarproj.remotedebugger">
+    package="com.zerobranch.remotedebugger">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -7,7 +7,7 @@
 
     <application>
         <receiver
-            android:name=".NotificationReceiver"
+            android:name="com.zerobranch.remotedebugger.NotificationReceiver"
             android:exported="false">
         </receiver>
     </application>
