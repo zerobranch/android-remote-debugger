@@ -54,11 +54,19 @@ class AppNotification {
 
     static void cancelAll(Context context) {
         if (instance == null) {
-            getNotificationManager(context).cancelAll();
+            cancel(getNotificationManager(context));
             return;
         }
 
-        instance.notificationManager.cancelAll();
+        cancel(instance.notificationManager);
+    }
+
+    private static void cancel(NotificationManager notificationManager) {
+        notificationManager.cancel(NOTIFICATION_ID);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            notificationManager.cancel(GROUP_KEY.hashCode());
+        }
     }
 
     private void notification(@Nullable String title, @Nullable String description, boolean isError) {
