@@ -1,1 +1,1 @@
-include ':app', ':remote-debugger'
+include ':example', ':remote-debugger'
