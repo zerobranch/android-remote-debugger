@@ -8,7 +8,6 @@
     <application>
         <receiver
             android:name="com.zerobranch.remotedebugger.NotificationReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false" />
     </application>
 </manifest>
