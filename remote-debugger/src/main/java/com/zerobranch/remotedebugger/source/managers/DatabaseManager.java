@@ -10,7 +10,6 @@ import com.zerobranch.remotedebugger.source.models.Table;
 import com.zerobranch.remotedebugger.utils.FileUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,11 +28,11 @@ public final class DatabaseManager {
     private static final Object LOCK = new Object();
 
     private SQLiteDatabase db;
-    private WeakReference<Context> contextWeakReference;
+    private Context context;
     private static DatabaseManager instance;
 
     private DatabaseManager(Context context, String dbName) {
-        contextWeakReference = new WeakReference<>(context);
+        this.context = context;
 
         File dataBaseDir = new File(context.getApplicationInfo().dataDir, DATA_BASE_DIR);
         if (!dataBaseDir.exists() || !dataBaseDir.isDirectory()) {
@@ -62,21 +61,6 @@ public final class DatabaseManager {
         synchronized (LOCK) {
             disconnect();
             instance = new DatabaseManager(context, dbName);
-        }
-    }
-
-    public static void disconnect() {
-        synchronized (LOCK) {
-            if (instance != null) {
-                if (instance.db != null && instance.db.isOpen()) {
-                    instance.db.close();
-                }
-
-                instance.db = null;
-                instance.contextWeakReference.clear();
-                instance.contextWeakReference = null;
-                instance = null;
-            }
         }
     }
 
@@ -217,11 +201,11 @@ public final class DatabaseManager {
 
     public void dropDatabase(String dbName) {
         synchronized (LOCK) {
-            if (dbName == null || contextWeakReference.get() == null) {
+            if (dbName == null) {
                 return;
             }
 
-            contextWeakReference.get().deleteDatabase(dbName);
+            context.deleteDatabase(dbName);
             disconnect();
         }
     }
@@ -430,6 +414,20 @@ public final class DatabaseManager {
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
+        }
+    }
+
+    private static void disconnect() {
+        synchronized (LOCK) {
+            if (instance != null) {
+                if (instance.db != null && instance.db.isOpen()) {
+                    instance.db.close();
+                }
+
+                instance.db = null;
+                instance.context = null;
+                instance = null;
+            }
         }
     }
 }

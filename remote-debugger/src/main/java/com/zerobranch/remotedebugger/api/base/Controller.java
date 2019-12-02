@@ -19,10 +19,10 @@ import fi.iki.elonen.NanoHTTPD;
 
 public abstract class Controller {
     protected static final String EMPTY = "";
-    protected InternalSettings internalSettings;
-    protected Context context;
-    private Gson gson;
-    private Gson prettyPrintJson;
+    private final Gson gson;
+    private final Gson prettyPrintJson;
+    protected final InternalSettings internalSettings;
+    protected final Context context;
 
     public Controller(Context context, InternalSettings internalSettings) {
         this.context = context;
@@ -34,25 +34,21 @@ public abstract class Controller {
     public abstract String execute(Map<String, List<String>> params) throws NanoHTTPD.ResponseException;
 
     @SuppressWarnings("ConstantConditions")
-    protected boolean containsValue(Map<String, List<String>> params, String key) {
-        return params.containsKey(key) && params.get(key) != null && !params.get(key).isEmpty();
+    protected boolean notContains(Map<String, List<String>> params, String key) {
+        return !params.containsKey(key) || params.get(key) == null || params.get(key).isEmpty();
     }
 
-    @SuppressWarnings({"ConstantConditions", "SameParameterValue", "WeakerAccess"})
-    protected String getStringValue(Map<String, List<String>> params, String key, String defaultValue) {
-        if (!containsValue(params, key)) {
-            return defaultValue;
+    @SuppressWarnings("ConstantConditions")
+    protected String getStringValue(Map<String, List<String>> params, String key) {
+        if (notContains(params, key)) {
+            return null;
         }
         return params.get(key).get(0);
     }
 
-    protected String getStringValue(Map<String, List<String>> params, String key) {
-        return getStringValue(params, key, null);
-    }
-
     @SuppressWarnings("ConstantConditions")
     protected int getIntValue(Map<String, List<String>> params, String key, int defaultValue) {
-        if (!containsValue(params, key)) {
+        if (notContains(params, key)) {
             return defaultValue;
         }
 
@@ -66,7 +62,7 @@ public abstract class Controller {
 
     @SuppressWarnings({"ConstantConditions", "SameParameterValue"})
     protected boolean getBooleanValue(Map<String, List<String>> params, String key, boolean defaultValue) {
-        if (!containsValue(params, key)) {
+        if (notContains(params, key)) {
             return defaultValue;
         }
 

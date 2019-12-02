@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zerobranch.example.db.DBHelper;
-import com.zerobranch.remotedebugger.RemoteDebugger;
+import com.zerobranch.remotedebugger.AndroidRemoteDebugger;
 import com.zerobranch.remotedebugger.logging.NetLoggingInterceptor;
 import com.zerobranch.remotedebugger.utils.FileUtils;
 
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        RemoteDebugger.init(
-                new RemoteDebugger.Builder(this)
+        AndroidRemoteDebugger.init(
+                new AndroidRemoteDebugger.Builder(this)
                         .enabled(true)
                         .enableInternalLogging()
                         .enableJsonPrettyPrint()
@@ -43,24 +43,24 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.user).setOnClickListener(v -> {
 //                dbHelper.insertUser();
-//                RemoteDebugger.init(getApplicationContext(), true, true);
+//                AndroidRemoteDebugger.init(getApplicationContext(), true, true);
 //            dbHelper.insertUser();
             int a = 1 / 0;
         });
 
         findViewById(R.id.debug).setOnClickListener(v -> {
             String val = FileUtils.getTextFromAssets(getAssets(), "test.json");
-            RemoteDebugger.Log.d("test json", val);
+            AndroidRemoteDebugger.Log.d("test json", val);
 
 //            int i = 4;
 //            while (i > 0) {
-//                RemoteDebugger.Log.d("testTag", "[ " + i + " ] debug это уровенть отладки");
+//                AndroidRemoteDebugger.Log.d("testTag", "[ " + i + " ] debug это уровенть отладки");
 //                i--;
 //            }
 //
 //            i = -4;
 //            while (i < 0) {
-//                RemoteDebugger.Log.d("farcry", "[ " + i + " ] debug это уровенть отладки");
+//                AndroidRemoteDebugger.Log.d("farcry", "[ " + i + " ] debug это уровенть отладки");
 //                i++;
 //            }
         });
@@ -68,21 +68,21 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.info).setOnClickListener(v -> {
             int i = 4;
             while (i > 0) {
-                RemoteDebugger.Log.i("testTag", "[ " + i + " ] \"info\" информационная линия просмотра");
+                AndroidRemoteDebugger.Log.i("testTag", "[ " + i + " ] \"info\" информационная линия просмотра");
                 i--;
             }
 
-            RemoteDebugger.Log.i("testTag", "[ " + 3 + " ] info самая минимальная линия");
+            AndroidRemoteDebugger.Log.i("testTag", "[ " + 3 + " ] info самая минимальная линия");
 
             i = -4;
             while (i < 0) {
-                RemoteDebugger.Log.i("farcry", "[ " + i + " ] info информационная линия просмотра");
+                AndroidRemoteDebugger.Log.i("farcry", "[ " + i + " ] info информационная линия просмотра");
                 i++;
             }
         });
 
         findViewById(R.id.verbose).setOnClickListener(v -> {
-            RemoteDebugger.Log.v("testTag", "] verbose 'самая' минимальная линия");
+            AndroidRemoteDebugger.Log.v("testTag", "] verbose 'самая' минимальная линия");
 //            int i = 4;
 //            while (i > 0) {
 //                i--;
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //            i = -4;
 //            while (i < 0) {
-//                RemoteDebugger.Log.v("farcry", "[ " + i + " ] verbose самая минимальная линия");
+//                AndroidRemoteDebugger.Log.v("farcry", "[ " + i + " ] verbose самая минимальная линия");
 //                i++;
 //            }
         });
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 //            try {
 //                int a = 1 / 0;
 //            } catch (Throwable th) {
-//                RemoteDebugger.e("testTag", "asd", th);
+//                AndroidRemoteDebugger.e("testTag", "asd", th);
 //            }
 //            return false;
 //        });
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.error).setOnClickListener(v -> {
             int i = 4;
             while (i > 0) {
-                RemoteDebugger.Log.e("testTag", "[ " + i + " ] error " +
+                AndroidRemoteDebugger.Log.e("testTag", "[ " + i + " ] error " +
                         "2019-04-10 21:32:32.374 23388-23413/? E/StandaloneKeepAlive: Attempting to start service when the app is in background is not allowed on Android O+. Intent: Intent { cmp=com.google.android.googlequicksearchbox/com.google.android.apps.gsa.shared.util.keepalive.StandaloneKeepAlive$KeepAliveService }\n" +
                         "    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=com.google.android.googlequicksearchbox/com.google.android.apps.gsa.shared.util.keepalive.StandaloneKeepAlive$KeepAliveService }: app is in background uid UidRecord{60ade97 u0a35 TRNB bg:+1h36m26s353ms idle change:uncached procs:1 seq(163,163,163)}\n" +
                         "        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1577)\n" +
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
             i = -4;
             while (i < 0) {
-                RemoteDebugger.Log.e("farcry", "[ " + i + " ] error тут возможно произошла ошибка");
+                AndroidRemoteDebugger.Log.e("farcry", "[ " + i + " ] error тут возможно произошла ошибка");
                 i++;
             }
         });
@@ -144,13 +144,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.warn).setOnClickListener(v -> {
 //            int i = 4;
 //            while (i > 0) {
-                RemoteDebugger.Log.w("tag test asd", "<!DOCTYPE html> <html> <body> <h1>sdfghj</h1> <b>brbrbr</b> </body> </html>");
+                AndroidRemoteDebugger.Log.w("tag test asd", "<!DOCTYPE html> <html> <body> <h1>sdfghj</h1> <b>brbrbr</b> </body> </html>");
 //                i--;
 //            }
 //
 //            i = -4;
 //            while (i < 0) {
-//                RemoteDebugger.Log.w("farcry", "[ " + i + " ] warn это навернео уровень предупреждения");
+//                AndroidRemoteDebugger.Log.w("farcry", "[ " + i + " ] warn это навернео уровень предупреждения");
 //                i++;
 //            }
         });
@@ -158,20 +158,20 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fatal).setOnClickListener(v -> {
             int i = 4;
             while (i > 0) {
-                RemoteDebugger.Log.wtf("testTag", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
+                AndroidRemoteDebugger.Log.wtf("testTag", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
                 i--;
             }
 
             i = -4;
             while (i < 0) {
-                RemoteDebugger.Log.wtf("farcry", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
+                AndroidRemoteDebugger.Log.wtf("farcry", "[ " + i + " ] fatal фатальная почти невозможная ошибка");
                 i++;
             }
         });
 
         findViewById(R.id.flavor).setOnClickListener(v -> {
 //                dbHelper.insertFlavor();
-//                RemoteDebugger.stop();
+//                AndroidRemoteDebugger.stop();
 //            dbHelper.insertFlavor();
 
             Set<String> integers = new HashSet<>();
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         findViewById(R.id.network1).setOnClickListener(v -> {
-//            RemoteDebugger.Log.d("tags", "asd");
+//            AndroidRemoteDebugger.Log.d("tags", "asd");
             send("http://www.mocky.io/v2/5dbdbc9e330000678f16a26c"); // link and query
 //            send("http://www.mocky.io/v2/5d7bcf0a350000a96f3cadea?type=everType&profile=sky"); // link and query
         });

@@ -43,15 +43,6 @@ public final class SharedPrefsManager {
         }
     }
 
-    public static void disconnect() {
-        synchronized (LOCK) {
-            if (instance != null) {
-                instance.sharedPreferences = null;
-                instance = null;
-            }
-        }
-    }
-
     public static List<String> getSharedPreferences(Context context) {
         synchronized (LOCK) {
             final File prefsDir = new File(context.getApplicationInfo().dataDir, SHARE_PREFS_DIR);
@@ -108,6 +99,15 @@ public final class SharedPrefsManager {
                 editor.remove(key);
             }
             editor.apply();
+        }
+    }
+
+    private static void disconnect() {
+        synchronized (LOCK) {
+            if (instance != null) {
+                instance.sharedPreferences = null;
+                instance = null;
+            }
         }
     }
 }

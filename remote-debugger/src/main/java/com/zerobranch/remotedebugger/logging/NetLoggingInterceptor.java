@@ -1,6 +1,6 @@
 package com.zerobranch.remotedebugger.logging;
 
-import com.zerobranch.remotedebugger.RemoteDebugger;
+import com.zerobranch.remotedebugger.AndroidRemoteDebugger;
 import com.zerobranch.remotedebugger.source.managers.ContinuousDBManager;
 import com.zerobranch.remotedebugger.source.mapper.HttpLogRequestMapper;
 import com.zerobranch.remotedebugger.source.mapper.HttpLogResponseMapper;
@@ -46,9 +46,8 @@ public class NetLoggingInterceptor implements Interceptor {
 
     @NotNull
     @Override
-    @SuppressWarnings("ConstantConditions")
     public Response intercept(@NotNull Chain chain) throws IOException {
-        if (!RemoteDebugger.isEnable()) {
+        if (!AndroidRemoteDebugger.isEnable()) {
             return chain.proceed(chain.request());
         }
 
@@ -79,7 +78,10 @@ public class NetLoggingInterceptor implements Interceptor {
 
         if (requestBody != null) {
             if (requestBody.contentType() != null) {
-                logRequest.requestContentType = requestBody.contentType().toString();
+                MediaType contentType = requestBody.contentType();
+                if (contentType != null) {
+                    logRequest.requestContentType = contentType.toString();
+                }
             }
 
             logRequest.bodySize = String.valueOf(requestBody.contentLength());
@@ -93,7 +95,9 @@ public class NetLoggingInterceptor implements Interceptor {
                 charset = contentType.charset(UTF8);
             }
 
-            logRequest.body = buffer.readString(charset);
+            if (charset != null) {
+                logRequest.body = buffer.readString(charset);
+            }
         }
 
         logRequest.queryId = String.valueOf(queryNumber.incrementAndGet());
@@ -106,7 +110,7 @@ public class NetLoggingInterceptor implements Interceptor {
             // ignore
         } finally {
             HttpLogModel logModel = requestMapper.map(logRequest);
-            if (RemoteDebugger.isEnable()) {
+            if (AndroidRemoteDebugger.isEnable()) {
                 logRequest.id = getDataBase().addHttpLog(logModel);
                 onReceiveLog(logModel);
             }
@@ -127,7 +131,7 @@ public class NetLoggingInterceptor implements Interceptor {
             logResponse.errorMessage = e.getMessage();
 
             HttpLogModel logModel = responseMapper.map(logResponse);
-            if (RemoteDebugger.isEnable()) {
+            if (AndroidRemoteDebugger.isEnable()) {
                 getDataBase().addHttpLog(logModel);
                 onReceiveLog(logModel);
             }
@@ -177,13 +181,13 @@ public class NetLoggingInterceptor implements Interceptor {
                 logResponse.bodySize = String.valueOf(buffer.size());
             }
 
-            if (responseContentLength != 0) {
+            if (responseContentLength != 0 && charset != null) {
                 logResponse.body = buffer.clone().readString(charset);
             }
         }
 
         HttpLogModel logModel = responseMapper.map(logResponse);
-        if (RemoteDebugger.isEnable()) {
+        if (AndroidRemoteDebugger.isEnable()) {
             getDataBase().addHttpLog(logModel);
             onReceiveLog(logModel);
         }

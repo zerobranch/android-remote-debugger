@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
 
 public final class RemoteLog {
     private static final String DEFAULT_TAG = RemoteLog.class.getSimpleName();
-    private ContinuousDBManager continuousDBManager;
-    private final Logger logger;
     private static final int MAX_LOG_LENGTH = 2000;
     private static final int MAX_TAG_LENGTH = 23;
+    private final ContinuousDBManager continuousDBManager;
+    private final Logger logger;
 
     public RemoteLog(Logger logger) {
         this.logger = logger;

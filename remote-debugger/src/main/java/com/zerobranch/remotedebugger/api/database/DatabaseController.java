@@ -58,7 +58,7 @@ public class DatabaseController extends Controller {
     }
 
     private String getTable(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
@@ -78,7 +78,7 @@ public class DatabaseController extends Controller {
     }
 
     private String getTables(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATABASE)) {
+        if (notContains(params, HtmlParams.DATABASE)) {
             throwEmptyParameterException(HtmlParams.DATABASE);
         }
 
@@ -97,11 +97,11 @@ public class DatabaseController extends Controller {
     }
 
     private String updateTable(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
+        if (notContains(params, HtmlParams.DATA)) {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
@@ -121,11 +121,11 @@ public class DatabaseController extends Controller {
     }
 
     private String deleteTableItems(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
+        if (notContains(params, HtmlParams.DATA)) {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
@@ -146,7 +146,7 @@ public class DatabaseController extends Controller {
     }
 
     private String dropTable(Map<String, List<String>> params) throws NanoHTTPD.ResponseException {
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
@@ -156,7 +156,7 @@ public class DatabaseController extends Controller {
     }
 
     private String dropDatabase(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
@@ -177,7 +177,7 @@ public class DatabaseController extends Controller {
     }
 
     private String getByQuery(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
+        if (notContains(params, HtmlParams.DATA)) {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
@@ -186,11 +186,11 @@ public class DatabaseController extends Controller {
     }
 
     private String search(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
+        if (notContains(params, HtmlParams.DATA)) {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 

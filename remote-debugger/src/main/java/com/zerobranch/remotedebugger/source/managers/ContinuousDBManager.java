@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import com.zerobranch.remotedebugger.RemoteDebugger;
+import com.zerobranch.remotedebugger.AndroidRemoteDebugger;
 import com.zerobranch.remotedebugger.source.local.StatusCodeFilter;
 import com.zerobranch.remotedebugger.source.models.LogModel;
 import com.zerobranch.remotedebugger.source.models.httplog.HttpLogModel;
@@ -16,34 +16,39 @@ import java.util.List;
 
 public final class ContinuousDBManager {
     private static final String DATABASE_NAME = "remote_debugger_data.db";
-    private final static Object LOCK = new Object();
-    private final SQLiteDatabase database;
+    private static final Object LOCK = new Object();
     private static ContinuousDBManager instance;
-    private final HttpLogRepository httpLogRepository;
-    private final LogRepository logRepository;
     private final Handler loggingHandler;
     private final HandlerThread loggingHandlerThread;
+    private SQLiteDatabase database;
+    private HttpLogRepository httpLogRepository;
+    private LogRepository logRepository;
 
-    private ContinuousDBManager(Context context) {
+    private ContinuousDBManager(final Context context) {
         loggingHandlerThread = new HandlerThread("LoggingHandlerThread");
         loggingHandlerThread.start();
         loggingHandler = new Handler(loggingHandlerThread.getLooper());
 
-        SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
-        database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
-        database.setVersion(Integer.MAX_VALUE);
+        loggingHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
+                database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
+                database.setVersion(Integer.MAX_VALUE);
 
-        httpLogRepository = new HttpLogRepository(database);
-        httpLogRepository.createHttpLogsTable(database);
+                httpLogRepository = new HttpLogRepository(database);
+                httpLogRepository.createHttpLogsTable(database);
 
-        logRepository = new LogRepository(database);
-        logRepository.createLogsTable(database);
+                logRepository = new LogRepository(database);
+                logRepository.createLogsTable(database);
+            }
+        });
     }
 
     public static ContinuousDBManager getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("RemoteDebugger is not initialized. " +
-                    "Please call " + RemoteDebugger.class.getName() + ".init()");
+            throw new IllegalStateException("AndroidRemoteDebugger is not initialized. " +
+                    "Please call " + AndroidRemoteDebugger.class.getName() + ".init()");
         }
         return instance;
     }

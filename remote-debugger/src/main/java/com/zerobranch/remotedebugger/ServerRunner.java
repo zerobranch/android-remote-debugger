@@ -9,7 +9,7 @@ import com.zerobranch.remotedebugger.utils.InternalUtils;
 import fi.iki.elonen.NanoHTTPD;
 
 final class ServerRunner {
-    private static final String TAG = "RemoteDebugger";
+    private static final String TAG = "AndroidRemoteDebugger";
     private static volatile ServerRunner instance;
     private AndroidWebServer androidWebServer;
     private boolean enabledInternalLogging;
@@ -53,17 +53,17 @@ final class ServerRunner {
         }
     }
 
-    boolean isAlive() {
-        return androidWebServer != null && androidWebServer.isAlive();
+    static boolean isAlive() {
+        return instance != null && instance.androidWebServer != null && instance.androidWebServer.isAlive();
     }
 
-    void stop() {
-        if (androidWebServer != null && androidWebServer.isAlive()) {
-            androidWebServer.stop();
-            print("Android Remote Debugger is stopped.");
+    static void stop() {
+        if (isAlive()) {
+            instance.androidWebServer.stop();
+            instance.print("Android Remote Debugger is stopped.");
         }
 
-        androidWebServer = null;
+        instance.androidWebServer = null;
         instance = null;
     }
 

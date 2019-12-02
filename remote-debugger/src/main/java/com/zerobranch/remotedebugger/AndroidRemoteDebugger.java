@@ -10,15 +10,15 @@ import com.zerobranch.remotedebugger.settings.InternalSettings;
 import com.zerobranch.remotedebugger.source.local.LogLevel;
 import com.zerobranch.remotedebugger.source.managers.ContinuousDBManager;
 
-public final class RemoteDebugger {
+public final class AndroidRemoteDebugger {
     private static final int DEFAULT_PORT = 8080;
     private static final int MAX_PORT_VALUE = 8090;
+    private final Builder builder;
     private static RemoteLog remoteLog;
-    private static RemoteDebugger instance;
+    private static AndroidRemoteDebugger instance;
     private static boolean isEnable;
-    private Builder builder;
 
-    private RemoteDebugger(Builder builder) {
+    private AndroidRemoteDebugger(Builder builder) {
         this.builder = builder;
     }
 
@@ -26,13 +26,13 @@ public final class RemoteDebugger {
         init(new Builder(context).build());
     }
 
-    public synchronized static void init(final RemoteDebugger remoteDebugger) {
-        if (isNotDefaultProcess(remoteDebugger.builder.context)) {
+    public synchronized static void init(final AndroidRemoteDebugger androidRemoteDebugger) {
+        if (isNotDefaultProcess(androidRemoteDebugger.builder.context)) {
             return;
         }
 
-        instance = remoteDebugger;
-        isEnable = remoteDebugger.builder.enabled;
+        instance = androidRemoteDebugger;
+        isEnable = androidRemoteDebugger.builder.enabled;
 
         if (!isEnable) {
             stop();
@@ -43,7 +43,7 @@ public final class RemoteDebugger {
             return;
         }
 
-        final Builder builder = remoteDebugger.builder;
+        final Builder builder = androidRemoteDebugger.builder;
 
         if (builder.includedUncaughtException) {
             setUncaughtExceptionHandler();
@@ -66,7 +66,7 @@ public final class RemoteDebugger {
                 }
 
                 ContinuousDBManager.init(builder.context);
-                remoteLog = new RemoteLog(remoteDebugger.builder.logger);
+                remoteLog = new RemoteLog(androidRemoteDebugger.builder.logger);
             }
         });
     }
@@ -75,7 +75,7 @@ public final class RemoteDebugger {
         isEnable = false;
         remoteLog = null;
         instance = null;
-        ServerRunner.getInstance().stop();
+        ServerRunner.stop();
         ContinuousDBManager.destroy();
         AppNotification.destroy();
     }
@@ -85,7 +85,7 @@ public final class RemoteDebugger {
     }
 
     public static boolean isAliveWebServer() {
-        return ServerRunner.getInstance().isAlive();
+        return ServerRunner.isAlive();
     }
 
     static void reconnect() {
@@ -131,15 +131,21 @@ public final class RemoteDebugger {
     private static boolean isNotDefaultProcess(Context context) {
         String currentProcessName = "";
         int currentPid = android.os.Process.myPid();
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        Object objectManager = context.getSystemService(Context.ACTIVITY_SERVICE);
 
-        for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
-            if (processInfo.pid == currentPid) {
-                currentProcessName = processInfo.processName;
-                break;
+        if (objectManager instanceof ActivityManager) {
+            ActivityManager manager = (ActivityManager) objectManager;
+
+            for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
+                if (processInfo.pid == currentPid) {
+                    currentProcessName = processInfo.processName;
+                    break;
+                }
             }
+            return !currentProcessName.equals(context.getPackageName());
+        } else {
+            return false;
         }
-        return !currentProcessName.equals(context.getPackageName());
     }
 
     public static class Builder {
@@ -190,8 +196,8 @@ public final class RemoteDebugger {
             return this;
         }
 
-        public RemoteDebugger build() {
-            return new RemoteDebugger(this);
+        public AndroidRemoteDebugger build() {
+            return new AndroidRemoteDebugger(this);
         }
     }
 

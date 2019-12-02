@@ -55,7 +55,7 @@ public class SharedPrefsController extends Controller {
     }
 
     private String remove(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
+        if (notContains(params, HtmlParams.DATA)) {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
@@ -67,7 +67,7 @@ public class SharedPrefsController extends Controller {
     }
 
     private String update(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.DATA)) {
+        if (notContains(params, HtmlParams.DATA)) {
             throwEmptyParameterException(HtmlParams.DATA);
         }
 
@@ -101,7 +101,7 @@ public class SharedPrefsController extends Controller {
     }
 
     private String dropSharedPreferences(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
@@ -122,7 +122,7 @@ public class SharedPrefsController extends Controller {
     }
 
     private String getAll(Map<String, List<String>> params) throws ResponseException {
-        if (!containsValue(params, HtmlParams.NAME)) {
+        if (notContains(params, HtmlParams.NAME)) {
             throwEmptyParameterException(HtmlParams.NAME);
         }
 
