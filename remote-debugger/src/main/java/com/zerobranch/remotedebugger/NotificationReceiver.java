@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 
 public class NotificationReceiver extends BroadcastReceiver {
-    static final String ACTION_REPEAT_CONNECTION = "com.sarproj.remotedebugger.REPEAT_CONNECTION";
-    static final String ACTION_CHANGE_PORT = "com.sarproj.remotedebugger.CHANGE_PORT";
-    static final String ACTION_DISCONNECT = "com.sarproj.remotedebugger.ACTION_DISCONNECT";
+    static final String ACTION_REPEAT_CONNECTION = "com.zerobranch.remotedebugger.REPEAT_CONNECTION";
+    static final String ACTION_CHANGE_PORT = "com.zerobranch.remotedebugger.CHANGE_PORT";
+    static final String ACTION_DISCONNECT = "com.zerobranch.remotedebugger.ACTION_DISCONNECT";
 
     @Override
     public void onReceive(Context context, Intent intent) {

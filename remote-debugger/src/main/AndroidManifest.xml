@@ -7,7 +7,7 @@
 
     <application>
         <receiver
-            android:name="com.zerobranch.remotedebugger.NotificationReceiver"
+            android:name=".NotificationReceiver"
             android:exported="false" />
     </application>
 </manifest>

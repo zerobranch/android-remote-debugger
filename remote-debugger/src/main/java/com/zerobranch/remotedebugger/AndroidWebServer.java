@@ -23,12 +23,12 @@ import fi.iki.elonen.NanoHTTPD;
 final class AndroidWebServer extends NanoHTTPD {
     private final Context context;
     private final AssetManager assetManager;
+    private final InternalSettings internalSettings;
     private Controller homeController;
     private Controller logController;
     private Controller databaseController;
     private Controller sharedPrefsController;
     private Controller networkController;
-    private InternalSettings internalSettings;
 
     AndroidWebServer(Context context, String hostname, int port, InternalSettings internalSettings) {
         super(hostname, port);

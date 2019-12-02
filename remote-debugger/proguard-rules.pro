@@ -31,6 +31,6 @@
 ##--------------- End: Okhttp3 ----------
 
 
-#-keep class com.sarproj.remotedebugger.** { *; }
--keep class com.sarproj.remotedebugger.source.models.** { *; }
--keep class com.sarproj.remotedebugger.source.local.LogLevel
+#-keep class com.zerobranch.remotedebugger.** { *; }
+-keep class com.zerobranch.remotedebugger.source.models.** { *; }
+-keep class com.zerobranch.remotedebugger.source.local.LogLevel
