@@ -7,9 +7,9 @@ import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zerobranch.example.db.DBHelper;
-import com.zerobranch.remotedebugger.AndroidRemoteDebugger;
-import com.zerobranch.remotedebugger.logging.NetLoggingInterceptor;
-import com.zerobranch.remotedebugger.utils.FileUtils;
+import com.zerobranch.androidremotedebugger.AndroidRemoteDebugger;
+import com.zerobranch.androidremotedebugger.logging.NetLoggingInterceptor;
+import com.zerobranch.androidremotedebugger.utils.FileUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
