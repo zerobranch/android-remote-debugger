@@ -32,7 +32,7 @@ import okio.GzipSource;
 
 public class NetLoggingInterceptor implements Interceptor {
     private static final Charset UTF8 = StandardCharsets.UTF_8;
-    private static AtomicInteger queryNumber = new AtomicInteger(0);
+    private static final AtomicInteger queryNumber = new AtomicInteger(0);
     private final HttpLogRequestMapper requestMapper = new HttpLogRequestMapper();
     private final HttpLogResponseMapper responseMapper = new HttpLogResponseMapper();
     private HttpLogger httpLogger;

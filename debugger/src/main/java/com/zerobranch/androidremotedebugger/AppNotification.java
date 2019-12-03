@@ -17,7 +17,7 @@ class AppNotification {
     private static final int NOTIFICATION_ID = 7265;
     private static AppNotification instance;
     private final Context context;
-    private NotificationManager notificationManager;
+    private final NotificationManager notificationManager;
     private NotificationChannel channel;
 
     private AppNotification(Context context) {

@@ -1,8 +1,8 @@
 package com.zerobranch.androidremotedebugger.settings;
 
 public class InternalSettings {
-    private boolean enabledInternalLogging;
-    private boolean enabledJsonPrettyPrint;
+    private final boolean enabledInternalLogging;
+    private final boolean enabledJsonPrettyPrint;
 
     public InternalSettings(boolean enabledInternalLogging, boolean enabledJsonPrettyPrint) {
         this.enabledInternalLogging = enabledInternalLogging;

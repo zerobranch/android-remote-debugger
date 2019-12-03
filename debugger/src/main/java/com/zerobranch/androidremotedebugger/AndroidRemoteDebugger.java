@@ -118,7 +118,7 @@ public final class AndroidRemoteDebugger {
 
     private static void setUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            private Thread.UncaughtExceptionHandler originalHandler = Thread.getDefaultUncaughtExceptionHandler();
+            private final Thread.UncaughtExceptionHandler originalHandler = Thread.getDefaultUncaughtExceptionHandler();
 
             @Override
             public void uncaughtException(Thread t, Throwable e) {

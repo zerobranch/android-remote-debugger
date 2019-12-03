@@ -12,8 +12,8 @@ public enum Host {
     NETWORK_STYLE("/css/network.css", "css/network.css"),
     SHARED_REFERENCES_STYLE("/css/shared-preferences.css", "css/shared-preferences.css");
 
-    private String host;
-    private String path;
+    private final String host;
+    private final String path;
 
     Host(String host, String path) {
         this.host = host;
