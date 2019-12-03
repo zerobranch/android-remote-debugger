@@ -95,7 +95,7 @@ public final class SharedPrefsManager {
     public void removeItems(List<String> keys) {
         synchronized (LOCK) {
             final SharedPreferences.Editor editor = sharedPreferences.edit();
-            for  (String key: keys) {
+            for (String key : keys) {
                 editor.remove(key);
             }
             editor.apply();

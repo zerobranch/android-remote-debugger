@@ -60,7 +60,7 @@ public class SharedPrefsController extends Controller {
         }
 
         final String data = getStringValue(params, HtmlParams.DATA);
-        final List<String> keys = deserialize(data, new TypeToken<List<String>>(){}.getType());
+        final List<String> keys = deserialize(data, new TypeToken<List<String>>() {}.getType());
         getSharedPrefsAccess().removeItems(keys);
 
         return EMPTY;

@@ -22,7 +22,7 @@ public class StatusCodeFilter {
                 } else {
                     return;
                 }
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) { }
         }
 
         if (minStatusCode != -1 && maxStatusCode == -1) {
