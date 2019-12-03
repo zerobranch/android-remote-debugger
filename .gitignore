@@ -2,8 +2,8 @@
 .gradle
 /.idea
 .DS_Store
-/app/build
-/trace/build
+/build
+/debugger/build
 /captures
 .externalNativeBuild
 local.properties

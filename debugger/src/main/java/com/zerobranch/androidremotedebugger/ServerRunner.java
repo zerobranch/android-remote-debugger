@@ -60,10 +60,10 @@ final class ServerRunner {
     static void stop() {
         if (isAlive()) {
             instance.androidWebServer.stop();
+            instance.androidWebServer = null;
             instance.print("Android Remote Debugger is stopped.");
         }
 
-        instance.androidWebServer = null;
         instance = null;
     }
 
