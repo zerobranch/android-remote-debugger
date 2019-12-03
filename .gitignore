@@ -4,6 +4,7 @@
 .DS_Store
 /build
 /debugger/build
+/example
 /captures
 .externalNativeBuild
 local.properties
