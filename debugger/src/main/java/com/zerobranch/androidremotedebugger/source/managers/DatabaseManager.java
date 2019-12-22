@@ -100,9 +100,9 @@ public final class DatabaseManager {
             final Table table = new Table();
             table.data = new ArrayList<>();
 
-            customQuery = customQuery.trim().toLowerCase();
+            customQuery = customQuery.trim();
 
-            if (customQuery.startsWith(SELECT_QUERY)) {
+            if (customQuery.toLowerCase().startsWith(SELECT_QUERY)) {
                 final Cursor cursor = db.rawQuery(customQuery, null);
                 table.headers = getImmutableHeaders(Arrays.asList(cursor.getColumnNames()));
                 table.count = cursor.getCount();
