@@ -114,7 +114,7 @@ AndroidRemoteDebugger.init(
 ### Описание параметров `AndroidRemoteDebugger.Builder`
 Все параметры для `AndroidRemoteDebugger.Builder` являются необязательными. Для стандартной работы библиотеки достаточно вызвать `AndroidRemoteDebugger.init(applicationContext)`.
 
-```
+```java
 .enabled(true) - управление включением
 .enableJsonPrettyPrint() - включение форматирования json в разделах `Logging` и `Network`
 .excludeUncaughtException() - исключить печать логов при краше приложения
@@ -140,8 +140,7 @@ new NetLoggingInterceptor(new NetLoggingInterceptor.HttpLogger() {
 **Примечание**
 * Ссылку на страницу отладчика можно также получить следующим образом: http://ip-адрес-вашего-android-устройства:порт (ip-адрес-вашего-android-устройства можно посмотреть в настройках Вашего смартфона)
 * Если вы используете отладку через usb или Android Default Emulator и используете другой порт, например, 8081, то нужно запустить следующую команду: `adb forward tcp:8081 tcp:8081`
-* Данную библиотеку можно использовать на одном androd устройсте для двух приложений ОДНОВРЕМЕННО только с разными портами.
-
+* Данную библиотеку можно использовать на одном androd устройстве для двух приложений одновременно только с РАЗНЫМИ портами.
 
 ## License
 
