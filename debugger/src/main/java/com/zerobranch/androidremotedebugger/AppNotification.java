@@ -38,6 +38,10 @@ class AppNotification {
     }
 
     static void destroy() {
+        if (instance != null) {
+            cancelAll(instance.context);
+        }
+
         instance = null;
     }
 

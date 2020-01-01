@@ -151,8 +151,8 @@ public final class AndroidRemoteDebugger {
     public static class Builder {
         private final Context context;
         private boolean enabled = true;
-        private boolean enabledInternalLogging = false;
-        private boolean enabledJsonPrettyPrint = false;
+        private boolean enabledInternalLogging = true;
+        private boolean enabledJsonPrettyPrint = true;
         private boolean includedUncaughtException = true;
         private int port = DEFAULT_PORT;
         private Logger logger;
@@ -166,8 +166,8 @@ public final class AndroidRemoteDebugger {
             return this;
         }
 
-        public Builder enableInternalLogging() {
-            enabledInternalLogging = true;
+        public Builder disableInternalLogging() {
+            enabledInternalLogging = false;
             return this;
         }
 
@@ -181,8 +181,8 @@ public final class AndroidRemoteDebugger {
             return this;
         }
 
-        public Builder enableJsonPrettyPrint() {
-            enabledJsonPrettyPrint = true;
+        public Builder disableJsonPrettyPrint() {
+            enabledJsonPrettyPrint = false;
             return this;
         }
 
