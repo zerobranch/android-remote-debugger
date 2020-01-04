@@ -11,9 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 class AppNotification {
-    private static final String GROUP_KEY = "remote_debugger_group";
+    private static final String GROUP_KEY = "android_remote_debugger_group";
     private static final String CHANNEL_ID = "important_channel";
-    private static final String CHANNEL_NAME = "Information notifications";
+    private static final String CHANNEL_NAME = "Android Remote Debugger";
     private static final int NOTIFICATION_ID = 7265;
     private static AppNotification instance;
     private final Context context;
