@@ -10,6 +10,8 @@ import com.zerobranch.androidremotedebugger.settings.InternalSettings;
 import com.zerobranch.androidremotedebugger.source.local.LogLevel;
 import com.zerobranch.androidremotedebugger.source.managers.ContinuousDBManager;
 
+import org.jetbrains.annotations.NotNull;
+
 public final class AndroidRemoteDebugger {
     private static final int DEFAULT_PORT = 8080;
     private static final int MAX_PORT_VALUE = 8090;
@@ -17,6 +19,7 @@ public final class AndroidRemoteDebugger {
     private static RemoteLog remoteLog;
     private static AndroidRemoteDebugger instance;
     private static boolean isEnable;
+    private static boolean isEnabledNotifications;
 
     private AndroidRemoteDebugger(Builder builder) {
         this.builder = builder;
@@ -33,6 +36,7 @@ public final class AndroidRemoteDebugger {
 
         instance = androidRemoteDebugger;
         isEnable = androidRemoteDebugger.builder.enabled;
+        isEnabledNotifications = androidRemoteDebugger.builder.enabledNotifications;
 
         if (!isEnable) {
             stop();
@@ -57,12 +61,14 @@ public final class AndroidRemoteDebugger {
         ServerRunner.getInstance().init(builder.context, internalSettings, builder.port, new ServerRunner.ConnectionStatus() {
             @Override
             public void onResult(boolean isSuccessRunning, String ipPort) {
-                AppNotification.init(builder.context);
+                if (isEnabledNotifications) {
+                    AppNotification.init(builder.context);
 
-                if (isSuccessRunning) {
-                    AppNotification.notify("Successfully", String.format("http://%s", ipPort));
-                } else {
-                    AppNotification.notifyError("Failed connection", String.format("%s is busy", ipPort));
+                    if (isSuccessRunning) {
+                        AppNotification.notify("Successfully", String.format("http://%s", ipPort));
+                    } else {
+                        AppNotification.notifyError("Failed connection", String.format("%s is busy", ipPort));
+                    }
                 }
 
                 ContinuousDBManager.init(builder.context);
@@ -94,7 +100,9 @@ public final class AndroidRemoteDebugger {
 
     static void reconnect(Context context) {
         if (instance == null) {
-            AppNotification.cancelAll(context);
+            if (isEnabledNotifications) {
+                AppNotification.cancelAll(context);
+            }
             return;
         }
 
@@ -107,7 +115,9 @@ public final class AndroidRemoteDebugger {
 
     static void reconnectWithNewPort(Context context) {
         if (instance == null) {
-            AppNotification.cancelAll(context);
+            if (isEnabledNotifications) {
+                AppNotification.cancelAll(context);
+            }
             return;
         }
 
@@ -121,9 +131,11 @@ public final class AndroidRemoteDebugger {
             private final Thread.UncaughtExceptionHandler originalHandler = Thread.getDefaultUncaughtExceptionHandler();
 
             @Override
-            public void uncaughtException(Thread t, Throwable e) {
+            public void uncaughtException(@NotNull Thread t, @NotNull Throwable e) {
                 Log.wtf(e);
-                originalHandler.uncaughtException(t, e);
+                if (originalHandler != null) {
+                    originalHandler.uncaughtException(t, e);
+                }
             }
         });
     }
@@ -153,6 +165,7 @@ public final class AndroidRemoteDebugger {
         private boolean enabled = true;
         private boolean enabledInternalLogging = true;
         private boolean enabledJsonPrettyPrint = true;
+        private boolean enabledNotifications = true;
         private boolean includedUncaughtException = true;
         private int port = DEFAULT_PORT;
         private Logger logger;
@@ -183,6 +196,11 @@ public final class AndroidRemoteDebugger {
 
         public Builder disableJsonPrettyPrint() {
             enabledJsonPrettyPrint = false;
+            return this;
+        }
+
+        public Builder disableNotifications() {
+            enabledNotifications = false;
             return this;
         }
 
