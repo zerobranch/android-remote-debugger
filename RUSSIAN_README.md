@@ -61,7 +61,7 @@ Android Remote Debugger имеет 4 раздела:
 Для работы разделов `Logging`, `Database` и `Shared Preferences` необходимо выполнить несколько шагов:
 
 1. Вызвать: `AndroidRemoteDebugger.init(applicationContext)` в коде приложения.
-2. После запуска Вашего приложения, Вы получите уведомление в панели уведомлений, в котором будет указана ссылка. Просто перейдити по этой ссылке в вашем браузере.
+2. После запуска Вашего приложения, Вы получите уведомление в панели уведомлений, в котором будет указана ссылка типа: http://XXX.XXX.X.XXX:8080. Просто перейдити по этой ссылке в вашем браузере. Также в logcat будет добавлена запись:  `D/AndroidRemoteDebugger: Android Remote Debugger is started. Go to: http://XXX.XXX.X.XXX:8080`
 
 3. Чтобы просматривать логи в разделе `Logging` необходимо вызывать статические методы `AndroidRemoteDebugger.Log` в любом месте вашего приложения, например, `AndroidRemoteDebugger.Log.d("tag", "message")` или `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` с указанием всех параметров.
 
@@ -152,6 +152,18 @@ new NetLoggingInterceptor(new NetLoggingInterceptor.HttpLogger() {
 * Ссылку на страницу отладчика можно также получить следующим образом: http://ip-адрес-вашего-android-устройства:порт (ip-адрес-вашего-android-устройства можно посмотреть в настройках Вашего смартфона)
 * Если вы используете отладку через usb или Android Default Emulator и используете другой порт, например, 8081, то нужно запустить следующую команду: `adb forward tcp:8081 tcp:8081`
 * Данную библиотеку можно использовать на одном androd устройстве для двух приложений одновременно только с РАЗНЫМИ портами.
+
+## R8 / ProGuard
+Если вы используете R8, вам не нужно ничего делать. Конкретные правила будут включены автоматически.
+
+Если вы не используете R8, то Вам необходимо включить следующие правила:
+```
+-keep class com.zerobranch.androidremotedebugger.source.models.** { *; }
+-keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
+```
+
+Вам также могут понадобиться правила от [OkHttp3](https://github.com/square/okhttp) и [Gson](https://github.com/google/gson), которые являются зависимостями этой библиотеки.
+
 
 ## License
 
