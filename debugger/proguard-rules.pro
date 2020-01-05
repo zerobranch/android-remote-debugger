@@ -31,6 +31,7 @@
 ##--------------- End: Okhttp3 ----------
 
 
-#-keep class com.zerobranch.androidremotedebugger.** { *; }
+##--------------- Begin: Android Remote Debugger ----------
 -keep class com.zerobranch.androidremotedebugger.source.models.** { *; }
 -keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
+##--------------- End: Android Remote Debugger ----------
