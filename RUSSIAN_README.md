@@ -61,7 +61,7 @@ Android Remote Debugger имеет 4 раздела:
 Для работы разделов `Logging`, `Database` и `Shared Preferences` необходимо выполнить несколько шагов:
 
 1. Вызвать: `AndroidRemoteDebugger.init(applicationContext)` в коде приложения.
-2. После запуска Вашего приложения, Вы получите уведомление в панели уведомлений, в котором будет указана ссылка типа: http://XXX.XXX.X.XXX:8080. Просто перейдити по этой ссылке в вашем браузере. Также в logcat будет добавлена запись:  `D/AndroidRemoteDebugger: Android Remote Debugger is started. Go to: http://XXX.XXX.X.XXX:8080`
+2. После запуска Вашего приложения, Вы получите уведомление в панели уведомлений, в котором будет указана ссылка типа: http://xxx.xxx.x.xxx:8080. Просто перейдити по этой ссылке в вашем браузере. Также в logcat будет добавлена запись:  `D/AndroidRemoteDebugger: Android Remote Debugger is started. Go to: http://xxx.xxx.x.xxx:8080`
 
 3. Чтобы просматривать логи в разделе `Logging` необходимо вызывать статические методы `AndroidRemoteDebugger.Log` в любом месте вашего приложения, например, `AndroidRemoteDebugger.Log.d("tag", "message")` или `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` с указанием всех параметров.
 
