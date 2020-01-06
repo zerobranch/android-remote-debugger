@@ -103,7 +103,7 @@ OkHttpClient client = new OkHttpClient.Builder()
 ```java
 AndroidRemoteDebugger.init(
     new AndroidRemoteDebugger.Builder(applicationContext)
-        .enabled(true)
+        .enabled(boolean)
         .disableInternalLogging()
         .enableDuplicateLogging()
         .disableJsonPrettyPrint()
@@ -118,7 +118,7 @@ AndroidRemoteDebugger.init(
 Все параметры для `AndroidRemoteDebugger.Builder` являются необязательными. Для стандартной работы библиотеки достаточно вызвать `AndroidRemoteDebugger.init(applicationContext)`.
 
 ```java
-.enabled(true) - управление включением
+.enabled(boolean) - управление включением
 .disableInternalLogging() - отключить внутренние логи Android Remote Debugger
 .disableJsonPrettyPrint() - отключение форматирования json в разделах `Logging` и `Network`
 .disableNotifications() - отключить показ уведомлений статуса работы Android Remote Debugger
