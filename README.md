@@ -125,7 +125,7 @@ AndroidRemoteDebugger.init(
 .disableNotifications() - отключить показ уведомлений статуса работы Android Remote Debugger
 .excludeUncaughtException() - исключить печать логов при краше приложения
 .port(int) - использовать другой порт, отличный от 8080
-.enableDuplicateLogging() - все логи из раздела `Logging` будут также напечатаны в консоли
+.enableDuplicateLogging() - все логи из раздела `Logging` будут также напечатаны в logcat
 .enableDuplicateLogging(new Logger() { - callback для получения всех логов из раздела `Logging`
     @Override
     public void log(int priority, String tag, String msg, Throwable th) {
