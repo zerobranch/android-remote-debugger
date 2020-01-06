@@ -10,13 +10,13 @@
 [Русский](https://github.com/zerobranch/android-remote-debugger/blob/master/RUSSIAN_README.md)
 
 ## Возможности
-* Логирование
+* Logging
 	* Просматривать логи Вашего приложения
 	* Фильтровать логи по приоритету и тегам
 	* Выполнять поиск
 	* Скачивать логи
 	* Логируются также ошибки при падении приложения
-* База данных
+* Database
 	* Просмотр всех баз данных
 	* Редактировать записи базы данных
  	* Удалять записи базы данных
@@ -31,8 +31,7 @@
 	* Фильтровать данные по коду ответа и ошибкам
 	* Скачивать логи
 	* Выполнять поиск по всем данным
- 
- 
+
 ## Интеграция
 Добавьте в корневой build.gradle следующий репозиторий:
 ```groovy
@@ -62,11 +61,12 @@ Android Remote Debugger имеет 4 раздела:
 Для работы разделов `Logging`, `Database` и `Shared Preferences` необходимо выполнить несколько шагов:
 
 1. Вызвать: `AndroidRemoteDebugger.init(applicationContext)` в коде приложения.
+
 2. После запуска Вашего приложения, Вы получите уведомление в панели уведомлений, в котором будет указана ссылка типа: http://xxx.xxx.x.xxx:8080. Просто перейдити по этой ссылке в вашем браузере. Также в logcat будет добавлена запись:  `D/AndroidRemoteDebugger: Android Remote Debugger is started. Go to: http://xxx.xxx.x.xxx:8080`
 
 3. Чтобы просматривать логи в разделе `Logging` необходимо вызывать статические методы `AndroidRemoteDebugger.Log` в любом месте вашего приложения, например, `AndroidRemoteDebugger.Log.d("tag", "message")` или `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` с указанием всех параметров.
 
-4. Просматривать логи сети в разделе `Network` возможно в том случае, если Вы используете библиотку [OkHttp3](https://github.com/square/okhttp). Для этого необходимо добавить интерцептор `NetLoggingInterceptor`. Для получения достоверных данных, рекомендуется добавлять его последнием, после других интерцепторов.
+4. Чтобы просматривать логи сети в разделе `Network`, необходимо использовать библиотеку [OkHttp3](https://github.com/square/okhttp). Для этого нужно добавить интерцептор `NetLoggingInterceptor`. Для получения достоверных данных, рекомендуется добавлять его последнием, после других интерцепторов.
 
 ```java
 OkHttpClient client = new OkHttpClient.Builder()
@@ -79,7 +79,7 @@ OkHttpClient client = new OkHttpClient.Builder()
 * Ваше Android устройство и компьютер должны быть подключены к одной сети (Wi-Fi или LAN).
 * Вы также можете использовать отладку через usb или Android Default Emulator. Для этого запустите команду: `adb forward tcp:8080 tcp:8080` и перейдити по адресу: 
 [http://localhost:8080/](http://localhost:8080/) или [http://0.0.0.0:8080](http://0.0.0.0:8080) в Вашем браузере.
-* Есои вы используете Android Default Emulator, то возможно Вам также придется включить мобильный интернет и отключить WI-FI на эмуляторе.
+* Если вы используете Android Default Emulator, то возможно Вам также придется включить мобильный интернет и отключить WI-FI на эмуляторе.
 
 ## Скриншоты
 ### Logging
@@ -125,14 +125,13 @@ AndroidRemoteDebugger.init(
 .disableNotifications() - отключить показ уведомлений статуса работы Android Remote Debugger
 .excludeUncaughtException() - исключить печать логов при краше приложения
 .port(int) - использовать другой порт, отличный от 8080
-.enableDuplicateLogging() - все логи из раздела `Logging` будут также напечатаны в консоли
+.enableDuplicateLogging() - все логи из раздела `Logging` будут также напечатаны в logcat
 .enableDuplicateLogging(new Logger() { - callback для получения всех логов из раздела `Logging`
     @Override
     public void log(int priority, String tag, String msg, Throwable th) {
     }
 })
 ```
-
 
 Интерцептор `NetLoggingInterceptor` имеет два конструктора: пустой и с callback'ом для получения всех логов из раздела `Network`
 
