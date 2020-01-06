@@ -78,7 +78,7 @@ OkHttpClient client = new OkHttpClient.Builder()
 
 * Your Android device and computer must be connected to the same network (Wi-Fi or LAN).
 * You can also use debugging via usb or Android Default Emulator. To do this, run the command: `adb forward tcp:8080 tcp:8080` and go to the address:
-[http://localhost:8080/](http://localhost:8080/) or [http://0.0.0.0:8080](http://0.0.0.0:8080) in your browser.
+[http://localhost:8080](http://localhost:8080) or [http://0.0.0.0:8080](http://0.0.0.0:8080) in your browser.
 * If you use Android Default Emulator, then you may also need to turn on the mobile Internet and turn off WI-FI on the emulator.
 
 ## Screenshots
