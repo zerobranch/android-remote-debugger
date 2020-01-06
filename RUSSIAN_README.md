@@ -104,9 +104,12 @@ OkHttpClient client = new OkHttpClient.Builder()
 AndroidRemoteDebugger.init(
     new AndroidRemoteDebugger.Builder(applicationContext)
         .enabled(true)
-        .enableJsonPrettyPrint()
+        .disableInternalLogging()
         .enableDuplicateLogging()
+        .disableJsonPrettyPrint()
+        .disableNotifications()
         .excludeUncaughtException()
+        .port(int)
         .build()
 );
 ```
@@ -116,8 +119,11 @@ AndroidRemoteDebugger.init(
 
 ```java
 .enabled(true) - управление включением
-.enableJsonPrettyPrint() - включение форматирования json в разделах `Logging` и `Network`
+.disableInternalLogging() - отключить внутренние логи Android Remote Debugger
+.disableJsonPrettyPrint() - отключение форматирования json в разделах `Logging` и `Network`
+.disableNotifications() - отключить показ уведомлений статуса работы Android Remote Debugger
 .excludeUncaughtException() - исключить печать логов при краше приложения
+.port(int) - использовать другой порт, отличный от 8080
 .enableDuplicateLogging() - все логи из раздела `Logging` будут также напечатаны в консоли
 .enableDuplicateLogging(new Logger() { - callback для получения всех логов из раздела `Logging`
     @Override
