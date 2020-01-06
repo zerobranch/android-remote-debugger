@@ -43,6 +43,6 @@
 
 
 ##--------------- Begin: Android Remote Debugger ----------
--keep class com.zerobranch.androidremotedebugger.source.models.** { *; }
--keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
+-keep class zerobranch.androidremotedebugger.source.models.** { *; }
+-keep class zerobranch.androidremotedebugger.source.local.LogLevel
 ##--------------- End: Android Remote Debugger ----------
