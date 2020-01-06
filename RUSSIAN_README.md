@@ -2,7 +2,7 @@
 [![](https://jitpack.io/v/zerobranch/android-remote-debugger.svg)](https://jitpack.io/#zerobranch/android-remote-debugger) 
 [![API](https://img.shields.io/badge/API-19%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=19) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/zerobranch/android-remote-debugger/blob/master/LICENSE)
 
-**Android Remote Debugger** - это библиотека, которая позволяет выполнять удаленную отладку Android приложений. Она позволяет просматривать логи, базу данных, shared preferences и сетевые запросы прямо в браузере.
+**Android Remote Debugger** - это библиотека для удаленной отладку Android приложений. Она позволяет просматривать логи, базы данных, shared preferences и сетевые запросы прямо в браузере.
 
 ### Выберите язык
 [English](https://github.com/zerobranch/android-remote-debugger/blob/master/README.md) 
