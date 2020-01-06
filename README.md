@@ -145,30 +145,29 @@ new NetLoggingInterceptor(new NetLoggingInterceptor.HttpLogger() {
 ### Description of Logging page parameters
 <img src="/screenshots/logging_2.png" alt="logging_2.png" title="logging_2.png" width="489" height="260" /> 
 
-1. Выбор уровня логирования
-2. Отфильтровать логи по тегу
-3. Включить/отключить автоскролл при получении новых логов
-4. Перейти в начало списка
-5. Перейти в конец списка
-6. Вкоючить/отключить цвета для логов
-7. Удалить все логи
+1. Choosing a logging level
+2. Filter the logs by tag
+3. Enable/disable autoscroll when receiving new logs
+4. Go to the top of the list
+5. Go to the end of the list
+6. Enable/disable colors for logs
+7. Delete all logs
 
 ### Примечание
-* Ссылку на страницу отладчика можно также получить следующим образом: http://ip-адрес-вашего-android-устройства:порт (ip-адрес-вашего-android-устройства можно посмотреть в настройках Вашего смартфона)
-* Если вы используете отладку через usb или Android Default Emulator и используете другой порт, например, 8081, то нужно запустить следующую команду: `adb forward tcp:8081 tcp:8081`
-* Данную библиотеку можно использовать на одном androd устройстве для двух приложений одновременно только с РАЗНЫМИ портами.
+* A link to the debugger page can also be obtained as follows: http://ip-address-of-your-android-device:port (you can see the ip-address-of-your-android-device in the settings of your device).
+* If you use debugging via usb or Android Default Emulator and you want to use a different port, for example, 8081, then you need to run the following command: `adb forward tcp:8081 tcp:8081`.
+* To use this library on one Android device for two applications simultaneously, you need to use different ports.
 
 ## R8 / ProGuard
-Если вы используете R8, вам не нужно ничего делать. Конкретные правила будут включены автоматически.
+If you use R8, you don't have to do anything. The specific rules are included automatically.
 
-Если вы не используете R8, то Вам необходимо включить следующие правила:
+If you don't use R8 you have to apply the following rules:
 ```
 -keep class com.zerobranch.androidremotedebugger.source.models.** { *; }
 -keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
 ```
 
-Вам также могут понадобиться правила от [OkHttp3](https://github.com/square/okhttp) и [Gson](https://github.com/google/gson), которые являются зависимостями этой библиотеки.
-
+You might also need rules from [OkHttp3](https://github.com/square/okhttp) and [Gson](https://github.com/google/gson), which are dependencies of this library.
 
 ## License
 
