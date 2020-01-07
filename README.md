@@ -66,7 +66,7 @@ For the `Logging`, `Database` and `Shared Preferences` sections to work, several
 
 3. To view the logs in the `Logging` section, you must call the static methods` AndroidRemoteDebugger.Log` anywhere in your application, for example, `AndroidRemoteDebugger.Log.d("tag", "message")` or `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` with all parameters specified.
 
-4. To view network logs in the `Network` section, it is necessary to use the [OkHttp3](https://github.com/square/okhttp) library. To do this, add the `NetLoggingInterceptor` interceptor. Recommended to add it after all others interceptors to get actual network traffic data.
+4. To view network logs in the `Network` section, it is necessary to use the [OkHttp3](https://github.com/square/okhttp) library and add the `NetLoggingInterceptor` interceptor. Recommended to add it after all others interceptors to get actual network traffic data.
 
 ```java
 OkHttpClient client = new OkHttpClient.Builder()
@@ -79,7 +79,7 @@ OkHttpClient client = new OkHttpClient.Builder()
 * Your Android device and computer must be connected to the same network (Wi-Fi or LAN).
 * You can also use debugging via usb or Android Default Emulator. To do this, run the command: `adb forward tcp:8080 tcp:8080` and go to the address:
 [http://localhost:8080](http://localhost:8080) or [http://0.0.0.0:8080](http://0.0.0.0:8080) in your browser.
-* If you use Android Default Emulator, then you may also need to turn on the mobile Internet and turn off WI-FI on the emulator.
+* If you use Android Default Emulator, then you may also need to turn on the mobile Internet and turn off WI-FI.
 
 ## Screenshots
 ### Logging
