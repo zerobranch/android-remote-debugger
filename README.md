@@ -153,7 +153,7 @@ new NetLoggingInterceptor(new NetLoggingInterceptor.HttpLogger() {
 6. Enable/disable colors for logs
 7. Delete all logs
 
-### Примечание
+### Note
 * A link to the debugger page can also be obtained as follows: http://ip-address-of-your-android-device:port (you can see the ip-address-of-your-android-device in the settings of your device).
 * If you use debugging via usb or Android Default Emulator and you want to use a different port, for example, 8081, then you need to run the following command: `adb forward tcp:8081 tcp:8081`.
 * To use this library on one Android device for two applications simultaneously, you need to use different ports.
