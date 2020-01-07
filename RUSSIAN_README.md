@@ -168,7 +168,7 @@ new NetLoggingInterceptor(new NetLoggingInterceptor.HttpLogger() {
 -keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
 ```
 
-Вам также могут понадобиться правила от [OkHttp3](https://github.com/square/okhttp) и [Gson](https://github.com/google/gson), которые являются зависимостями этой библиотеки.
+Вам также могут потребоваться правила от [OkHttp3](https://github.com/square/okhttp) и [Gson](https://github.com/google/gson), которые являются зависимостями этой библиотеки.
 
 
 ## License
