@@ -66,7 +66,7 @@ Android Remote Debugger имеет 4 раздела:
 
 3. Чтобы просматривать логи в разделе `Logging` необходимо вызывать статические методы `AndroidRemoteDebugger.Log` в любом месте вашего приложения, например, `AndroidRemoteDebugger.Log.d("tag", "message")` или `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` с указанием всех параметров.
 
-4. Чтобы просматривать логи сети в разделе `Network`, необходимо использовать библиотеку [OkHttp3](https://github.com/square/okhttp) и добавить интерцептор `NetLoggingInterceptor`. Для получения достоверных данных, рекомендуется добавлять его последнием, после других интерцепторов.
+4. Чтобы просматривать логи сети в разделе `Network`, необходимо использовать библиотеку [OkHttp3](https://github.com/square/okhttp) и добавить интерцептор `NetLoggingInterceptor`. Для получения достоверных данных, рекомендуется добавить его последним, после других интерцепторов.
 
 ```java
 OkHttpClient client = new OkHttpClient.Builder()
