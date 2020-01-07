@@ -64,7 +64,7 @@ For the `Logging`, `Database` and `Shared Preferences` sections to work, several
 
 2. After launching your application, you will receive a notification in the notification panel, in which a link of the type: http://xxx.xxx.x.xxx:8080 will be indicated. Just follow this link in your browser. Also, an entry will be added to logcat: `D/AndroidRemoteDebugger: Android Remote Debugger is started. Go to: http://xxx.xxx.x.xxx:8080`
 
-3. To view the logs in the `Logging` section, you must call the static methods` AndroidRemoteDebugger.Log` anywhere in your application, for example, `AndroidRemoteDebugger.Log.d("tag", "message")` or `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` with all parameters specified.
+3. To view the logs in the `Logging` section, you must call the static methods `AndroidRemoteDebugger.Log` anywhere in your application, for example, `AndroidRemoteDebugger.Log.d("tag", "message")` or `AndroidRemoteDebugger.Log.log(priority, tag, msg, throwable)` with all parameters specified.
 
 4. To view network logs in the `Network` section, it is necessary to use the [OkHttp3](https://github.com/square/okhttp) library and add the `NetLoggingInterceptor` interceptor. Recommended to add it after all others interceptors to get actual network traffic data.
 
