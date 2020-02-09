@@ -1,7 +1,7 @@
 # Android Remote Debugger
 [![](https://jitpack.io/v/zerobranch/android-remote-debugger.svg)](https://jitpack.io/#zerobranch/android-remote-debugger) 
 [![API](https://img.shields.io/badge/API-19%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=19) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/zerobranch/android-remote-debugger/blob/master/LICENSE)
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-android%20remote%20debugger-green.svg?style=flat)](https://android-arsenal.com/details/1/8040)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Remote%20Debugger-green.svg?style=flat)](https://android-arsenal.com/details/1/8040)
 
 **Android Remote Debugger** is a library for remote debugging Android applications. It allows you to view logs, databases, shared preferences and network requests directly in the browser.
 
