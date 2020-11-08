@@ -107,7 +107,7 @@ class AppNotification {
             builder = new NotificationCompat.Builder(context);
         }
 
-        builder.setSmallIcon(R.drawable.ic_bug)
+        builder.setSmallIcon(R.drawable.android_remote_debugger_ic_bug)
                 .setContentTitle(title)
                 .setContentText(description)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -136,7 +136,7 @@ class AppNotification {
             builder.setGroup(GROUP_KEY);
 
             NotificationCompat.Builder groupBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_bug)
+                    .setSmallIcon(R.drawable.android_remote_debugger_ic_bug)
                     .setGroup(GROUP_KEY)
                     .setAutoCancel(true)
                     .setVibrate(new long[]{0L})
