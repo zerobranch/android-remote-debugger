@@ -164,8 +164,8 @@ If you use R8, you don't have to do anything. The specific rules are included au
 
 If you don't use R8 you have to apply the following rules:
 ```
--keep class com.zerobranch.androidremotedebugger.source.models.** { *; }
--keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
+-keep class zerobranch.androidremotedebugger.source.models.** { *; }
+-keep class zerobranch.androidremotedebugger.source.local.LogLevel
 ```
 
 You might also need rules from [OkHttp3](https://github.com/square/okhttp) and [Gson](https://github.com/google/gson), which are dependencies of this library.
