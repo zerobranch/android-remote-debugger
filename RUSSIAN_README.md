@@ -165,8 +165,8 @@ new NetLoggingInterceptor(new NetLoggingInterceptor.HttpLogger() {
 
 Если вы не используете R8, то Вам необходимо включить следующие правила:
 ```
--keep class com.zerobranch.androidremotedebugger.source.models.** { *; }
--keep class com.zerobranch.androidremotedebugger.source.local.LogLevel
+-keep class zerobranch.androidremotedebugger.source.models.** { *; }
+-keep class zerobranch.androidremotedebugger.source.local.LogLevel
 ```
 
 Вам также могут потребоваться правила от [OkHttp3](https://github.com/square/okhttp) и [Gson](https://github.com/google/gson), которые являются зависимостями этой библиотеки.
