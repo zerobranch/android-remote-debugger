@@ -15,16 +15,11 @@
  */
 package zerobranch.androidremotedebugger.logging;
 
-import zerobranch.androidremotedebugger.AndroidRemoteDebugger;
-import zerobranch.androidremotedebugger.source.managers.ContinuousDBManager;
-import zerobranch.androidremotedebugger.source.mapper.HttpLogRequestMapper;
-import zerobranch.androidremotedebugger.source.mapper.HttpLogResponseMapper;
-import zerobranch.androidremotedebugger.source.models.httplog.HttpLogModel;
-import zerobranch.androidremotedebugger.source.models.httplog.HttpLogRequest;
-import zerobranch.androidremotedebugger.source.models.httplog.HttpLogResponse;
+import android.text.TextUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -44,6 +39,15 @@ import okhttp3.internal.http.HttpHeaders;
 import okio.Buffer;
 import okio.BufferedSource;
 import okio.GzipSource;
+import okio.Okio;
+import okio.Source;
+import zerobranch.androidremotedebugger.AndroidRemoteDebugger;
+import zerobranch.androidremotedebugger.source.managers.ContinuousDBManager;
+import zerobranch.androidremotedebugger.source.mapper.HttpLogRequestMapper;
+import zerobranch.androidremotedebugger.source.mapper.HttpLogResponseMapper;
+import zerobranch.androidremotedebugger.source.models.httplog.HttpLogModel;
+import zerobranch.androidremotedebugger.source.models.httplog.HttpLogRequest;
+import zerobranch.androidremotedebugger.source.models.httplog.HttpLogResponse;
 
 public class NetLoggingInterceptor implements Interceptor {
     private static final Charset UTF8 = StandardCharsets.UTF_8;
@@ -51,6 +55,7 @@ public class NetLoggingInterceptor implements Interceptor {
     private final HttpLogRequestMapper requestMapper = new HttpLogRequestMapper();
     private final HttpLogResponseMapper responseMapper = new HttpLogResponseMapper();
     private HttpLogger httpLogger;
+    public static final long MAX_SIZE_BODY = 1024 * 1024 * 2;
 
     public NetLoggingInterceptor() {
     }
@@ -99,20 +104,21 @@ public class NetLoggingInterceptor implements Interceptor {
                 }
             }
 
-            logRequest.bodySize = String.valueOf(requestBody.contentLength());
+            long contentLength = requestBody.contentLength();
+            logRequest.bodySize = String.valueOf(contentLength);
+            logRequest.body = requestBodyAsStr(request);
+//            Buffer buffer = new Buffer();
+//            requestBody.writeTo(buffer);
 
-            Buffer buffer = new Buffer();
-            requestBody.writeTo(buffer);
-
-            Charset charset = UTF8;
-            MediaType contentType = requestBody.contentType();
-            if (contentType != null) {
-                charset = contentType.charset(UTF8);
-            }
-
-            if (charset != null) {
-                logRequest.body = buffer.readString(charset);
-            }
+//            Charset charset = UTF8;
+//            MediaType contentType = requestBody.contentType();
+//            if (contentType != null) {
+//                charset = contentType.charset(UTF8);
+//            }
+//
+//            if (charset != null) {
+//                logRequest.body = buffer.readString(charset);
+//            }
         }
 
         logRequest.queryId = String.valueOf(queryNumber.incrementAndGet());
@@ -222,5 +228,132 @@ public class NetLoggingInterceptor implements Interceptor {
 
     public interface HttpLogger {
         void log(HttpLogModel httpLogModel);
+    }
+
+    private static String requestBodyAsStr(Request request) {
+        RequestBody requestBody = request.body();
+        if (requestBody == null) {
+            return null;
+        }
+        MediaType contentType = requestBody.contentType();
+        if (contentType != null && !TextUtils.isEmpty(contentType.toString())) {
+            if (contentType.toString().contains("form-data")
+                    || contentType.toString().contains("octet-stream")) {
+                try {
+                    return " (binary " + requestBody.contentLength() + "-byte body omitted)";
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }
+        String contentEncoding = request.header("Content-Encoding");
+        boolean gzip = "gzip".equalsIgnoreCase(contentEncoding);
+        Buffer buffer = new Buffer();
+        try {
+            requestBody.writeTo(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (!isPlaintext(buffer)) {
+            try {
+                return " (binary " + requestBody.contentLength() + "-byte body omitted)";
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        try {
+            if (requestBody.contentLength() > MAX_SIZE_BODY) {
+                return "(binary " + requestBody.contentLength() + "-byte body omitted)";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sourceToStrInternal(buffer, gzip, requestBody.contentType());
+    }
+
+    private static String responseBodyAsStr(Response response) {
+        ResponseBody responseBody = response.body();
+        if (responseBody == null || !HttpHeaders.hasBody(response)) {
+            return null;
+        }
+        try {
+            BufferedSource source = responseBody.source();
+            source.request(64); // Buffer the entire body.
+            Buffer buffer = source.buffer();
+            if (!isPlaintext(buffer)) {
+                return "(binary " + responseBody.contentLength() + "-byte body omitted)";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        if (responseBody.contentLength() > MAX_SIZE_BODY) {
+            return "(binary " + responseBody.contentLength() + "-byte body omitted)";
+        }
+
+        String contentEncoding = response.header("Content-Encoding");
+        boolean gzip = "gzip".equalsIgnoreCase(contentEncoding);
+        try {
+            return sourceToStrInternal(
+                    response.peekBody(Long.MAX_VALUE).source(), gzip, responseBody.contentType());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Returns true if the body in question probably contains human readable text. Uses a small sample
+     * of code points to detect unicode control characters commonly used in binary file signatures.
+     */
+    private static boolean isPlaintext(Buffer buffer) {
+        try {
+            Buffer prefix = new Buffer();
+            long byteCount = buffer.size() < 64 ? buffer.size() : 64;
+            buffer.copyTo(prefix, 0, byteCount);
+            for (int i = 0; i < 16; i++) {
+                if (prefix.exhausted()) {
+                    break;
+                }
+                int codePoint = prefix.readUtf8CodePoint();
+                if (Character.isISOControl(codePoint) && !Character.isWhitespace(codePoint)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (EOFException e) {
+            return false; // Truncated UTF-8 sequence.
+        }
+    }
+
+    private static String sourceToStrInternal(Source source, boolean gzip, MediaType contentType) {
+        BufferedSource bufferedSource;
+        if (gzip) {
+            GzipSource gzipSource = new GzipSource(source);
+            bufferedSource = Okio.buffer(gzipSource);
+        } else {
+            bufferedSource = Okio.buffer(source);
+        }
+        String tempStr = null;
+        Charset charset = UTF8;
+        if (contentType != null) {
+            charset = contentType.charset(UTF8);
+        }
+        try {
+            tempStr = bufferedSource.readString(charset);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bufferedSource.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return tempStr;
     }
 }
