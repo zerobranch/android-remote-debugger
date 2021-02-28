@@ -71,7 +71,6 @@ public final class RemoteLog {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void partialLogs(int priority, String tag, @NotNull String msg, Throwable th) {
         if (msg.length() < MAX_LOG_LENGTH) {
             logger.log(priority, tag, msg, th);
