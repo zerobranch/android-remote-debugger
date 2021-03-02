@@ -47,9 +47,13 @@ allprojects {
 Add the following dependency to your module's build.gradle:
 ```groovy
 dependencies {
-    implementation 'com.github.zerobranch:android-remote-debugger:1.0.1'
+    debugImplementation 'com.github.zerobranch.android-remote-debugger:debugger:1.1.0'
+    releaseImplementation 'com.github.zerobranch.android-remote-debugger:noop:1.1.0'
 }
 ```
+**Note:** The final line above will use a no-op version, which does nothing.
+It should only be used in production build.
+This makes it impossible to run the server on a production build.
  
 ## How to use ?
 Android Remote Debugger has 4 sections:
@@ -61,7 +65,7 @@ Android Remote Debugger has 4 sections:
 
 For the `Logging`, `Database` and `Shared Preferences` sections to work, several steps are necessary:
 
-1. Call: `AndroidRemoteDebugger.init(applicationContext)` in the application code.
+1. Call: **`AndroidRemoteDebugger.init(applicationContext)`** in the application code.
 
 2. After launching your application, you will receive a notification in the notification panel, in which a link of the type: http://xxx.xxx.x.xxx:8080 will be indicated. Just follow this link in your browser. Also, an entry will be added to logcat: `D/AndroidRemoteDebugger: Android Remote Debugger is started. Go to: http://xxx.xxx.x.xxx:8080`
 

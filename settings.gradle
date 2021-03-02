@@ -1,1 +1,3 @@
-include ':debugger', 'zerobranch.example'
+include ':noop'
+include ':debugger'
+include ':example'
