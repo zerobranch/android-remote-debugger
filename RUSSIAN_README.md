@@ -1,6 +1,7 @@
 # Android Remote Debugger
 [![](https://jitpack.io/v/zerobranch/android-remote-debugger.svg)](https://jitpack.io/#zerobranch/android-remote-debugger) 
-[![API](https://img.shields.io/badge/API-19%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=19) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/zerobranch/android-remote-debugger/blob/master/LICENSE)
+[![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/zerobranch/android-remote-debugger/blob/master/LICENSE)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Remote%20Debugger-green.svg?style=flat)](https://android-arsenal.com/details/1/8040)
 
 **Android Remote Debugger** - это библиотека для удаленной отладки Android приложений. Она позволяет просматривать логи, базы данных, shared preferences и сетевые запросы прямо в браузере.
@@ -47,8 +48,8 @@ allprojects {
 Добавьте в build.gradle вашего модуля следующую зависимость:
 ```groovy
 dependencies {
-    debugImplementation 'com.github.zerobranch.android-remote-debugger:debugger:1.1.0'
-    releaseImplementation 'com.github.zerobranch.android-remote-debugger:noop:1.1.0'
+    debugImplementation 'com.github.zerobranch.android-remote-debugger:debugger:1.1.2'
+    releaseImplementation 'com.github.zerobranch.android-remote-debugger:noop:1.1.2'
 }
 ```
 **Примечание:** В последней строке выше будет использоваться no-op версия, которая ничего не делает. Её следует использовать только в релизных сборках. Это делает невозможным запуск сервера в релизной сборке.
