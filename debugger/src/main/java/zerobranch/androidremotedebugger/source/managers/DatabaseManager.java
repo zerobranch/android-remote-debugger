@@ -21,9 +21,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import zerobranch.androidremotedebugger.source.models.Table;
-import zerobranch.androidremotedebugger.utils.FileUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import zerobranch.androidremotedebugger.source.models.Table;
+import zerobranch.androidremotedebugger.utils.FileUtils;
 
 public final class DatabaseManager {
     private static final String FIELD_TYPE_NULL = "null";
@@ -66,7 +66,7 @@ public final class DatabaseManager {
         synchronized (LOCK) {
             if (instance == null) {
                 throw new IllegalStateException("The database is not open. " +
-                        "Please, use '" + DatabaseManager.class.getName() + ".connect(Context, String)'");
+                    "Please, use '" + DatabaseManager.class.getName() + ".connect(Context, String)'");
             }
             return instance;
         }
@@ -162,7 +162,7 @@ public final class DatabaseManager {
 
             final int offset = (page - 1) * limit;
             final Cursor cursor = db.rawQuery("SELECT * FROM " + tableName +
-                    " LIMIT " + limit + " OFFSET " + offset, null);
+                " LIMIT " + limit + " OFFSET " + offset, null);
 
             while (cursor.moveToNext()) {
                 final List<String> row = new ArrayList<>();
@@ -179,27 +179,24 @@ public final class DatabaseManager {
 
     public void removeItems(final String tableName, final List<String> headers, final List<List<String>> lines) {
         synchronized (LOCK) {
-            transactionRun(new Runnable() {
-                @Override
-                public void run() {
-                    StringBuilder whereClause = new StringBuilder();
-                    for (int i = 0; i < lines.size(); i++) {
-                        List<String> arguments = new ArrayList<>();
+            transactionRun(() -> {
+                StringBuilder whereClause = new StringBuilder();
+                for (int i = 0; i < lines.size(); i++) {
+                    List<String> arguments = new ArrayList<>();
 
-                        for (int j = 0; j < lines.get(i).size(); j++) {
-                            String item = lines.get(i).get(j);
+                    for (int j = 0; j < lines.get(i).size(); j++) {
+                        String item = lines.get(i).get(j);
 
-                            if (!TextUtils.isEmpty(item)) {
-                                whereClause.append(headers.get(j)).append("=?").append(" and ");
-                                arguments.add(item);
-                            }
+                        if (!TextUtils.isEmpty(item)) {
+                            whereClause.append(headers.get(j)).append("=?").append(" and ");
+                            arguments.add(item);
                         }
-
-                        whereClause.delete(whereClause.length() - 4, whereClause.length());
-
-                        db.delete(tableName, whereClause.toString(), arguments.toArray(new String[0]));
-                        whereClause.setLength(0);
                     }
+
+                    whereClause.delete(whereClause.length() - 4, whereClause.length());
+
+                    db.delete(tableName, whereClause.toString(), arguments.toArray(new String[0]));
+                    whereClause.setLength(0);
                 }
             });
         }
@@ -229,7 +226,7 @@ public final class DatabaseManager {
         synchronized (LOCK) {
             if (headers.size() != oldValues.size() || headers.size() != newValues.size()) {
                 throw new IllegalArgumentException("the size of the array 'oldValues' " +
-                        "and 'newValues' must match the size of the array 'headers'");
+                    "and 'newValues' must match the size of the array 'headers'");
             }
 
             final StringBuilder whereClause = new StringBuilder();
@@ -274,8 +271,8 @@ public final class DatabaseManager {
 
             for (Table.Header header : table.headers) {
                 queryBuilder.append(header.name)
-                        .append(" LIKE ?")
-                        .append(" or ");
+                    .append(" LIKE ?")
+                    .append(" or ");
                 arguments.add("%".concat(text).concat("%"));
             }
 
@@ -299,7 +296,7 @@ public final class DatabaseManager {
 
     private String getTableMetaInfo(String tableName) {
         final Cursor metaCursor = db.rawQuery("SELECT sql FROM sqlite_master " +
-                "where name = '" + tableName + "'", null);
+            "where name = '" + tableName + "'", null);
 
         metaCursor.moveToFirst();
         String metaSql = metaCursor.getString(metaCursor.getColumnIndex("sql"));
@@ -369,13 +366,13 @@ public final class DatabaseManager {
 
         String columnsText = sql.substring(start + 1, end);
         columnsText = columnsText
-                .trim()
-                .replaceAll("\"", "")
-                .replaceAll("`", "")
-                .replaceAll("'", "")
-                .replaceAll("\n", " ")
-                .replaceAll("\r", " ")
-                .replaceAll("\t", " ");
+            .trim()
+            .replaceAll("\"", "")
+            .replaceAll("`", "")
+            .replaceAll("'", "")
+            .replaceAll("\n", " ")
+            .replaceAll("\r", " ")
+            .replaceAll("\t", " ");
 
         List<String> primaryKeys = findPrimaryKey(columnsText);
 

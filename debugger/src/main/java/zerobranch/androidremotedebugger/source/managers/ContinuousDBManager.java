@@ -44,19 +44,16 @@ public final class ContinuousDBManager {
         loggingHandlerThread.start();
         loggingHandler = new Handler(loggingHandlerThread.getLooper());
 
-        loggingHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
-                database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
-                database.setVersion(Integer.MAX_VALUE);
+        loggingHandler.post(() -> {
+            SQLiteDatabase.deleteDatabase(context.getDatabasePath(DATABASE_NAME));
+            database = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null);
+            database.setVersion(Integer.MAX_VALUE);
 
-                httpLogRepository = new HttpLogRepository(database);
-                httpLogRepository.createHttpLogsTable(database);
+            httpLogRepository = new HttpLogRepository(database);
+            httpLogRepository.createHttpLogsTable(database);
 
-                logRepository = new LogRepository(database);
-                logRepository.createLogsTable(database);
-            }
+            logRepository = new LogRepository(database);
+            logRepository.createLogsTable(database);
         });
     }
 
@@ -96,23 +93,13 @@ public final class ContinuousDBManager {
 
     public void clearAllHttpLogs() {
         synchronized (LOCK) {
-            loggingHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    httpLogRepository.clearAll();
-                }
-            });
+            loggingHandler.post(() -> httpLogRepository.clearAll());
         }
     }
 
     public void addLog(final LogModel model) {
         synchronized (LOCK) {
-            loggingHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logRepository.addLog(model);
-                }
-            });
+            loggingHandler.post(() -> logRepository.addLog(model));
         }
     }
 
@@ -124,12 +111,7 @@ public final class ContinuousDBManager {
 
     public void clearAllLogs() {
         synchronized (LOCK) {
-            loggingHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    logRepository.clearAllLogs();
-                }
-            });
+            loggingHandler.post(() -> logRepository.clearAllLogs());
         }
     }
 

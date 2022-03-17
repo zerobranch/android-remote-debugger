@@ -114,21 +114,24 @@ class AppNotification {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(description))
                 .setAutoCancel(true);
 
+        int pendingIntentFlag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0;
+
         if (isError) {
             Intent repeatConnectionIntent = new Intent(context, NotificationReceiver.class);
             repeatConnectionIntent.setAction(NotificationReceiver.ACTION_REPEAT_CONNECTION);
-            PendingIntent repeatConnectionPendingIntent = PendingIntent.getBroadcast(context, 0, repeatConnectionIntent, 0);
+            PendingIntent repeatConnectionPendingIntent = PendingIntent.getBroadcast(context, 0, repeatConnectionIntent, pendingIntentFlag);
 
             Intent changePortIntent = new Intent(context, NotificationReceiver.class);
             changePortIntent.setAction(NotificationReceiver.ACTION_CHANGE_PORT);
-            PendingIntent changePortPendingIntent = PendingIntent.getBroadcast(context, 0, changePortIntent, 0);
+            PendingIntent changePortPendingIntent = PendingIntent.getBroadcast(context, 0, changePortIntent, pendingIntentFlag);
 
             builder.addAction(0, "Repeat", repeatConnectionPendingIntent);
             builder.addAction(0, "Change port", changePortPendingIntent);
         } else {
             Intent disconnectIntent = new Intent(context, NotificationReceiver.class);
             disconnectIntent.setAction(NotificationReceiver.ACTION_DISCONNECT);
-            PendingIntent disconnectPendingIntent = PendingIntent.getBroadcast(context, 0, disconnectIntent, 0);
+
+            PendingIntent disconnectPendingIntent = PendingIntent.getBroadcast(context, 0, disconnectIntent, pendingIntentFlag);
             builder.addAction(0, "Disconnect", disconnectPendingIntent);
         }
 
