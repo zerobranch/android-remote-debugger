@@ -22,8 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import zerobranch.androidremotedebugger.settings.InternalSettings;
-import zerobranch.androidremotedebugger.utils.InternalUtils;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
+import zerobranch.androidremotedebugger.settings.InternalSettings;
+import zerobranch.androidremotedebugger.utils.InternalUtils;
 
 public abstract class Controller {
     protected static final String EMPTY = "";
@@ -105,11 +105,11 @@ public abstract class Controller {
 
     protected void throwEmptyParameterException(String parameter) throws NanoHTTPD.ResponseException {
         throw new NanoHTTPD.ResponseException(NanoHTTPD.Response.Status.BAD_REQUEST,
-                "'" + parameter + "' parameter not found");
+            "'" + parameter + "' parameter not found");
     }
 
     protected String prettyJson(String item) throws JsonSyntaxException {
-        return prettyPrintJson.toJson(new JsonParser().parse(item));
+        return prettyPrintJson.toJson(JsonParser.parseString(item));
     }
 
     protected String fromBase64(String value) {

@@ -18,6 +18,17 @@ package zerobranch.androidremotedebugger.api.sharedprefs;
 import android.content.Context;
 
 import com.google.gson.reflect.TypeToken;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import fi.iki.elonen.NanoHTTPD.ResponseException;
 import zerobranch.androidremotedebugger.api.base.Controller;
 import zerobranch.androidremotedebugger.api.base.HtmlParams;
 import zerobranch.androidremotedebugger.http.Host;
@@ -25,18 +36,6 @@ import zerobranch.androidremotedebugger.settings.InternalSettings;
 import zerobranch.androidremotedebugger.source.managers.SharedPrefsManager;
 import zerobranch.androidremotedebugger.source.models.SharedPrefsData;
 import zerobranch.androidremotedebugger.utils.FileUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import fi.iki.elonen.NanoHTTPD.ResponseException;
 
 public class SharedPrefsController extends Controller {
     private final static String TYPE_INTEGER = "Integer";
@@ -106,9 +105,9 @@ public class SharedPrefsController extends Controller {
             manager.put(prefsData.key, prefsData.value);
         } else if (prefsData.type.equalsIgnoreCase(TYPE_SET_STRING)) {
             final String[] splitData = prefsData.value
-                    .replaceAll("\\[", "")
-                    .replaceAll("]", "")
-                    .split(",");
+                .replaceAll("\\[", "")
+                .replaceAll("]", "")
+                .split(",");
             manager.put(prefsData.key, new HashSet<>(Arrays.asList(splitData)));
         }
 
@@ -127,12 +126,7 @@ public class SharedPrefsController extends Controller {
 
     private String getAllSharedPreferencesNames() {
         List<String> sharedPreferences = SharedPrefsManager.getSharedPreferences(context);
-        Collections.sort(sharedPreferences, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareToIgnoreCase(o2);
-            }
-        });
+        Collections.sort(sharedPreferences, String::compareToIgnoreCase);
         return serialize(sharedPreferences);
     }
 
