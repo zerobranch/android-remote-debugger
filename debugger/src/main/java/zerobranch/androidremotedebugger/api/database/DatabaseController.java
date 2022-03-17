@@ -17,6 +17,12 @@ package zerobranch.androidremotedebugger.api.database;
 
 import android.content.Context;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import fi.iki.elonen.NanoHTTPD;
+import fi.iki.elonen.NanoHTTPD.ResponseException;
 import zerobranch.androidremotedebugger.api.base.Controller;
 import zerobranch.androidremotedebugger.api.base.HtmlParams;
 import zerobranch.androidremotedebugger.http.Host;
@@ -27,14 +33,6 @@ import zerobranch.androidremotedebugger.source.models.Table;
 import zerobranch.androidremotedebugger.source.models.Tables;
 import zerobranch.androidremotedebugger.source.models.UpdatingDatabase;
 import zerobranch.androidremotedebugger.utils.FileUtils;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
-import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.NanoHTTPD.ResponseException;
 
 public class DatabaseController extends Controller {
     private static final int FIRST_PAGE = 1;
@@ -101,12 +99,7 @@ public class DatabaseController extends Controller {
         DatabaseManager.connect(context, dbName);
 
         List<String> tables = getDBAccess().getTables();
-        Collections.sort(tables, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareToIgnoreCase(o2);
-            }
-        });
+        Collections.sort(tables, String::compareToIgnoreCase);
 
         return serialize(new Tables(tables, getDBAccess().getDatabaseVersion()));
     }
@@ -122,8 +115,8 @@ public class DatabaseController extends Controller {
 
         final String tableName = getStringValue(params, HtmlParams.NAME);
         final UpdatingDatabase fields = deserialize(
-                getStringValue(params, HtmlParams.DATA),
-                UpdatingDatabase.class
+            getStringValue(params, HtmlParams.DATA),
+            UpdatingDatabase.class
         );
 
         for (int i = 0; i < fields.newValues.size(); i++) {
@@ -146,8 +139,8 @@ public class DatabaseController extends Controller {
 
         final String tableName = getStringValue(params, HtmlParams.NAME);
         final DeletingDatabase deletingDatabase = deserialize(
-                getStringValue(params, HtmlParams.DATA),
-                DeletingDatabase.class
+            getStringValue(params, HtmlParams.DATA),
+            DeletingDatabase.class
         );
 
         for (int i = 0; i < deletingDatabase.fields.size(); i++) {
@@ -182,12 +175,7 @@ public class DatabaseController extends Controller {
 
     private String getDatabases() {
         List<String> databases = DatabaseManager.getDBNameList(context);
-        Collections.sort(databases, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareToIgnoreCase(o2);
-            }
-        });
+        Collections.sort(databases, String::compareToIgnoreCase);
         return serialize(databases);
     }
 
