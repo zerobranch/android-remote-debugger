@@ -702,6 +702,17 @@
                 bodyP.appendChild(bodySpan);
                 setLogItemClassName(logLine, bodySpan);
 
+                bodySpan.classList.add("detail-log-item");
+                bodySpan.title = "Copy";
+                bodySpan.onclick = function () {
+                    let bodyPreStr = bodyP.nextElementSibling.innerHTML;
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(bodyPreStr);
+                    } else {
+                        alert("Your browser doesn't support");
+                    }
+                };
+
                 let bodyPre = document.createElement("pre");
                 bodyPre.innerHTML = setBodyLinkable(getSimpleText(logLine.body));
                 bodyPre.className = "default-item-space query-body";
