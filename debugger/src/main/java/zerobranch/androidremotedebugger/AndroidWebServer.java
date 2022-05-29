@@ -18,6 +18,10 @@ package zerobranch.androidremotedebugger;
 import android.content.Context;
 import android.content.res.AssetManager;
 
+import java.util.List;
+import java.util.Map;
+
+import fi.iki.elonen.NanoHTTPD;
 import zerobranch.androidremotedebugger.api.base.Controller;
 import zerobranch.androidremotedebugger.api.database.DatabaseController;
 import zerobranch.androidremotedebugger.api.home.HomeController;
@@ -30,11 +34,6 @@ import zerobranch.androidremotedebugger.settings.InternalSettings;
 import zerobranch.androidremotedebugger.utils.FileUtils;
 import zerobranch.androidremotedebugger.utils.InternalUtils;
 
-import java.util.List;
-import java.util.Map;
-
-import fi.iki.elonen.NanoHTTPD;
-
 final class AndroidWebServer extends NanoHTTPD {
     private final Context context;
     private final AssetManager assetManager;
@@ -46,7 +45,7 @@ final class AndroidWebServer extends NanoHTTPD {
     private Controller networkController;
 
     AndroidWebServer(Context context, String hostname, int port, InternalSettings internalSettings) {
-        super(hostname, port);
+        super("0.0.0.0", port);
         this.context = context;
         this.internalSettings = internalSettings;
         assetManager = context.getAssets();
