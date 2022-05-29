@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.library'
+    id 'maven-publish'
 }
 
 android {
@@ -29,4 +30,17 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation 'androidx.core:core:1.7.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.chenyue404'
+                artifactId = 'androidremotedebugger'
+                version = '1.0.0'
+            }
+        }
+    }
 }
