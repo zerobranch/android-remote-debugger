@@ -48,7 +48,7 @@ allprojects {
 Add the following dependency to your module's build.gradle:
 ```groovy
 dependencies {
-    debugImplementation 'com.github.chenyue404:android-remote-debugger:1.0.2'
+    debugImplementation 'com.github.chenyue404:android-remote-debugger:1.0.3'
     releaseImplementation 'com.github.zerobranch.android-remote-debugger:noop:1.1.2'
 }
 ```
