@@ -1,5 +1,5 @@
 # Android Remote Debugger
-[![](https://jitpack.io/v/zerobranch/android-remote-debugger.svg)](https://jitpack.io/#zerobranch/android-remote-debugger) 
+[![](https://jitpack.io/v/chenyue404/ThemeImageView.svg)](https://jitpack.io/#chenyue404/ThemeImageView)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/zerobranch/android-remote-debugger/blob/master/LICENSE)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Android%20Remote%20Debugger-green.svg?style=flat)](https://android-arsenal.com/details/1/8040)
@@ -48,7 +48,7 @@ allprojects {
 Add the following dependency to your module's build.gradle:
 ```groovy
 dependencies {
-    debugImplementation 'com.github.zerobranch.android-remote-debugger:debugger:1.1.2'
+    debugImplementation 'com.github.chenyue404:android-remote-debugger:1.0.2'
     releaseImplementation 'com.github.zerobranch.android-remote-debugger:noop:1.1.2'
 }
 ```
